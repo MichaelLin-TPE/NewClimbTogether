@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".login_activity.LoginActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/login_toolbar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:title="@string/login_page"
+        app:navigationIcon="@drawable/back"
+        android:background="@drawable/toolbar_shape"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:id="@+id/login_logo"
+        android:layout_marginTop="5dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/hiking_logo"
+        app:layout_constraintTop_toBottomOf="@id/login_toolbar"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="@dimen/mountain_item_photo_height"
+        android:layout_height="@dimen/mountain_item_photo_height"/>
+
+    <TextView
+        android:id="@+id/login_text_notice"
+        android:layout_marginTop="10dp"
+        android:text="@string/login_to_user_all_function"
+        app:layout_constraintTop_toBottomOf="@id/login_logo"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textSize="@dimen/normal_text_size"
+        android:textColor="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/login_text_phone"
+        android:textSize="@dimen/normal_text_size"
+        android:textColor="@color/black"
+        android:text="@string/email"
+        app:layout_constraintTop_toBottomOf="@id/login_text_notice"
+        android:layout_marginTop="40dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/login_edit_email"
+        app:layout_constraintLeft_toRightOf="@id/login_text_phone"
+        app:layout_constraintTop_toTopOf="@id/login_text_phone"
+        app:layout_constraintBottom_toBottomOf="@id/login_text_phone"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="10dp"
+        android:lines="1"
+        android:hint="@string/edit_email_style"
+        android:layout_marginEnd="15dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"/>
+
+
+    <TextView
+        android:id="@+id/login_text_password"
+        android:textSize="@dimen/normal_text_size"
+        android:textColor="@color/black"
+        android:text="@string/password"
+        app:layout_constraintTop_toBottomOf="@id/login_text_phone"
+        android:layout_marginTop="40dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/login_edit_password"
+        app:layout_constraintLeft_toLeftOf="@id/login_edit_email"
+        app:layout_constraintTop_toTopOf="@id/login_text_password"
+        app:layout_constraintBottom_toBottomOf="@id/login_text_password"
+        app:layout_constraintRight_toRightOf="parent"
+        android:lines="1"
+        android:hint="@string/input_password"
+        android:inputType="textPassword"
+        android:layout_marginEnd="15dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/login_btn"
+        android:text="@string/login"
+        app:layout_constraintTop_toBottomOf="@id/login_text_password"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@drawable/btn_selector"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/login_register"
+        android:text="@string/register"
+        app:layout_constraintTop_toBottomOf="@id/login_btn"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@drawable/btn_selector"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/login_other_login"
+        android:text="@string/other_way_to_login"
+        android:textSize="@dimen/normal_text_size"
+        app:layout_constraintTop_toBottomOf="@id/login_register"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ProgressBar
+        android:id="@+id/login_progressbar"
+        app:layout_constraintTop_toBottomOf="@id/login_other_login"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        android:elevation="0.1dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/login_google_login"
+        app:layout_constraintTop_toBottomOf="@id/login_other_login"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

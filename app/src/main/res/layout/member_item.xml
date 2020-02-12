@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/member_item_click_area"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:id="@+id/member_item_icon"
+        android:scaleType="centerCrop"
+        android:layout_width="@dimen/member_item_icon_size"
+        android:layout_height="@dimen/member_item_icon_size"/>
+
+    <TextView
+        android:id="@+id/member_item_text_title"
+        android:textColor="@color/colorPrimaryDark"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="10dp"
+        app:layout_constraintLeft_toRightOf="@id/member_item_icon"
+        app:layout_constraintRight_toLeftOf="@id/member_item_next"
+        tools:text="XXXXXXX"
+        android:textSize="@dimen/member_item_text_title_size"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/member_item_next"
+        android:src="@drawable/next"
+        android:scaleType="centerCrop"
+        android:layout_width="@dimen/member_item_icon_size"
+        android:layout_height="@dimen/member_item_icon_size"/>
+
+    <View
+        app:layout_constraintTop_toBottomOf="@id/member_item_icon"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorPrimaryDark"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
