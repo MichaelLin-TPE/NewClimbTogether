@@ -80,7 +80,9 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     private String topTime;
 
-    private ArrayList<String> firestoreData,timeArray;
+    private ArrayList<Long> timeArray;
+
+    private ArrayList<String> firestoreData;
 
     private ProgressBar progressBar;
 
@@ -106,18 +108,44 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         Log.i("Michael","Mt onCreate");
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
+        adapter = new MountainRecyclerViewAdapter(context);
         initPresenter();
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.i("Michael","Mt onStart");
+        user = mAuth.getCurrentUser();
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i("Michael","Mt onPause");
+        adapter.setData(new ArrayList<DataDTO>());
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.i("Michael","Mt onStop");
     }
 
     @Override
     public void onResume() {
         super.onResume();
         Log.i("Michael","Mt onResume");
+        user = mAuth.getCurrentUser();
         if (user != null){
+            Log.i("Michael","onResume 有用戶");
             String email = user.getEmail();
             presenter.onSearchDbData(email);
         }else {
+            Log.i("Michael","onResume 沒用戶");
             presenter.initDbData();
         }
     }
@@ -148,7 +176,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
                                     Log.i("Michael",document.getId() + " =>" + document.getData());
                                     Map<String,Object> map = document.getData();
                                     Log.i("Michael","time : "+map.get("topTime"));
-                                    timeArray.add((String) map.get("topTime"));
+                                    timeArray.add((Long) map.get("topTime"));
                                     firestoreData.add(document.getId());
                                 }
                                 if (firestoreData.size() != 0 && timeArray.size() != 0){
@@ -194,7 +222,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
-
+                presenter.onSpinnerSelectListener(position);
             }
 
             @Override
@@ -202,6 +230,12 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
             }
         });
+    }
+
+    @Override
+    public void changeRecyclerViewSor(ArrayList<DataDTO> allInformation) {
+        adapter.setData(allInformation);
+        adapter.notifyDataSetChanged();
     }
 
     private void initPresenter() {
@@ -222,8 +256,8 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.i("Michael","Mt onActivityCreated");
-        presenter.onPrepareSpinnerData();
         initDbData();
+
     }
 
     private void initView(View view) {
@@ -324,13 +358,13 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     @Override
     public void setRecyclerView(ArrayList<DataDTO> allInformation) {
-        adapter = new MountainRecyclerViewAdapter(context);
+
         adapter.setData(allInformation);
         recyclerView.setAdapter(adapter);
         adapter.setOnMountainItemClickListener(new MountainRecyclerViewAdapter.OnMountainItemClickListener() {
             @Override
             public void onClick(DataDTO data) {
-
+                presenter.onMountainItemClick(data);
             }
 
             @Override
@@ -345,6 +379,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
             }
         });
+        presenter.onPrepareSpinnerData();
 
     }
 
@@ -410,7 +445,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     }
 
     @Override
-    public void setFirestore(final int sid, String topTime, DataDTO data) {
+    public void setFirestore(final int sid, long topTime, DataDTO data) {
         user = mAuth.getCurrentUser();
         if (user != null) {
             String email = user.getEmail();

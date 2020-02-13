@@ -21,7 +21,7 @@ public interface MountainFragmentVu {
 
     void showDatePick(int sid);
 
-    void setFirestore(int sid, String topTime,DataDTO data);
+    void setFirestore(int sid, long topTime,DataDTO data);
 
     void intentToLoginActivity();
 
@@ -34,4 +34,6 @@ public interface MountainFragmentVu {
     void showProgressbar(boolean isShow);
 
     void setSpinner(ArrayList<String> spinnerData);
+
+    void changeRecyclerViewSor(ArrayList<DataDTO> allInformation);
 }

@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/climb_together_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".login_activity.LoginActivity"></activity>
+        <activity android:name=".mountain_collection_activity.MountainCollectionActivity"></activity>
+        <activity android:name=".login_activity.LoginActivity" />
         <activity android:name=".member_activity.MemberActivity" />
         <activity android:name=".home_page.HomePageActivity" />
         <activity android:name=".MainActivity">

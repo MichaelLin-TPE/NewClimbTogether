@@ -8,6 +8,10 @@ public interface DataBaseApi {
 
     ArrayList<DataDTO> getLevelAInformation(String level);
 
+    ArrayList<DataDTO> getInformationOrderByTimeNotFar();
+
+    ArrayList<DataDTO> getInformationOrderByTimFar();
+
     void update(DataDTO data);
 
     DataDTO getDataBySid(int sid);

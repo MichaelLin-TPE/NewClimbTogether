@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.example.climbtogether.R;
 import com.example.climbtogether.login_activity.LoginActivity;
+import com.example.climbtogether.mountain_collection_activity.MountainCollectionActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -164,6 +165,12 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     public void intentToBrowser(String url) {
         Intent it = new Intent(Intent.ACTION_VIEW);
         it.setData(Uri.parse(url));
+        startActivity(it);
+    }
+
+    @Override
+    public void intentToMtCollectionActivity() {
+        Intent it = new Intent(this, MountainCollectionActivity.class);
         startActivity(it);
     }
 

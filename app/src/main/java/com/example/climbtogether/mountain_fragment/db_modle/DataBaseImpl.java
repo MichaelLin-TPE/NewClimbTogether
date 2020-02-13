@@ -102,6 +102,40 @@ public class DataBaseImpl implements DataBaseApi {
     }
 
     @Override
+    public ArrayList<DataDTO> getInformationOrderByTimeNotFar() {
+        ArrayList<DataDTO> data = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatatbase();
+        Cursor cursor = db.rawQuery("SELECT * FROM mountain_table ORDER BY ",null);
+        if (cursor.moveToFirst()){
+            do{
+                DataDTO dataDTO = new DataDTO();
+                dataDTO.fromCursor(cursor);
+                data.add(dataDTO);
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return data;
+    }
+
+    @Override
+    public ArrayList<DataDTO> getInformationOrderByTimFar() {
+        ArrayList<DataDTO> data = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatatbase();
+        Cursor cursor = db.rawQuery("SELECT * FROM mountain_table",null);
+        if (cursor.moveToFirst()){
+            do{
+                DataDTO dataDTO = new DataDTO();
+                dataDTO.fromCursor(cursor);
+                data.add(dataDTO);
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return data;
+    }
+
+    @Override
     public void update(DataDTO data) {
         SQLiteDatabase db = getWriteableDatabase();
         try{

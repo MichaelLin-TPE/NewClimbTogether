@@ -59,6 +59,7 @@ public class MemberActivityPresenterImpl implements MemberActivityPresenter {
         String url;
         switch (itemPosition) {
             case TOP_PEAK:
+                mView.intentToMtCollectionActivity();
                 break;
             case SEARCH_BED:
                 url = "https://npm.cpami.gov.tw/bed_menu.aspx";

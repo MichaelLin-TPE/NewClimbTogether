@@ -9,6 +9,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,9 @@ import com.example.climbtogether.R;
 import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
 import com.makeramen.roundedimageview.RoundedImageView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 public class MountainRecyclerViewAdapter extends RecyclerView.Adapter<MountainRecyclerViewAdapter.ViewHolder> {
@@ -86,13 +89,20 @@ public class MountainRecyclerViewAdapter extends RecyclerView.Adapter<MountainRe
             }
         });
 
-        holder.tvTime.setText(data.getTime() == null ? "" : data.getTime());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd",Locale.TAIWAN);
+        String time;
+        if (data.getTime() != 0){
+            time = sdf.format(new Date(data.getTime()));
+        }else {
+            time = "";
+        }
+        holder.tvTime.setText(time);
 
     }
 
     @Override
     public int getItemCount() {
-        return dataArrayList != null ? dataArrayList.size() : 0;
+        return dataArrayList == null ? 0 : dataArrayList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{

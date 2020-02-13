@@ -22,7 +22,7 @@ public class DataDTO {
 
     private String check;
 
-    private String time;
+    private long time;
 
     public int getSid() {
         return sid;
@@ -96,11 +96,11 @@ public class DataDTO {
         this.check = check;
     }
 
-    public String getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(long time) {
         this.time = time;
     }
 
@@ -114,7 +114,7 @@ public class DataDTO {
         location = cursor.getString(cursor.getColumnIndex("location"));
         difficulty = cursor.getString(cursor.getColumnIndex("difficulty"));
         check = cursor.getString(cursor.getColumnIndex("check_top"));
-        time = cursor.getString(cursor.getColumnIndex("time"));
+        time = cursor.getLong(cursor.getColumnIndex("time"));
 
     }
 

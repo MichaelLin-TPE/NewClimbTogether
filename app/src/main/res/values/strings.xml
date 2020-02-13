@@ -47,7 +47,14 @@
     <string name="input_display_name">輸入暱稱</string>
     <string name="processing">處理中....</string>
     <string name="google_login_fail">Google 登入失敗 : </string>
-    <string name="order_by_time">排序順序</string>
+    <string name="no_sort">默認排序</string>
+    <string name="order_by_time">日期由近到遠</string>
+    <string name="order_by_time_not_far">日期由遠到近</string>
+    <string name="login_notice">此功能僅限會員使用\n立即「免費註冊」或登入即可增加戰績</string>
+    <string name="choose_sort_mode">選擇排版樣式 : </string>
+    <string name="port_view">直版面</string>
+    <string name="land_view">橫版面</string>
+    <string name="on_favorite_data">沒有任何的百岳紀錄唷,快去爬...</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

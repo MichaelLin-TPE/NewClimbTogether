@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/port_view_click_area"
+    android:padding="10dp"
+    android:background="@drawable/circle_shapte"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/port_view_photo"
+        android:src="@drawable/empty_photo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:contentDescription="@null"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="@dimen/port_view_photo_width"
+        android:layout_height="@dimen/port_view_photo_height"/>
+
+    <TextView
+        android:id="@+id/port_view_text_title"
+        tools:text="XXX"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/normal_text_size"
+        app:layout_constraintTop_toBottomOf="@id/port_view_photo"
+        app:layout_constraintLeft_toLeftOf="@id/port_view_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/port_view_text_height"
+        android:textSize="@dimen/small_text_size"
+        tools:text="XXX"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toBottomOf="@id/port_view_text_title"
+        app:layout_constraintLeft_toLeftOf="@id/port_view_text_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/port_view_text_time"
+        android:textSize="@dimen/small_text_size"
+        tools:text="XXX"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toBottomOf="@id/port_view_text_height"
+        app:layout_constraintLeft_toLeftOf="@id/port_view_text_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

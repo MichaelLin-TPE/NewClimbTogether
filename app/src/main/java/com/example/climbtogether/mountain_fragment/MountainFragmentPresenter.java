@@ -21,9 +21,13 @@ public interface MountainFragmentPresenter {
 
     void onSearchDbData(String email);
 
-    void onModifyDataFromFirestore(ArrayList<String> firestoreData,ArrayList<String> timeArray, ArrayList<DataDTO> allInformation);
+    void onModifyDataFromFirestore(ArrayList<String> firestoreData,ArrayList<Long> timeArray, ArrayList<DataDTO> allInformation);
 
     void initDbData();
 
     void onPrepareSpinnerData();
+
+    void onSpinnerSelectListener(int position);
+
+    void onMountainItemClick(DataDTO data);
 }

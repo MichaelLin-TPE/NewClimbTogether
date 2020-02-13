@@ -2,6 +2,7 @@ package com.example.climbtogether.home_fragment.anmiation_photo_view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -32,7 +33,7 @@ public class AnimationPhotoView extends ConstraintLayout {
     public AnimationPhotoView(Context context) {
         super(context);
         this.context = context;
-        initImagLoader();
+        initImageLoader();
         initView();
     }
 
@@ -41,9 +42,8 @@ public class AnimationPhotoView extends ConstraintLayout {
         ivPhoto = view.findViewById(R.id.animation_photo);
     }
 
-    private void initImagLoader() {
+    private void initImageLoader() {
         options = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.mipmap.ic_launcher)
                 .showImageOnFail(R.mipmap.ic_launcher)
                 .showImageForEmptyUri(R.mipmap.ic_launcher)
                 .cacheOnDisk(true)
@@ -56,11 +56,12 @@ public class AnimationPhotoView extends ConstraintLayout {
     }
 
     public void setPhotoData(ArrayList<String> photoUrlArray) {
-        //先給一張預設圖
-        imageLoader.displayImage(photoUrlArray.get(0),ivPhoto,options);
+//        //先給一張預設圖
+//        imageLoader.displayImage(photoUrlArray.get(0),ivPhoto,options);
 
+        Log.i("Michael","執行 setPhotoData");
 
-        fadeOutAndHideImage(ivPhoto,photoUrlArray);
+        fadeInAndShowImage(ivPhoto,photoUrlArray);
     }
 
     //圖片淡出

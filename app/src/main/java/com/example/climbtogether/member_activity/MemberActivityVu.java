@@ -18,4 +18,6 @@ public interface MemberActivityVu {
     void showConfirmSignOutDialog();
 
     void intentToBrowser(String url);
+
+    void intentToMtCollectionActivity();
 }
