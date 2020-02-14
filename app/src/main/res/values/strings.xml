@@ -55,6 +55,15 @@
     <string name="port_view">直版面</string>
     <string name="land_view">橫版面</string>
     <string name="on_favorite_data">沒有任何的百岳紀錄唷,快去爬...</string>
+    <string name="upload_photo">上傳照片</string>
+    <string name="watch_information">查看資料</string>
+    <string name="share_experience">分享心得</string>
+    <string name="modify_time">修正攻頂時間</string>
+    <string name="please_wait">上傳中... 請稍後</string>
+    <string name="remove_data">移除戰績</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="delete_success">刪除成功...</string>
+    <string name="delete_fail">刪除失敗...</string>
+    <string name="please_wait_progressing">處理中...請稍後</string>
 </resources>

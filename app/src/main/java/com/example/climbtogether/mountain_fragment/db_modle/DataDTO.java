@@ -22,7 +22,17 @@ public class DataDTO {
 
     private String check;
 
+    private String userPhoto;
+
     private long time;
+
+    public String getUserPhoto() {
+        return userPhoto;
+    }
+
+    public void setUserPhoto(String userPhoto) {
+        this.userPhoto = userPhoto;
+    }
 
     public int getSid() {
         return sid;
@@ -115,6 +125,7 @@ public class DataDTO {
         difficulty = cursor.getString(cursor.getColumnIndex("difficulty"));
         check = cursor.getString(cursor.getColumnIndex("check_top"));
         time = cursor.getLong(cursor.getColumnIndex("time"));
+        userPhoto = cursor.getString(cursor.getColumnIndex("user_photo"));
 
     }
 
@@ -122,6 +133,7 @@ public class DataDTO {
         ContentValues data = new ContentValues();
         data.put("check_top",this.check);
         data.put("time",time);
+        data.put("user_photo",userPhoto);
         return data;
     }
 }

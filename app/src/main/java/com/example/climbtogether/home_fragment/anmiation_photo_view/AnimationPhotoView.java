@@ -56,12 +56,10 @@ public class AnimationPhotoView extends ConstraintLayout {
     }
 
     public void setPhotoData(ArrayList<String> photoUrlArray) {
-//        //先給一張預設圖
-//        imageLoader.displayImage(photoUrlArray.get(0),ivPhoto,options);
 
         Log.i("Michael","執行 setPhotoData");
 
-        fadeInAndShowImage(ivPhoto,photoUrlArray);
+        fadeOutAndHideImage(ivPhoto,photoUrlArray);
     }
 
     //圖片淡出
@@ -69,7 +67,6 @@ public class AnimationPhotoView extends ConstraintLayout {
         final Animation fadeOut = new AlphaAnimation(1, 0);
         fadeOut.setInterpolator(new AccelerateInterpolator());
         fadeOut.setDuration(3000);
-
 
         fadeOut.setAnimationListener(new Animation.AnimationListener()
         {

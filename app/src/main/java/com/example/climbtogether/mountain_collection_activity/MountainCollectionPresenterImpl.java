@@ -1,5 +1,6 @@
 package com.example.climbtogether.mountain_collection_activity;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.example.climbtogether.R;
@@ -9,15 +10,27 @@ import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
 
 import java.util.ArrayList;
 
-import static com.example.climbtogether.mountain_collection_activity.view_presenter.MtPresenterImpl.LAND_VIEW;
-import static com.example.climbtogether.mountain_collection_activity.view_presenter.MtPresenterImpl.PORT_VIEW;
-
 public class MountainCollectionPresenterImpl implements MountainCollectionPresenter {
 
     private MountainCollectionVu mView;
 
+    public static final int UPLOAD = 0;
+
+    public static final int WATCH_INFORMATION = 1;
+
+    public static final int SHARE_EXPERIENCE = 2;
+
+    public static final int MODIFY_TIME = 3;
+
+    public static final int REMOVE_DATA = 4;
+    
+    private DataBaseApi db;
+
+    private int currentSid;
+
     public MountainCollectionPresenterImpl(MountainCollectionVu mView) {
         this.mView = mView;
+        db = new DataBaseImpl(mView.getVuContext());
     }
 
     @Override
@@ -55,15 +68,16 @@ public class MountainCollectionPresenterImpl implements MountainCollectionPresen
     }
 
     @Override
-    public void onSearchDataSuccessFromFirebase(ArrayList<String> mtNameArray, ArrayList<Long> timeArray) {
+    public void onSearchDataSuccessFromFirebase(ArrayList<String> mtNameArray, ArrayList<Long> timeArray,ArrayList<String> downloadUrlArray) {
 
         for (int i = 0; i < mtNameArray.size(); i++) {
-            for (DataDTO data : getDatabase().getAllInformation()) {
+            for (DataDTO data : db.getAllInformation()) {
                 if (data.getName().equals(mtNameArray.get(i))) {
-                    DataDTO dataDTO = getDatabase().getDataBySid(data.getSid());
+                    DataDTO dataDTO = db.getDataBySid(data.getSid());
                     dataDTO.setTime(timeArray.get(i));
                     dataDTO.setCheck("true");
-                    getDatabase().update(dataDTO);
+                    dataDTO.setUserPhoto(downloadUrlArray.get(i));
+                    db.update(dataDTO);
                     break;
                 }
             }
@@ -72,7 +86,7 @@ public class MountainCollectionPresenterImpl implements MountainCollectionPresen
         ArrayList<DataDTO> dataArrayList = new ArrayList<>();
 
         for (String mtNmae : mtNameArray) {
-            for (DataDTO data : getDatabase().getAllInformation()) {
+            for (DataDTO data : db.getAllInformation()) {
                 if (data.getName().equals(mtNmae)) {
                     dataArrayList.add(data);
                 }
@@ -96,10 +110,53 @@ public class MountainCollectionPresenterImpl implements MountainCollectionPresen
 
     @Override
     public void onSpinnerItemSelectedListener(int position) {
+        mView.saveViewType(position);
         mView.setViewType(position);
     }
 
-    private DataBaseApi getDatabase() {
-        return new DataBaseImpl(mView.getVuContext());
+    @Override
+    public void onItemClickListener(DataDTO dataDTO) {
+        mView.showItemAlertDialog(dataDTO);
     }
+
+    @Override
+    public void onItemDialogClickListener(int itemPosition,DataDTO dataDTO) {
+        currentSid = dataDTO.getSid();
+        switch (itemPosition) {
+            case UPLOAD:
+                mView.selectPhoto(dataDTO.getName());
+                break;
+            case WATCH_INFORMATION:
+                break;
+            case SHARE_EXPERIENCE:
+                break;
+            case MODIFY_TIME:
+                mView.showDatePickerDialog(dataDTO);
+                break;
+            case REMOVE_DATA:
+                DataDTO data = db.getDataBySid(dataDTO.getSid());
+                data.setCheck("false");
+                data.setUserPhoto("");
+                data.setTime(0);
+                db.update(data);
+                mView.removeData(dataDTO);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onShowProgressToast(String message) {
+        mView.showToast(message);
+    }
+
+    @Override
+    public void onDatePickerDialogClickListener(DataDTO dataDTO, long pickTime) {
+        DataDTO data = db.getDataBySid(dataDTO.getSid());
+        data.setTime(pickTime);
+        db.update(data);
+        mView.modifyFirestoreData(data,pickTime);
+    }
+
 }

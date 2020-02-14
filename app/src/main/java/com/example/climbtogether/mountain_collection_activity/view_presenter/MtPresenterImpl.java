@@ -2,6 +2,7 @@ package com.example.climbtogether.mountain_collection_activity.view_presenter;
 
 import com.example.climbtogether.mountain_collection_activity.view.LandView;
 import com.example.climbtogether.mountain_collection_activity.view.LandViewHolder;
+import com.example.climbtogether.mountain_collection_activity.view.PortView;
 import com.example.climbtogether.mountain_collection_activity.view.PortViewHolder;
 import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
 import com.nostra13.universalimageloader.utils.L;
@@ -89,5 +90,15 @@ public class MtPresenterImpl implements MtPresenter {
             holder.setData(dataArrayList.get(position),isColorChange);
             isColorChange = true;
         }
+    }
+
+    @Override
+    public void setOnPortViewClickListener(PortViewHolder holder,PortView.OnPortViewItemClickListener listener) {
+        holder.setOnPortViewItemClickListener(listener);
+    }
+
+    @Override
+    public void setOnLanViewClickListener(LandViewHolder holder, PortView.OnPortViewItemClickListener listener) {
+        holder.setOnLandViewItemClickListener(listener);
     }
 }

@@ -13,6 +13,12 @@ public class PortViewHolder extends RecyclerView.ViewHolder {
 
     private PortView portView;
 
+    private PortView.OnPortViewItemClickListener listener;
+
+    public void setOnPortViewItemClickListener(PortView.OnPortViewItemClickListener listener){
+        portView.setOnPortViewItemClickListener(listener);
+    }
+
     public PortViewHolder(@NonNull View itemView) {
         super(itemView);
 

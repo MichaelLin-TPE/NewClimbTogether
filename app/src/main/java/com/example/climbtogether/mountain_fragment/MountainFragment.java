@@ -455,6 +455,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
                 map.put("name", data.getName());
                 map.put("topTime", topTime);
                 map.put("sid", data.getSid());
+                map.put("photoUrl","");
                 firestore.collection(email).document(mountainName)
                         .set(map)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {

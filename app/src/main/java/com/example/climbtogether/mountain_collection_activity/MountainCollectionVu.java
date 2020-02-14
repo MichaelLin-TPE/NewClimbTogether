@@ -26,4 +26,18 @@ public interface MountainCollectionVu {
     void setSpinner(ArrayList<String> listArray);
 
     void setViewType(int position);
+
+    void showItemAlertDialog(DataDTO dataDTO);
+
+    void selectPhoto(String mtName);
+
+    void showToast(String message);
+
+    void saveViewType(int position);
+
+    void removeData(DataDTO dataDTO);
+
+    void showDatePickerDialog(DataDTO dataDTO);
+
+    void modifyFirestoreData(DataDTO data, long pickTime);
 }

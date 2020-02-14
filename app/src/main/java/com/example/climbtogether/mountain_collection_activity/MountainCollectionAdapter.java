@@ -23,6 +23,11 @@ public class MountainCollectionAdapter extends RecyclerView.Adapter {
 
     private MtPresenter mtPresenter;
     private Context context;
+    private PortView.OnPortViewItemClickListener listener;
+
+    public void setOnPortViewItemClickListener (PortView.OnPortViewItemClickListener listener){
+        this.listener = listener;
+    }
 
     public MountainCollectionAdapter(Context context, MtPresenter mtPresenter) {
         this.mtPresenter = mtPresenter;
@@ -38,7 +43,6 @@ public class MountainCollectionAdapter extends RecyclerView.Adapter {
                 return new PortViewHolder(portView);
             case LAND_VIEW:
                 LandView landView = new LandView(context);
-
                 return new LandViewHolder(landView);
         }
         return null;
@@ -48,9 +52,11 @@ public class MountainCollectionAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof PortViewHolder){
             mtPresenter.onBindPortViewHolder((PortViewHolder)holder,position);
+            mtPresenter.setOnPortViewClickListener((PortViewHolder)holder,listener);
         }
         if (holder instanceof LandViewHolder){
             mtPresenter.onBindLandViewHolder((LandViewHolder)holder,position);
+            mtPresenter.setOnLanViewClickListener((LandViewHolder)holder,listener);
         }
     }
 
@@ -63,4 +69,5 @@ public class MountainCollectionAdapter extends RecyclerView.Adapter {
     public int getItemViewType(int position) {
         return mtPresenter.getItemViewType(position);
     }
+
 }
