@@ -51,6 +51,7 @@
     <string name="order_by_time">日期由近到遠</string>
     <string name="order_by_time_not_far">日期由遠到近</string>
     <string name="login_notice">此功能僅限會員使用\n立即「免費註冊」或登入即可增加戰績</string>
+    <string name="login_notice_discuss">此功能僅限會員使用\n立即「免費註冊」或登入即可參加討論</string>
     <string name="choose_sort_mode">選擇排版樣式 : </string>
     <string name="port_view">直版面</string>
     <string name="land_view">橫版面</string>
@@ -66,4 +67,5 @@
     <string name="delete_success">刪除成功...</string>
     <string name="delete_fail">刪除失敗...</string>
     <string name="please_wait_progressing">處理中...請稍後</string>
+    <string name="send">送出</string>
 </resources>
