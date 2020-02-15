@@ -1,23 +1,30 @@
 package com.example.climbtogether.member_activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.climbtogether.R;
 import com.example.climbtogether.login_activity.LoginActivity;
@@ -26,10 +33,20 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.makeramen.roundedimageview.RoundedImageView;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -37,9 +54,9 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
     private RecyclerView recyclerView;
 
-    private TextView tvNotice,tvEmail;
+    private TextView tvNotice, tvEmail;
 
-    private ImageView ivUserIcon;
+    private RoundedImageView ivUserIcon;
 
     private Button btnLogin;
 
@@ -53,6 +70,14 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
     private GoogleSignInClient signInClient;
 
+    private StorageReference storage;
+
+    private static final int IMAGE_REQUEST_CODE = 99;
+
+    private DisplayImageOptions options;
+
+    private ImageLoader imageLoader = ImageLoader.getInstance();
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -63,13 +88,13 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        getMenuInflater().inflate(R.menu.member_menu,menu);
+        getMenuInflater().inflate(R.menu.member_menu, menu);
 
         signOut = menu.findItem(R.id.member_sign_out);
 
-        if (currentUser != null){
+        if (currentUser != null) {
             signOut.setVisible(true);
-        }else {
+        } else {
             signOut.setVisible(false);
         }
 
@@ -79,7 +104,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        if (item.getItemId() == R.id.member_sign_out){
+        if (item.getItemId() == R.id.member_sign_out) {
             presenter.onSignOutClickListener();
         }
 
@@ -87,21 +112,22 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     }
 
     private void updateUI(FirebaseUser currentUser) {
-        if (currentUser != null){
+        if (currentUser != null) {
             presenter.onChangeView(false);
-        }else {
+        } else {
             presenter.onChangeView(true);
         }
     }
+
     @Override
-    public void changeView(boolean isShow){
+    public void changeView(boolean isShow) {
         tvNotice.setVisibility(isShow ? View.VISIBLE : View.GONE);
         btnLogin.setVisibility(isShow ? View.VISIBLE : View.GONE);
         ivUserIcon.setVisibility(isShow ? View.GONE : View.VISIBLE);
         tvEmail.setVisibility(isShow ? View.GONE : View.VISIBLE);
-        tvEmail.setText(isShow ? "" : String.format(Locale.getDefault(),"目前登入 : %s",currentUser.getEmail()));
+        tvEmail.setText(isShow ? "" : String.format(Locale.getDefault(), "目前登入 : %s", currentUser.getEmail()));
 
-        if (signOut != null){
+        if (signOut != null) {
             signOut.setVisible(!isShow);
         }
     }
@@ -121,7 +147,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
     @Override
     public void signOut() {
-        if (mAuth != null){
+        if (mAuth != null) {
             GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken(getResources().getString(R.string.default_web_client_id))
                     .requestEmail()
@@ -139,7 +165,6 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
             });
 
 
-
         }
     }
 
@@ -150,7 +175,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
                 .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                       presenter.onConfirmSignOutClickListener();
+                        presenter.onConfirmSignOutClickListener();
                     }
                 }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
@@ -175,15 +200,136 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     }
 
     @Override
+    public void uploadUserPhoto() {
+
+        Intent it = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(it, IMAGE_REQUEST_CODE);
+
+    }
+
+    @Override
+    public void showToast(String message) {
+        Toast.makeText(this,message,Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void downloadUserPhoto() {
+        if (currentUser != null){
+            StorageReference river = storage.child(currentUser.getEmail()+"/userPhoto/"+currentUser.getEmail()+".jpg");
+            river.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    String url = uri.toString();
+                    ivUserIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    imageLoader.displayImage(url,ivUserIcon,options);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    //do nothing
+                    e.printStackTrace();
+                    Log.i("Michael","沒照片");
+                    Log.i("Michael",e.toString());
+                    ivUserIcon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    ivUserIcon.setImageResource(R.drawable.empty_photo);
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == IMAGE_REQUEST_CODE) {
+            Bitmap bitmap;
+            try {
+                Log.i("Michael", "壓縮照片");
+                if (data != null) {
+                    Uri uri = data.getData();
+                    ContentResolver or = this.getContentResolver();
+                    if (uri != null) {
+                        bitmap = BitmapFactory.decodeStream(or.openInputStream(uri));
+                        Log.i("Michael", "取得的照片 : " + bitmap);
+                        //壓縮照片
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        int quality = 10;
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos);
+                        byte[] bytes = baos.toByteArray();
+                        bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        Log.i("Michael", "壓縮後的圖片大小 : " + (bitmap.getByteCount() / 1024 / 1024) + " , 寬度 : " + bitmap.getWidth()
+                                + " , 高度為 : " + bitmap.getHeight() + " , bytes 長度 : "
+                                + (bytes.length / 1024) + " kb " + "quality = " + quality);
+                        //Uri 轉 Bitmap
+//                            uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(),bitmap,null,null));
+                        String message = getString(R.string.please_wait);
+
+                        presenter.onShowProgressToast(message);
+
+                        uploadPhotoToStorage(bytes);
+
+
+                    } else {
+                        Log.i("Michael", "photo uri = null");
+                    }
+                } else {
+                    Log.i("Michael", " data = null");
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("Michael", "壓縮照片錯誤");
+            }
+        }
+    }
+
+    private void uploadPhotoToStorage(final byte[] bytes) {
+        if (currentUser != null){
+            StorageReference river = storage.child(currentUser.getEmail()+"/userPhoto/"+currentUser.getEmail()+".jpg");
+            UploadTask task = river.putBytes(bytes);
+            task.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    String message = getString(R.string.upload_success);
+                    presenter.onShowProgressToast(message);
+                    ivUserIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+                    ivUserIcon.setImageBitmap(bitmap);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_member);
         //初始化Firebase Auth
         mAuth = FirebaseAuth.getInstance();
-
+        storage = FirebaseStorage.getInstance().getReference();
         initPresenter();
         initView();
+        initImageLoader();
         presenter.onShowRecycler();
+    }
+
+    private void initImageLoader() {
+        options = new DisplayImageOptions.Builder()
+                .showImageForEmptyUri(R.drawable.empty_photo)
+                .showImageOnFail(R.drawable.empty_photo)
+                .showImageOnLoading(R.drawable.empty_photo)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .bitmapConfig(Bitmap.Config.ALPHA_8)
+                .build();
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+                .defaultDisplayImageOptions(options).build();
+        imageLoader.init(config);
     }
 
     private void initView() {
@@ -212,6 +358,13 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         });
 
 
+        ivUserIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onUploadUserPhotoListener();
+            }
+        });
+
     }
 
     private void initPresenter() {
@@ -231,7 +384,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         iconArray.add(R.drawable.apply);
         iconArray.add(R.drawable.weather);
 
-        MemberRecyclerViewAdapter adapter = new MemberRecyclerViewAdapter(iconArray,btnList,this);
+        MemberRecyclerViewAdapter adapter = new MemberRecyclerViewAdapter(iconArray, btnList, this);
 
         recyclerView.setAdapter(adapter);
 

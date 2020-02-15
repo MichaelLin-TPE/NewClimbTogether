@@ -33,6 +33,7 @@ public class MemberActivityPresenterImpl implements MemberActivityPresenter {
 
     @Override
     public void onChangeView(boolean isShow) {
+        mView.downloadUserPhoto();
         mView.changeView(isShow);
     }
 
@@ -76,5 +77,15 @@ public class MemberActivityPresenterImpl implements MemberActivityPresenter {
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onUploadUserPhotoListener() {
+        mView.uploadUserPhoto();
+    }
+
+    @Override
+    public void onShowProgressToast(String message) {
+        mView.showToast(message);
     }
 }

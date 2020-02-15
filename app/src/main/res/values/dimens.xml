@@ -26,4 +26,10 @@
     <dimen name="land_view_photo_width">150dp</dimen>
     <dimen name="land_view_photo_height">100dp</dimen>
     <dimen name="chat_edit_height">50dp</dimen>
+    <dimen name="member_user_photo_width">140dp</dimen>
+    <dimen name="member_user_photo_height">100dp</dimen>
+
+    <dimen name="speech_bubble_corners">10dp</dimen>
+    <dimen name="speech_bubble_corners_plus_tail">15dp</dimen>
+    <dimen name="speech_bubble_spacing">5dp</dimen>
 </resources>

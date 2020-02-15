@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,6 +43,13 @@ public class DiscussFragmentAdapter extends RecyclerView.Adapter<DiscussFragment
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+
+        if (position == 0){
+            holder.ivIcon.setImageResource(R.drawable.conversation);
+        }else {
+            holder.ivIcon.setImageResource(R.drawable.notebook);
+        }
+
         holder.tvTitle.setText(listArrayList.get(position));
         holder.clickArea.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,10 +71,14 @@ public class DiscussFragmentAdapter extends RecyclerView.Adapter<DiscussFragment
 
         private ConstraintLayout clickArea;
 
+        private ImageView ivIcon;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.discuss_item_title);
             clickArea = itemView.findViewById(R.id.discuss_item_click_area);
+
+            ivIcon = itemView.findViewById(R.id.discuss_item_icon);
         }
     }
 

@@ -27,6 +27,14 @@ public class ChatRightViewHolder extends RecyclerView.ViewHolder {
 
     public void setData(ChatData chatData) {
         tvMessage.setText(chatData.getMessage());
-        tvTime.setText(new SimpleDateFormat("HH:mm", Locale.TAIWAN).format(new Date(chatData.getTime())));
+        String hour = new SimpleDateFormat("HH",Locale.TAIWAN).format(new Date(chatData.getTime()));
+        int houtInt = Integer.parseInt(hour);
+        if (houtInt < 12){
+            hour = "AM";
+        }else {
+            hour = "PM";
+        }
+        tvTime.setText(String.format(Locale.getDefault(),"%s %s",new SimpleDateFormat("HH:mm", Locale.TAIWAN).format(new Date(chatData.getTime())),hour));
+
     }
 }

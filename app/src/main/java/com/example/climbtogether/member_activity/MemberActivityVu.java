@@ -20,4 +20,10 @@ public interface MemberActivityVu {
     void intentToBrowser(String url);
 
     void intentToMtCollectionActivity();
+
+    void uploadUserPhoto();
+
+    void showToast(String message);
+
+    void downloadUserPhoto();
 }

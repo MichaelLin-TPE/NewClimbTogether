@@ -8,4 +8,8 @@ public interface ChatActivityPresenter {
     void onSearchChatData(String email);
 
     void onCatchChatDataSuccessful(ArrayList<ChatData> chatDataArrayList);
+
+    void onChangeData(String email);
+
+    void onShowRecyclerViewChangeData(ArrayList<ChatData> chatDataArrayList);
 }

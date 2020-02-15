@@ -42,7 +42,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
         switch (viewType) {
             case LEFT:
                 view = inflater.inflate(R.layout.chat_left_item_layout, parent, false);
-                return new ChatLeftViewHolder(view);
+                return new ChatLeftViewHolder(view,context);
             case RIGHT:
                 view = inflater.inflate(R.layout.chat_right_item_layout, parent, false);
                 return new ChatRightViewHolder(view);

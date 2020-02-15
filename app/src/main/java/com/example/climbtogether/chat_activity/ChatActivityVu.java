@@ -12,4 +12,8 @@ public interface ChatActivityVu {
     void createChatDataToFirestore(String message, long currentTime);
 
     void showErrorMessage(String errorMessage);
+
+    void catchDataFormFirestore(String email);
+
+    void reShowRecyclerView(ArrayList<ChatData> chatDataArrayList);
 }

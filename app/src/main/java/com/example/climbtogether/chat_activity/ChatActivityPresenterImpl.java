@@ -29,4 +29,14 @@ public class ChatActivityPresenterImpl implements ChatActivityPresenter {
     public void onCatchChatDataSuccessful(ArrayList<ChatData> chatDataArrayList) {
         mView.setRecyclerView(chatDataArrayList);
     }
+
+    @Override
+    public void onChangeData(String email) {
+        mView.catchDataFormFirestore(email);
+    }
+
+    @Override
+    public void onShowRecyclerViewChangeData(ArrayList<ChatData> chatDataArrayList) {
+        mView.reShowRecyclerView(chatDataArrayList);
+    }
 }

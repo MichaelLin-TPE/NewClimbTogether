@@ -12,4 +12,8 @@ public interface MemberActivityPresenter {
     void onConfirmSignOutClickListener();
 
     void onListItemClickListener(int itemPosition);
+
+    void onUploadUserPhotoListener();
+
+    void onShowProgressToast(String message);
 }
