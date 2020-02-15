@@ -55,6 +55,8 @@ public class ChatAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         //明天繼續做
+
+
     }
 
     @Override
