@@ -72,6 +72,8 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu{
         initView();
         adapter = new ChatAdapter(this,viewPresenter);
         checkLoginStatus();
+
+        //在家測試
     }
 
     /**
