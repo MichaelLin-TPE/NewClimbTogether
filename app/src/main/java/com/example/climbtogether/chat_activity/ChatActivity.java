@@ -1,6 +1,7 @@
 package com.example.climbtogether.chat_activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,8 +24,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.MetadataChanges;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -63,6 +68,10 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu{
 
     private static final String CHAT_DATA = "chat_data";
 
+    private boolean isStillPosting;
+
+    private int secondSize;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +82,63 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu{
         initView();
         adapter = new ChatAdapter(this,viewPresenter);
         checkLoginStatus();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        CheckChatDataChange();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isStillPosting = false;
+    }
+
+    private void CheckChatDataChange() {
+        isStillPosting = true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                do {
+                    try {
+                        Thread.sleep(1500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (isStillPosting){
+                        firestore.collection(DISCUSSION).document(listName).collection(CHAT_DATA)
+                                .orderBy("time" , Query.Direction.ASCENDING)
+                                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()){
+                                    if (task.getResult() != null){
+                                        ArrayList<String> chatArrayList = new ArrayList<>();
+
+                                        for (QueryDocumentSnapshot document : task.getResult()){
+                                            chatArrayList.add(document.getId());
+                                        }
+                                        int firstSize = chatArrayList.size();
+                                        if (firstSize == secondSize || secondSize == 0){
+                                            secondSize = firstSize;
+                                            Log.i("Michael","長度相同");
+                                        }else {
+                                            checkLoginStatus();
+                                            secondSize = firstSize;
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }else {
+                        Log.i("Michael","結束迴圈");
+                        break;
+                    }
+                }while (true);
+            }
+        }).start();
     }
 
     private void checkLoginStatus() {
@@ -126,7 +192,6 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu{
         Bundle bundle = it.getExtras();
         if (bundle != null){
             listName = bundle.getString("listName","");
-            Log.i("Michael","進入 : "+listName);
         }
     }
 
@@ -170,10 +235,8 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu{
 
         viewPresenter.setData(chatDataArrayList,user.getEmail());
 
-
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-//        linearLayoutManager.setReverseLayout(true);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(adapter);
         recyclerView.scrollToPosition(chatDataArrayList.size() -1);

@@ -1,6 +1,8 @@
 package com.example.climbtogether.chat_activity.chat_view_presenter;
 
 import com.example.climbtogether.chat_activity.ChatData;
+import com.example.climbtogether.chat_activity.ChatLeftViewHolder;
+import com.example.climbtogether.chat_activity.ChatRightViewHolder;
 
 import java.util.ArrayList;
 
@@ -10,4 +12,8 @@ public interface ViewPresenter {
     int getItemViewType(int position);
 
     int getItemCount();
+
+    void onBindRightViewHolder(ChatRightViewHolder holder, int position);
+
+    void onBindLeftViewHolder(ChatLeftViewHolder holder, int position);
 }

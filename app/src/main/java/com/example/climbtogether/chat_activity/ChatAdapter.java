@@ -28,11 +28,10 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
     private ViewPresenter viewPresenter;
 
-    public ChatAdapter(Context context,ViewPresenter viewPresenter){
+    public ChatAdapter(Context context, ViewPresenter viewPresenter) {
         this.context = context;
         this.viewPresenter = viewPresenter;
     }
-
 
 
     @NonNull
@@ -40,12 +39,12 @@ public class ChatAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view;
-        switch (viewType){
+        switch (viewType) {
             case LEFT:
-                view = inflater.inflate(R.layout.chat_left_item_layout,parent,false);
+                view = inflater.inflate(R.layout.chat_left_item_layout, parent, false);
                 return new ChatLeftViewHolder(view);
             case RIGHT:
-                view = inflater.inflate(R.layout.chat_right_item_layout,parent,false);
+                view = inflater.inflate(R.layout.chat_right_item_layout, parent, false);
                 return new ChatRightViewHolder(view);
         }
         return null;
@@ -55,7 +54,12 @@ public class ChatAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         //明天繼續做
-
+        if (holder instanceof ChatRightViewHolder) {
+            viewPresenter.onBindRightViewHolder((ChatRightViewHolder) holder, position);
+        }
+        if (holder instanceof ChatLeftViewHolder) {
+            viewPresenter.onBindLeftViewHolder((ChatLeftViewHolder) holder, position);
+        }
 
     }
 

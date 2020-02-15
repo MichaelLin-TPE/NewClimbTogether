@@ -13,13 +13,16 @@
         android:roundIcon="@mipmap/climb_together_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".chat_activity.ChatActivity"></activity>
+        <!-- 這是掌控KeyBoard的關鍵-->
+        <activity android:name=".chat_activity.ChatActivity"
+                  android:windowSoftInputMode="stateVisible|adjustPan"/>
         <activity android:name=".mountain_collection_activity.MountainCollectionActivity" />
         <activity android:name=".login_activity.LoginActivity" />
         <activity android:name=".member_activity.MemberActivity" />
         <activity android:name=".home_page.HomePageActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -127,7 +127,7 @@ public class DiscussFragment extends Fragment implements DiscussFragmentVu {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
-        int pix = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
+        int pix = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, getResources().getDisplayMetrics());
 
         recyclerView.addItemDecoration(new SpaceItemDecoration(pix));
 

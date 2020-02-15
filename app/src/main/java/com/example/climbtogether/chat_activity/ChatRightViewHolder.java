@@ -1,5 +1,6 @@
 package com.example.climbtogether.chat_activity;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -7,6 +8,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.climbtogether.R;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class ChatRightViewHolder extends RecyclerView.ViewHolder {
 
@@ -16,7 +21,12 @@ public class ChatRightViewHolder extends RecyclerView.ViewHolder {
 
     public ChatRightViewHolder(@NonNull View itemView) {
         super(itemView);
-        tvMessage = itemView.findViewById(R.id.chat_left_item_message);
-        tvTime = itemView.findViewById(R.id.chat_left_item_time);
+        tvMessage = itemView.findViewById(R.id.chat_item_message);
+        tvTime = itemView.findViewById(R.id.chat_item_time);
+    }
+
+    public void setData(ChatData chatData) {
+        tvMessage.setText(chatData.getMessage());
+        tvTime.setText(new SimpleDateFormat("HH:mm", Locale.TAIWAN).format(new Date(chatData.getTime())));
     }
 }
