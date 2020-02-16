@@ -57,4 +57,9 @@ public class ViewPresenterImpl implements ViewPresenter {
 //        }
         holder.setData(chatDataArrayList.get(position));
     }
+
+    @Override
+    public void setOnUserPhotoClickListener(ChatLeftViewHolder.OnUserPhotoClickListener listener, ChatLeftViewHolder holder) {
+        holder.setOnUserPhotoClickListener(listener);
+    }
 }

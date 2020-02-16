@@ -39,4 +39,37 @@ public class ChatActivityPresenterImpl implements ChatActivityPresenter {
     public void onShowRecyclerViewChangeData(ArrayList<ChatData> chatDataArrayList) {
         mView.reShowRecyclerView(chatDataArrayList);
     }
+
+    @Override
+    public void onUserPhotoClickListener(String mail) {
+        mView.searchInfoFromFirebase(mail);
+    }
+
+    @Override
+    public void onCatchUserData(String displayName, String photoUrl, String mail,boolean isFriend) {
+        mView.showUserDialog(displayName,photoUrl,mail,isFriend);
+    }
+
+    @Override
+    public void onAddFriendClickListener(String strangerEmail,String userEmail) {
+        mView.sendInviteToStranger(strangerEmail,userEmail);
+    }
+
+
+    @Override
+    public void onSearchFriendShip(String email, String strangerEmail) {
+        mView.searchFriendShip(email,strangerEmail);
+    }
+
+    @Override
+    public void onSendInviteSuccessful() {
+        mView.setUserDialogViewChange(true);
+        String message = "邀請成功";
+        mView.showToast(message);
+    }
+
+    @Override
+    public void onSearchInvite(String strangeEmail) {
+        mView.searchFriendInvite(strangeEmail);
+    }
 }

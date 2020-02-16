@@ -15,13 +15,20 @@
         app:riv_oval="true"
         android:layout_width="@dimen/weather_big_icon"
         android:layout_height="@dimen/weather_big_icon"/>
+    <TextView
+        android:id="@+id/chat_left_item_name"
+        android:textSize="@dimen/smaller_text_size"
+        app:layout_constraintTop_toTopOf="@id/chat_left_item_user_photo"
+        app:layout_constraintLeft_toRightOf="@id/chat_left_item_user_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <TextView
         android:background="@drawable/chat_shape_left"
         android:gravity="center"
         android:text="XXXXXXXXX"
         android:padding="10dp"
-        app:layout_constraintTop_toTopOf="@id/chat_left_item_user_photo"
+        app:layout_constraintTop_toBottomOf="@id/chat_left_item_name"
         app:layout_constraintLeft_toRightOf="@id/chat_left_item_user_photo"
         android:id="@+id/chat_left_item_message"
         android:textSize="@dimen/normal_text_size"

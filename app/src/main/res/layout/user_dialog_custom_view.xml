@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:background="@drawable/button_shape_not_press"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:id="@+id/user_dialog_photo"
+        app:riv_oval="true"
+        android:layout_width="@dimen/member_user_photo_width"
+        android:layout_height="@dimen/member_user_photo_width"/>
+
+    <TextView
+        android:id="@+id/user_dialog_display_name"
+        android:layout_marginTop="10dp"
+        android:textSize="@dimen/big_text_size"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/user_dialog_photo"
+        app:layout_constraintLeft_toLeftOf="@id/user_dialog_photo"
+        app:layout_constraintRight_toRightOf="@id/user_dialog_photo"
+        android:textColor="@color/colorPrimaryDark"
+        tools:text="XXXX"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/user_dialog_email"
+        android:layout_marginTop="5dp"
+        android:textSize="@dimen/small_text_size"
+        android:textStyle="bold"
+        tools:text="XXXX"
+        app:layout_constraintTop_toBottomOf="@id/user_dialog_display_name"
+        app:layout_constraintLeft_toLeftOf="@id/user_dialog_photo"
+        app:layout_constraintRight_toRightOf="@id/user_dialog_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:id="@+id/user_dialog_add_user"
+        android:contentDescription="@null"
+        app:layout_constraintTop_toTopOf="@id/user_dialog_display_name"
+        android:layout_marginStart="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/user_dialog_display_name"
+        app:layout_constraintLeft_toRightOf="@id/user_dialog_display_name"
+        android:src="@drawable/add_user"
+        android:layout_width="@dimen/add_user_icon_size"
+        android:layout_height="@dimen/add_user_icon_size"/>
+
+    <ImageView
+        android:id="@+id/user_dialog_friend"
+        android:contentDescription="@null"
+        app:layout_constraintTop_toTopOf="@id/user_dialog_display_name"
+        android:layout_marginStart="10dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@id/user_dialog_display_name"
+        app:layout_constraintLeft_toRightOf="@id/user_dialog_display_name"
+        android:src="@drawable/friends"
+        android:layout_width="@dimen/add_user_icon_size"
+        android:layout_height="@dimen/add_user_icon_size"/>
+
+    <TextView
+        android:id="@+id/user_dialog_invite_process"
+        android:text="@string/invite_process"
+        android:textSize="@dimen/smaller_text_size"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="@id/user_dialog_display_name"
+        android:layout_marginStart="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/user_dialog_display_name"
+        app:layout_constraintLeft_toRightOf="@id/user_dialog_display_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

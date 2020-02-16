@@ -16,4 +16,6 @@ public interface ViewPresenter {
     void onBindRightViewHolder(ChatRightViewHolder holder, int position);
 
     void onBindLeftViewHolder(ChatLeftViewHolder holder, int position);
+
+    void setOnUserPhotoClickListener(ChatLeftViewHolder.OnUserPhotoClickListener listener, ChatLeftViewHolder holder);
 }

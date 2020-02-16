@@ -26,4 +26,6 @@ public interface MemberActivityVu {
     void showToast(String message);
 
     void downloadUserPhoto();
+
+    void intentToFriendManagerActivity();
 }

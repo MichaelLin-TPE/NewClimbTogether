@@ -27,7 +27,7 @@ import java.util.Locale;
 public class ChatLeftViewHolder extends RecyclerView.ViewHolder {
     private TextView tvMessage;
 
-    private TextView tvTime;
+    private TextView tvTime,tvName;
 
     private RoundedImageView ivUserPhoto;
 
@@ -37,11 +37,18 @@ public class ChatLeftViewHolder extends RecyclerView.ViewHolder {
 
     private ImageLoader imageLoader = ImageLoader.getInstance();
 
+    private OnUserPhotoClickListener listener;
+
+    public void setOnUserPhotoClickListener(OnUserPhotoClickListener listener){
+        this.listener = listener;
+    }
+
 //    private TextView tvEmail;
 
     public ChatLeftViewHolder(@NonNull View itemView, Context context) {
         super(itemView);
         storage = FirebaseStorage.getInstance().getReference();
+        tvName = itemView.findViewById(R.id.chat_left_item_name);
         tvMessage = itemView.findViewById(R.id.chat_left_item_message);
         tvTime = itemView.findViewById(R.id.chat_left_item_time);
         ivUserPhoto = itemView.findViewById(R.id.chat_left_item_user_photo);
@@ -63,8 +70,9 @@ public class ChatLeftViewHolder extends RecyclerView.ViewHolder {
         imageLoader.init(config);
     }
 
-    public void setData(ChatData chatData) {
+    public void setData(final ChatData chatData) {
         tvMessage.setText(chatData.getMessage());
+        tvName.setText(chatData.getDisPlayName());
 //        tvEmail.setText(String.format(Locale.getDefault(),"%s 說 : ",chatData.getEmail()));
         String hour = new SimpleDateFormat("HH",Locale.TAIWAN).format(new Date(chatData.getTime()));
         int houtInt = Integer.parseInt(hour);
@@ -76,6 +84,13 @@ public class ChatLeftViewHolder extends RecyclerView.ViewHolder {
         tvTime.setText(String.format(Locale.getDefault(),"%s %s",new SimpleDateFormat("HH:mm", Locale.TAIWAN).format(new Date(chatData.getTime())),hour));
 
         downloadUserPhoto(chatData.getEmail());
+
+        ivUserPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onClick(chatData.getEmail());
+            }
+        });
     }
 
     private void downloadUserPhoto(String email) {
@@ -97,5 +112,10 @@ public class ChatLeftViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
+    }
+
+
+    public interface OnUserPhotoClickListener{
+        void onClick(String mail);
     }
 }

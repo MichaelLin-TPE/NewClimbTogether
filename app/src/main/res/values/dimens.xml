@@ -32,4 +32,7 @@
     <dimen name="speech_bubble_corners">10dp</dimen>
     <dimen name="speech_bubble_corners_plus_tail">15dp</dimen>
     <dimen name="speech_bubble_spacing">5dp</dimen>
+    <dimen name="add_user_icon_size">30dp</dimen>
+    <dimen name="invite_item_check_icon_size">30dp</dimen>
+    <dimen name="invite_item_user_photo_size">60dp</dimen>
 </resources>

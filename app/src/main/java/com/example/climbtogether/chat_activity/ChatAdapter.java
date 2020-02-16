@@ -28,6 +28,13 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
     private ViewPresenter viewPresenter;
 
+    private ChatLeftViewHolder.OnUserPhotoClickListener listener;
+
+
+    public void setOnUserPhotoClickListener(ChatLeftViewHolder.OnUserPhotoClickListener listener){
+        this.listener = listener;
+    }
+
     public ChatAdapter(Context context, ViewPresenter viewPresenter) {
         this.context = context;
         this.viewPresenter = viewPresenter;
@@ -59,6 +66,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
         }
         if (holder instanceof ChatLeftViewHolder) {
             viewPresenter.onBindLeftViewHolder((ChatLeftViewHolder) holder, position);
+            viewPresenter.setOnUserPhotoClickListener(listener,(ChatLeftViewHolder)holder);
         }
 
     }

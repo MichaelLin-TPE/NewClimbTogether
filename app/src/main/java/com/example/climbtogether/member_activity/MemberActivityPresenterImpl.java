@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import static com.example.climbtogether.tool.Constant.APPLY_MT;
 import static com.example.climbtogether.tool.Constant.CENTER_WEATHER;
+import static com.example.climbtogether.tool.Constant.FRIEND_MANAGER;
 import static com.example.climbtogether.tool.Constant.SEARCH_BED;
 import static com.example.climbtogether.tool.Constant.TOP_PEAK;
 
@@ -25,6 +26,7 @@ public class MemberActivityPresenterImpl implements MemberActivityPresenter {
         btnList.add(mView.getVuContext().getString(R.string.search_bed));
         btnList.add(mView.getVuContext().getString(R.string.apply_mt));
         btnList.add(mView.getVuContext().getString(R.string.center_weather));
+        btnList.add(mView.getVuContext().getString(R.string.friend_manager));
 
         mView.setRecyclerView(btnList);
 
@@ -74,6 +76,8 @@ public class MemberActivityPresenterImpl implements MemberActivityPresenter {
                 url = "https://www.cwb.gov.tw/V8/C/";
                 mView.intentToBrowser(url);
                 break;
+            case FRIEND_MANAGER:
+                mView.intentToFriendManagerActivity();
             default:
                 break;
         }

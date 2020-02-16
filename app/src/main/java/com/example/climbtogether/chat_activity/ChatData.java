@@ -7,6 +7,16 @@ public class ChatData {
 
     private String photoUrl;
 
+    private String disPlayName;
+
+    public String getDisPlayName() {
+        return disPlayName;
+    }
+
+    public void setDisPlayName(String disPlayName) {
+        this.disPlayName = disPlayName;
+    }
+
     private long time;
 
     public long getTime() {

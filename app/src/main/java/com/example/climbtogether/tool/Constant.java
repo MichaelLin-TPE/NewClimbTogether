@@ -14,5 +14,6 @@ public class Constant {
     public static final int SEARCH_BED = 1;
     public static final int APPLY_MT = 2;
     public static final int CENTER_WEATHER = 3;
+    public static final int FRIEND_MANAGER = 4;
 
 }

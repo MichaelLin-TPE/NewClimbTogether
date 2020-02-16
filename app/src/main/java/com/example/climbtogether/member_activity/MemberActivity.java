@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.climbtogether.R;
+import com.example.climbtogether.friend_manager_activity.FriendManagerActivity;
 import com.example.climbtogether.login_activity.LoginActivity;
 import com.example.climbtogether.mountain_collection_activity.MountainCollectionActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -77,6 +78,8 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     private DisplayImageOptions options;
 
     private ImageLoader imageLoader = ImageLoader.getInstance();
+
+    private MemberRecyclerViewAdapter adapter;
 
     @Override
     protected void onStart() {
@@ -130,6 +133,10 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         if (signOut != null) {
             signOut.setVisible(!isShow);
         }
+        adapter.setCurrent(isShow ? null : currentUser);
+        adapter.notifyDataSetChanged();
+
+
     }
 
     @Override
@@ -235,6 +242,12 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
                 }
             });
         }
+    }
+
+    @Override
+    public void intentToFriendManagerActivity() {
+        Intent it = new Intent(this, FriendManagerActivity.class);
+        startActivity(it);
     }
 
     @Override
@@ -383,9 +396,11 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         iconArray.add(R.drawable.bed);
         iconArray.add(R.drawable.apply);
         iconArray.add(R.drawable.weather);
+        iconArray.add(R.drawable.add_user);
 
-        MemberRecyclerViewAdapter adapter = new MemberRecyclerViewAdapter(iconArray, btnList, this);
-
+        adapter = new MemberRecyclerViewAdapter(iconArray, btnList, this);
+        currentUser = mAuth.getCurrentUser();
+        adapter.setCurrent(currentUser);
         recyclerView.setAdapter(adapter);
 
         adapter.setOnItemClickListener(new MemberRecyclerViewAdapter.OnMemberListItemClickListener() {

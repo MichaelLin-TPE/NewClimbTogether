@@ -12,4 +12,16 @@ public interface ChatActivityPresenter {
     void onChangeData(String email);
 
     void onShowRecyclerViewChangeData(ArrayList<ChatData> chatDataArrayList);
+
+    void onUserPhotoClickListener(String mail);
+
+    void onCatchUserData(String displayName, String photoUrl, String mail,boolean isFriend);
+
+    void onAddFriendClickListener(String StrangerEmail,String userEmail);
+
+    void onSearchFriendShip(String email,String strangerEmail);
+
+    void onSendInviteSuccessful();
+
+    void onSearchInvite(String strangeEmail);
 }
