@@ -72,4 +72,9 @@ public class ChatActivityPresenterImpl implements ChatActivityPresenter {
     public void onSearchInvite(String strangeEmail) {
         mView.searchFriendInvite(strangeEmail);
     }
+
+    @Override
+    public void onChatButtonClickListener(String displayName, String mail, String photoUrl) {
+        mView.intentToPersonalChatActivity(displayName,mail,photoUrl);
+    }
 }

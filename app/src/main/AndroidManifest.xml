@@ -13,8 +13,8 @@
         android:roundIcon="@mipmap/climb_together_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".friend_manager_activity.FriendManagerActivity"></activity>
-        <!-- 這是掌控KeyBoard的關鍵 -->
+        <activity android:name=".personal_chat_activity.PersonalChatActivity"></activity>
+        <activity android:name=".friend_manager_activity.FriendManagerActivity" /> <!-- 這是掌控KeyBoard的關鍵 -->
         <activity
             android:name=".chat_activity.ChatActivity"
             android:windowSoftInputMode="stateVisible|adjustPan" />

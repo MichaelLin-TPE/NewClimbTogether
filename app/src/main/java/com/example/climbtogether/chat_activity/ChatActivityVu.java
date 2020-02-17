@@ -30,4 +30,6 @@ public interface ChatActivityVu {
     void showToast(String message);
 
     void searchFriendInvite(String strangeEmail);
+
+    void intentToPersonalChatActivity(String displayName, String mail, String photoUrl);
 }

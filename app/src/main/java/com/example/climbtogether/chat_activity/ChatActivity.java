@@ -17,6 +17,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 import com.example.climbtogether.R;
 import com.example.climbtogether.chat_activity.chat_view_presenter.ViewPresenter;
 import com.example.climbtogether.chat_activity.chat_view_presenter.ViewPresenterImpl;
+import com.example.climbtogether.personal_chat_activity.PersonalChatActivity;
 import com.example.climbtogether.tool.ImageLoaderManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -450,17 +452,28 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
                 });
     }
 
+    @Override
+    public void intentToPersonalChatActivity(String displayName, String mail, String photoUrl) {
+        Intent it = new Intent(this, PersonalChatActivity.class);
+        it.putExtra("displayName",displayName);
+        it.putExtra("mail",mail);
+        it.putExtra("photoUrl",photoUrl);
+        startActivity(it);
+    }
 
 
     @Override
-    public void showUserDialog(String displayName, String photoUrl, final String mail, boolean isFriend) {
+    public void showUserDialog(final String displayName, final String photoUrl, final String mail, boolean isFriend) {
         View view = View.inflate(this, R.layout.user_dialog_custom_view, null);
         RoundedImageView ivPhoto = view.findViewById(R.id.user_dialog_photo);
         TextView tvDisplayName = view.findViewById(R.id.user_dialog_display_name);
         TextView tvEmail = view.findViewById(R.id.user_dialog_email);
+        LinearLayout chatClickArea = view.findViewById(R.id.user_dialog_chat_clickArea);
         tvInviteProcess = view.findViewById(R.id.user_dialog_invite_process);
         ivAddFriend = view.findViewById(R.id.user_dialog_add_user);
         ivFriend = view.findViewById(R.id.user_dialog_friend);
+
+        chatClickArea.setVisibility(isFriend ? View.VISIBLE : View.GONE);
 
         tvInviteProcess.setVisibility(isInvited ? View.VISIBLE : View.GONE);
 
@@ -495,6 +508,14 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
             }
         });
         isInvited = false;
+
+        chatClickArea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onChatButtonClickListener(displayName,mail,photoUrl);
+            }
+        });
+
 
     }
 

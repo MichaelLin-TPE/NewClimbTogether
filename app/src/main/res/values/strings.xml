@@ -74,4 +74,6 @@
     <string name="friend_invite">好友邀請</string>
     <string name="add_successful">新增成功</string>
     <string name="friend">好友</string>
+    <string name="chat">聊天</string>
+    <string name="empty_message">請輸入對話內容</string>
 </resources>

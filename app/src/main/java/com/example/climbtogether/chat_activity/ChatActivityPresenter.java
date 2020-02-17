@@ -24,4 +24,6 @@ public interface ChatActivityPresenter {
     void onSendInviteSuccessful();
 
     void onSearchInvite(String strangeEmail);
+
+    void onChatButtonClickListener(String displayName, String mail, String photoUrl);
 }

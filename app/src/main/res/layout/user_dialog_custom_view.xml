@@ -28,17 +28,18 @@
         tools:text="XXXX"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
     <TextView
         android:id="@+id/user_dialog_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:textSize="@dimen/small_text_size"
         android:textStyle="bold"
-        tools:text="XXXX"
-        app:layout_constraintTop_toBottomOf="@id/user_dialog_display_name"
         app:layout_constraintLeft_toLeftOf="@id/user_dialog_photo"
         app:layout_constraintRight_toRightOf="@id/user_dialog_photo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        app:layout_constraintTop_toBottomOf="@id/user_dialog_display_name"
+        tools:text="XXXX" />
 
     <ImageView
         android:id="@+id/user_dialog_add_user"
@@ -74,6 +75,40 @@
         app:layout_constraintLeft_toRightOf="@id/user_dialog_display_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:id="@+id/user_dialog_chat_clickArea"
+        app:layout_constraintTop_toBottomOf="@id/user_dialog_email"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:visibility="gone"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="@dimen/add_user_icon_size_smaller"
+            android:layout_height="@dimen/add_user_icon_size_smaller"
+            android:src="@drawable/personal_chat"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="10dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/user_dialog_email" />
+        <TextView
+            android:text="@string/chat"
+            android:textColor="@color/black"
+            android:id="@+id/user_dialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+
+        </LinearLayout>
+
+
+
 
 
 
