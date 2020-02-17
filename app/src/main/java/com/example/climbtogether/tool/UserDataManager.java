@@ -7,7 +7,10 @@ public class UserDataManager {
 
     private SharedPreferences sharedPreferences;
 
+    private Context context;
+
     public UserDataManager(Context context){
+        this.context = context;
         sharedPreferences = context.getSharedPreferences("userData",Context.MODE_PRIVATE);
     }
 

@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/climb_together_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".personal_chat_activity.PersonalChatActivity"></activity>
+        <activity android:name=".personal_chat_activity.PersonalChatActivity"
+                 android:windowSoftInputMode="stateVisible|adjustPan"/>
         <activity android:name=".friend_manager_activity.FriendManagerActivity" /> <!-- 這是掌控KeyBoard的關鍵 -->
         <activity
             android:name=".chat_activity.ChatActivity"
@@ -21,7 +22,7 @@
         <activity android:name=".mountain_collection_activity.MountainCollectionActivity" />
         <activity android:name=".login_activity.LoginActivity" />
         <activity android:name=".member_activity.MemberActivity" />
-        <activity android:name=".home_page.HomePageActivity" />
+        <activity android:name=".home_activity.HomePageActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

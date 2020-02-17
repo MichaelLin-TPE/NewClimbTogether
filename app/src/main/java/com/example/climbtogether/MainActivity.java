@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.climbtogether.home_page.HomePageActivity;
+import com.example.climbtogether.home_activity.HomePageActivity;
 
 public class MainActivity extends AppCompatActivity implements MainActivityVu {
 

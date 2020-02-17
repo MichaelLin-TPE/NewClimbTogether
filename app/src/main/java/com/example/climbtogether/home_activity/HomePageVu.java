@@ -1,4 +1,4 @@
-package com.example.climbtogether.home_page;
+package com.example.climbtogether.home_activity;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

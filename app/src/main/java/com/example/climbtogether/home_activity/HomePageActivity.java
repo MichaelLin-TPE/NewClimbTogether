@@ -1,4 +1,4 @@
-package com.example.climbtogether.home_page;
+package com.example.climbtogether.home_activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;

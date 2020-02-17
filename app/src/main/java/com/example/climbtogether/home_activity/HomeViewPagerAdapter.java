@@ -1,9 +1,10 @@
-package com.example.climbtogether.home_page;
+package com.example.climbtogether.home_activity;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
+import com.example.climbtogether.personal_fragment.PersonalChatFragment;
 import com.example.climbtogether.disscuss_fragment.DiscussFragment;
 import com.example.climbtogether.equipment_fragment.EquipmentFragment;
 import com.example.climbtogether.home_fragment.HomeFragment;
@@ -23,13 +24,15 @@ public class HomeViewPagerAdapter extends FragmentStatePagerAdapter {
             return MountainFragment.newInstance();
         }else if (position == 2){
             return EquipmentFragment.newInstance();
-        }else {
+        }else if (position == 3){
             return DiscussFragment.newInstance();
+        }else {
+            return PersonalChatFragment.newInstance();
         }
     }
 
     @Override
     public int getCount() {
-        return 4;
+        return 5;
     }
 }

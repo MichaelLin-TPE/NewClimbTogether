@@ -1,4 +1,4 @@
-package com.example.climbtogether.home_page;
+package com.example.climbtogether.home_activity;
 
 public interface HomePagePresenter {
     void onPrepareData();

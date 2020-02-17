@@ -1,4 +1,4 @@
-package com.example.climbtogether.home_page;
+package com.example.climbtogether.home_activity;
 
 import android.graphics.drawable.Drawable;
 
@@ -21,6 +21,7 @@ public class HomePagePresenterImpl implements HomePagePresenter {
         tabTitleArray.add(mView.getVuContext().getResources().getString(R.string.mountain));
         tabTitleArray.add(mView.getVuContext().getResources().getString(R.string.equipment));
         tabTitleArray.add(mView.getVuContext().getResources().getString(R.string.discuss));
+        tabTitleArray.add(mView.getVuContext().getString(R.string.personal_chat));
         /**
          * 未點擊
          */
@@ -29,6 +30,7 @@ public class HomePagePresenterImpl implements HomePagePresenter {
         notPressIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.mt_not_press));
         notPressIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.equipment_not_press));
         notPressIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.chat_not_press));
+        notPressIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.personal_chat_not_pressed));
 
         /**
          * 點擊後
@@ -38,6 +40,7 @@ public class HomePagePresenterImpl implements HomePagePresenter {
         pressedIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.mt_pressed));
         pressedIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.equipment_pressed));
         pressedIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.chat_pressed));
+        pressedIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.personal_chat_pressed));
 
         mView.showBottomTabLayout(tabTitleArray,notPressIconArray,pressedIconArray);
     }

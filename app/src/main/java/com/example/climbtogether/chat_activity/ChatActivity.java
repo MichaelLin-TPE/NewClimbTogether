@@ -167,6 +167,7 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     protected void onPause() {
         super.onPause();
         isStillPosting = false;
+        countSecond = 0;
     }
 
     /**

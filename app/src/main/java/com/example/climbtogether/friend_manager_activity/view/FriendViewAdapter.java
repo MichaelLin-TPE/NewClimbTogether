@@ -68,7 +68,7 @@ public class FriendViewAdapter extends RecyclerView.Adapter<FriendViewAdapter.Vi
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         final FriendDTO data = friendArrayList.get(position);
 
-        StorageReference river = storage.child(data.getEmail()+"/userPhoto/"+data.getDisplayName()+".jpg");
+        StorageReference river = storage.child(data.getEmail()+"/userPhoto/"+data.getEmail()+".jpg");
         river.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
