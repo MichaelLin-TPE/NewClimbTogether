@@ -30,17 +30,26 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
     @Override
     public void onShowProgress(boolean isShow) {
         mView.showProgress(isShow);
+        mView.showLoginInformation(false);
     }
 
     @Override
     public void onCatchAllDataSucessful(ArrayList<PersonalChatDTO> chatDataArrayList) {
         mView.showProgress(false);
         Log.i("Micahel","資料長度 : "+chatDataArrayList.size());
-        mView.setRecyclerView(chatDataArrayList);
+        if (chatDataArrayList.size() == 0){
+            mView.showNoChatDataView(true);
+        }else {
+            mView.showNoChatDataView(false);
+            mView.setRecyclerView(chatDataArrayList);
+        }
+
     }
 
     @Override
     public void onItemClickListener(String displayName, String friendEmail, String photoUrl) {
         mView.intentToPersonalChatActivity(displayName,friendEmail,photoUrl);
     }
+
+
 }

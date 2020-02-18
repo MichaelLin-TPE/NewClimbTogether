@@ -39,6 +39,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -49,7 +51,9 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class MemberActivity extends AppCompatActivity implements MemberActivityVu {
 
@@ -80,6 +84,8 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     private ImageLoader imageLoader = ImageLoader.getInstance();
 
     private MemberRecyclerViewAdapter adapter;
+
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onStart() {
@@ -298,7 +304,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
     private void uploadPhotoToStorage(final byte[] bytes) {
         if (currentUser != null){
-            StorageReference river = storage.child(currentUser.getEmail()+"/userPhoto/"+currentUser.getEmail()+".jpg");
+            final StorageReference river = storage.child(currentUser.getEmail()+"/userPhoto/"+currentUser.getEmail()+".jpg");
             UploadTask task = river.putBytes(bytes);
             task.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -308,6 +314,19 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
                     ivUserIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
                     ivUserIcon.setImageBitmap(bitmap);
+
+                    river.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            String photoUrl = uri.toString();
+                            updateUserData(photoUrl);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -318,6 +337,15 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         }
     }
 
+    private void updateUserData(String photoUrl) {
+        if (currentUser != null && currentUser.getEmail() != null){
+            Map<String,Object> map = new HashMap<>();
+            map.put("photoUrl",photoUrl);
+            firestore.collection("users").document(currentUser.getEmail())
+                    .set(map, SetOptions.merge());
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -325,6 +353,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         //初始化Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance().getReference();
+        firestore = FirebaseFirestore.getInstance();
         initPresenter();
         initView();
         initImageLoader();

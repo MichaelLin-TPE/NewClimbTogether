@@ -14,4 +14,5 @@ public interface PersonalFragmentPresenter {
     void onCatchAllDataSucessful(ArrayList<PersonalChatDTO> chatDataArrayList);
 
     void onItemClickListener(String displayName, String friendEmail, String photoUrl);
+
 }

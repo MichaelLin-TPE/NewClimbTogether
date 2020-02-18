@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -49,7 +50,16 @@ public class PersonalFragmentAdapter extends RecyclerView.Adapter<PersonalFragme
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final PersonalChatDTO data = dataList.get(position);
-        imageLoaderManager.setPhotoUrl(data.getPhotoUrl(),holder.ivUserPhoto);
+
+        if (data.getPhotoUrl().isEmpty()){
+            holder.ivUserPhoto.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            holder.ivUserPhoto.setImageResource(R.drawable.empty_photo);
+        }else {
+            holder.ivUserPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageLoaderManager.setPhotoUrl(data.getPhotoUrl(),holder.ivUserPhoto);
+        }
+
+
 
         int hour = Integer.parseInt(new SimpleDateFormat("HH", Locale.TAIWAN).format(new Date(data.getTime())));
         String hours;
