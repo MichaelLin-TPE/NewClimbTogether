@@ -11,15 +11,16 @@
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/port_view_photo"
-        android:src="@drawable/empty_photo"
-        app:riv_corner_radius="10dip"
-        android:scaleType="fitXY"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:contentDescription="@null"
-        app:layout_constraintRight_toRightOf="parent"
         android:layout_width="@dimen/port_view_photo_width"
-        android:layout_height="@dimen/port_view_photo_height"/>
+        android:layout_height="@dimen/port_view_photo_width"
+        android:layout_marginTop="12dp"
+        android:contentDescription="@null"
+        android:src="@drawable/empty_photo"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:riv_corner_radius="10dip" />
 
     <TextView
         android:id="@+id/port_view_text_title"

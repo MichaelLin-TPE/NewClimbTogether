@@ -30,6 +30,7 @@ import com.example.climbtogether.R;
 import com.example.climbtogether.friend_manager_activity.FriendManagerActivity;
 import com.example.climbtogether.login_activity.LoginActivity;
 import com.example.climbtogether.mountain_collection_activity.MountainCollectionActivity;
+import com.example.climbtogether.tool.ImageLoaderManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -39,7 +40,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -48,6 +53,8 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -77,15 +84,11 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
     private StorageReference storage;
 
-    private static final int IMAGE_REQUEST_CODE = 99;
-
-    private DisplayImageOptions options;
-
-    private ImageLoader imageLoader = ImageLoader.getInstance();
-
     private MemberRecyclerViewAdapter adapter;
 
     private FirebaseFirestore firestore;
+
+    private ImageLoaderManager imageLoaderManager;
 
     @Override
     protected void onStart() {
@@ -150,6 +153,8 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         super.onResume();
         currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
+
+
     }
 
     @Override
@@ -212,13 +217,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         startActivity(it);
     }
 
-    @Override
-    public void uploadUserPhoto() {
 
-        Intent it = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(it, IMAGE_REQUEST_CODE);
-
-    }
 
     @Override
     public void showToast(String message) {
@@ -234,7 +233,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
                 public void onSuccess(Uri uri) {
                     String url = uri.toString();
                     ivUserIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                    imageLoader.displayImage(url,ivUserIcon,options);
+                    imageLoaderManager.setPhotoUrl(url,ivUserIcon);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -257,49 +256,92 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     }
 
     @Override
+    public void uploadUserPhoto() {
+
+//        Intent it = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//        startActivityForResult(it, IMAGE_REQUEST_CODE);
+
+        CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .start(this);
+
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == IMAGE_REQUEST_CODE) {
-            Bitmap bitmap;
-            try {
-                Log.i("Michael", "壓縮照片");
-                if (data != null) {
-                    Uri uri = data.getData();
-                    ContentResolver or = this.getContentResolver();
-                    if (uri != null) {
-                        bitmap = BitmapFactory.decodeStream(or.openInputStream(uri));
-                        Log.i("Michael", "取得的照片 : " + bitmap);
-                        //壓縮照片
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        int quality = 10;
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos);
-                        byte[] bytes = baos.toByteArray();
-                        bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        Log.i("Michael", "壓縮後的圖片大小 : " + (bitmap.getByteCount() / 1024 / 1024) + " , 寬度 : " + bitmap.getWidth()
-                                + " , 高度為 : " + bitmap.getHeight() + " , bytes 長度 : "
-                                + (bytes.length / 1024) + " kb " + "quality = " + quality);
-                        //Uri 轉 Bitmap
-//                            uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(),bitmap,null,null));
-                        String message = getString(R.string.please_wait);
 
-                        presenter.onShowProgressToast(message);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK && result != null) {
 
-                        uploadPhotoToStorage(bytes);
+                Uri resultUri = result.getUri();
+                try{
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),resultUri);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    int quality = 80;
+                    bitmap.compress(Bitmap.CompressFormat.JPEG,quality,baos);
+                    byte[] bytes = baos.toByteArray();
 
+                    String message = getString(R.string.please_wait);
 
-                    } else {
-                        Log.i("Michael", "photo uri = null");
-                    }
-                } else {
-                    Log.i("Michael", " data = null");
+                    presenter.onShowProgressToast(message);
+
+                    uploadPhotoToStorage(bytes);
+
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
 
 
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.i("Michael", "壓縮照片錯誤");
+
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
             }
         }
+
+//        if (requestCode == IMAGE_REQUEST_CODE) {
+//            Bitmap bitmap;
+//            try {
+//                Log.i("Michael", "壓縮照片");
+//                if (data != null) {
+//                    Uri uri = data.getData();
+//                    ContentResolver or = this.getContentResolver();
+//                    if (uri != null) {
+//                        bitmap = BitmapFactory.decodeStream(or.openInputStream(uri));
+//                        Log.i("Michael", "取得的照片 : " + bitmap);
+//                        //壓縮照片
+//                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                        int quality = 10;
+//                        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos);
+//                        byte[] bytes = baos.toByteArray();
+//                        bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+//                        Log.i("Michael", "壓縮後的圖片大小 : " + (bitmap.getByteCount() / 1024 / 1024) + " , 寬度 : " + bitmap.getWidth()
+//                                + " , 高度為 : " + bitmap.getHeight() + " , bytes 長度 : "
+//                                + (bytes.length / 1024) + " kb " + "quality = " + quality);
+//                        //Uri 轉 Bitmap
+////                            uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(),bitmap,null,null));
+//                        String message = getString(R.string.please_wait);
+//
+//                        presenter.onShowProgressToast(message);
+//
+//                        uploadPhotoToStorage(bytes);
+//
+//
+//                    } else {
+//                        Log.i("Michael", "photo uri = null");
+//                    }
+//                } else {
+//                    Log.i("Michael", " data = null");
+//                }
+//
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                Log.i("Michael", "壓縮照片錯誤");
+//            }
+//        }
     }
 
     private void uploadPhotoToStorage(final byte[] bytes) {
@@ -354,25 +396,13 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         mAuth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance().getReference();
         firestore = FirebaseFirestore.getInstance();
+        imageLoaderManager = new ImageLoaderManager(this);
+
         initPresenter();
         initView();
-        initImageLoader();
         presenter.onShowRecycler();
     }
 
-    private void initImageLoader() {
-        options = new DisplayImageOptions.Builder()
-                .showImageForEmptyUri(R.drawable.empty_photo)
-                .showImageOnFail(R.drawable.empty_photo)
-                .showImageOnLoading(R.drawable.empty_photo)
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .bitmapConfig(Bitmap.Config.ALPHA_8)
-                .build();
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
-                .defaultDisplayImageOptions(options).build();
-        imageLoader.init(config);
-    }
 
     private void initView() {
         Toolbar toolbar = findViewById(R.id.member_toolbar);

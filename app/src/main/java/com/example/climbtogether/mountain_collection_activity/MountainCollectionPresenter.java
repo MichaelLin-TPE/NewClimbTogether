@@ -25,9 +25,9 @@ public interface MountainCollectionPresenter {
 
     void onSpinnerItemSelectedListener(int position);
 
-    void onItemClickListener(DataDTO dataDTO);
+    void onItemClickListener(DataDTO dataDTO,int position);
 
-    void onItemDialogClickListener(int itemPosition,DataDTO dataDTO);
+    void onItemDialogClickListener(int itemPosition,DataDTO dataDTO,int position);
 
     void onShowProgressToast(String message);
 

@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -75,7 +76,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     private static final String FRIEND = "friend";
 
-    private int searchCount = 0;
+    private int searchCount = 0,searchCountOnResume = 0;
 
     private ArrayList<PersonalChatDTO> chatDataArrayList;
     
@@ -84,6 +85,9 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
     private String currentEmail;
 
     private PersonalFragmentAdapter adapter;
+
+    private int secondCount = 0;
+    private boolean isStillConnect;
 
     public static PersonalChatFragment newInstance() {
         PersonalChatFragment fragment = new PersonalChatFragment();
@@ -149,7 +153,6 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.i("Michael","chat onActivityCreated");
-        searchData();
     }
 
     private void searchData() {
@@ -182,6 +185,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
     public void showLoginInformation(boolean isShow) {
         ivLogo.setVisibility(isShow ? View.VISIBLE : View.GONE);
         tvNotice.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        tvNotice.setText(getString(R.string.login_notice_chat));
         btnLogin.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
 
@@ -238,10 +242,13 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
             Log.i("Michael","朋友有幾個 : "+friendsArrayList.size());
             searchFriendsData(friendsArrayList.get(searchCount),currentEmail);
         }else {
+            searchCount = 0;
             Log.i("Michael","所有資料讀取完畢");
             presenter.onCatchAllDataSucessful(chatDataArrayList);
         }
     }
+
+
 
     private void searchFriendsData(final String friendEmail, final String currentEmail) {
         firestore.collection("users").document(friendEmail)
@@ -296,28 +303,10 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                 });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.i("Michael","chat OnResume");
-        searchData();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.i("Michael","chat onPause");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.i("Michael","chat onStop");
-    }
-
     private void reSearchChatData(String path, final PersonalChatDTO data) {
         firestore.collection(PERSONAL_CHAT).document(path)
                 .collection(CHAT_DATA)
+                .orderBy("time", Query.Direction.ASCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -350,4 +339,48 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                     }
                 });
     }
+
+
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i("Michael","chat OnResume");
+        user = mAuth.getCurrentUser();
+        if (user != null){
+            Log.i("Michael","有用戶");
+
+            searchData();
+
+
+        }else {
+            chatDataArrayList = new ArrayList<>();
+            if (adapter != null){
+                adapter = new PersonalFragmentAdapter(context,chatDataArrayList);
+                recyclerView.setAdapter(adapter);
+            }
+            presenter.onNoUserEvent();
+            Log.i("Michael","沒用戶");
+        }
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i("Michael","chat onPause");
+        if (adapter != null){
+            adapter = new PersonalFragmentAdapter(context,new ArrayList<PersonalChatDTO>());
+            recyclerView.setAdapter(adapter);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.i("Michael","chat onStop");
+    }
+
+
 }

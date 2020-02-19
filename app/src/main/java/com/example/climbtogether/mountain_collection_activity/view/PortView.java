@@ -77,7 +77,7 @@ public class PortView extends ConstraintLayout {
     }
 
 
-    public void setData(final DataDTO data, boolean isChangeColor) {
+    public void setData(final DataDTO data, boolean isChangeColor, final int position) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd", Locale.TAIWAN);
         tvTime.setText(String.format(Locale.getDefault(), "日期 : %s", sdf.format(new Date(data.getTime()))));
         tvTitle.setText(data.getName());
@@ -86,18 +86,20 @@ public class PortView extends ConstraintLayout {
         clickArea.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onClick(data);
+                listener.onClick(data,position);
             }
         });
         if (data.getUserPhoto() != null){
+            ivPhoto.setScaleType(ImageView.ScaleType.FIT_CENTER);
             imageLoader.displayImage(data.getUserPhoto(),ivPhoto,options);
         }else {
+            ivPhoto.setScaleType(null);
             Log.i("Michael","照片沒資料");
         }
 
     }
 
     public interface OnPortViewItemClickListener{
-        void onClick(DataDTO dataDTO);
+        void onClick(DataDTO dataDTO,int itemPosition);
     }
 }

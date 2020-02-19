@@ -115,12 +115,12 @@ public class MountainCollectionPresenterImpl implements MountainCollectionPresen
     }
 
     @Override
-    public void onItemClickListener(DataDTO dataDTO) {
-        mView.showItemAlertDialog(dataDTO);
+    public void onItemClickListener(DataDTO dataDTO,int position) {
+        mView.showItemAlertDialog(dataDTO,position);
     }
 
     @Override
-    public void onItemDialogClickListener(int itemPosition,DataDTO dataDTO) {
+    public void onItemDialogClickListener(int itemPosition,DataDTO dataDTO,int position) {
         currentSid = dataDTO.getSid();
         switch (itemPosition) {
             case UPLOAD:
@@ -139,6 +139,7 @@ public class MountainCollectionPresenterImpl implements MountainCollectionPresen
                 data.setUserPhoto("");
                 data.setTime(0);
                 db.update(data);
+                mView.changeRecyclerView(position);
                 mView.removeData(dataDTO);
                 break;
             default:

@@ -71,10 +71,10 @@ public class MtPresenterImpl implements MtPresenter {
     @Override
     public void onBindPortViewHolder(PortViewHolder holder, int position) {
         if (isColorChange){
-            holder.setData(dataArrayList.get(position),isColorChange);
+            holder.setData(dataArrayList.get(position),isColorChange,position);
             isColorChange = false;
         }else {
-            holder.setData(dataArrayList.get(position),isColorChange);
+            holder.setData(dataArrayList.get(position),isColorChange,position);
             isColorChange = true;
         }
 
@@ -84,10 +84,10 @@ public class MtPresenterImpl implements MtPresenter {
     @Override
     public void onBindLandViewHolder(LandViewHolder holder, int position) {
         if (isColorChange){
-            holder.setData(dataArrayList.get(position),isColorChange);
+            holder.setData(dataArrayList.get(position),isColorChange,position);
             isColorChange = false;
         }else {
-            holder.setData(dataArrayList.get(position),isColorChange);
+            holder.setData(dataArrayList.get(position),isColorChange,position);
             isColorChange = true;
         }
     }

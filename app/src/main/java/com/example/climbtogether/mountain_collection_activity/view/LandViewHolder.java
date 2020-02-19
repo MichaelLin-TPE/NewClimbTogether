@@ -17,8 +17,8 @@ public class LandViewHolder extends RecyclerView.ViewHolder {
         landView = (LandView) itemView;
     }
 
-    public void setData(DataDTO dataDTO, boolean isColorChange) {
-        landView.setData(dataDTO,isColorChange);
+    public void setData(DataDTO dataDTO, boolean isColorChange,int position) {
+        landView.setData(dataDTO,isColorChange,position);
     }
 
     public void setOnLandViewItemClickListener(PortView.OnPortViewItemClickListener listener) {

@@ -20,7 +20,7 @@
     <dimen name="mountain_item_photo_height">70dp</dimen>
     <dimen name="member_item_icon_size">30dp</dimen>
     <dimen name="member_item_text_title_size">20sp</dimen>
-    <dimen name="port_view_photo_width">100dp</dimen>
+    <dimen name="port_view_photo_width">120dp</dimen>
     <dimen name="port_view_photo_height">140dp</dimen>
 
     <dimen name="land_view_photo_width">150dp</dimen>

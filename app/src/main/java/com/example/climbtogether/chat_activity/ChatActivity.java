@@ -1,6 +1,7 @@
 package com.example.climbtogether.chat_activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -33,8 +34,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -225,6 +229,8 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
                 } while (true);
             }
         }).start();
+
+
     }
 
     private void checkLoginStatus() {
@@ -478,9 +484,9 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
 
         tvInviteProcess.setVisibility(isInvited ? View.VISIBLE : View.GONE);
 
-        ivAddFriend.setVisibility(isInvited ? View.GONE : View.VISIBLE);
-
-        ivAddFriend.setVisibility(isFriend ? View.GONE : View.VISIBLE);
+        ivAddFriend.setVisibility(!isFriend & isInvited ? View.GONE : View.VISIBLE);
+//
+//        ivAddFriend.setVisibility(isFriend ? View.GONE : View.VISIBLE);
 
         ivFriend.setVisibility(isFriend ? View.VISIBLE : View.GONE);
 

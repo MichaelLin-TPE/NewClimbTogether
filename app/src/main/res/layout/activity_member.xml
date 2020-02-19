@@ -36,7 +36,7 @@
         android:layout_width="@dimen/member_user_photo_width"
         android:layout_marginBottom="5dp"
         android:visibility="visible"
-        android:layout_height="@dimen/member_user_photo_height"/>
+        android:layout_height="@dimen/member_user_photo_width"/>
 
     <TextView
         android:id="@+id/member_text_email"

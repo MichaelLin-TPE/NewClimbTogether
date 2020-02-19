@@ -47,4 +47,7 @@ dependencies {
 
     //圓角圖套件
     implementation 'com.makeramen:roundedimageview:2.3.0'
+
+    //裁減圖套件
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
 }

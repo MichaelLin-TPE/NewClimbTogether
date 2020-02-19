@@ -36,7 +36,7 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
     @Override
     public void onCatchAllDataSucessful(ArrayList<PersonalChatDTO> chatDataArrayList) {
         mView.showProgress(false);
-        Log.i("Micahel","資料長度 : "+chatDataArrayList.size());
+        Log.i("Michael","資料長度 : "+chatDataArrayList.size());
         if (chatDataArrayList.size() == 0){
             mView.showNoChatDataView(true);
         }else {

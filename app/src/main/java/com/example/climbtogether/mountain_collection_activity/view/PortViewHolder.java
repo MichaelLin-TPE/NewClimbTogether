@@ -25,7 +25,7 @@ public class PortViewHolder extends RecyclerView.ViewHolder {
         portView = (PortView) itemView;
     }
 
-    public void setData(DataDTO data,boolean isColorChange) {
-        portView.setData(data,isColorChange);
+    public void setData(DataDTO data,boolean isColorChange,int position) {
+        portView.setData(data,isColorChange,position);
     }
 }

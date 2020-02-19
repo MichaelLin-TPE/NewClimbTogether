@@ -50,6 +50,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
@@ -103,6 +105,8 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
     private long userPressedTime;
 
     private long pickTime;
+
+    private ArrayList<DataDTO> dataArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -276,6 +280,8 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
     @Override
     public void setRecyclerViewData(final ArrayList<DataDTO> dataArrayList) {
 
+        this.dataArrayList = dataArrayList;
+
         mtPresenter.setData(dataArrayList);
 
         adapter = new MountainCollectionAdapter(this,mtPresenter);
@@ -291,8 +297,8 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
         recyclerView.setAdapter(adapter);
         adapter.setOnPortViewItemClickListener(new PortView.OnPortViewItemClickListener() {
             @Override
-            public void onClick(DataDTO dataDTO) {
-                presenter.onItemClickListener(dataDTO);
+            public void onClick(DataDTO dataDTO,int position) {
+                presenter.onItemClickListener(dataDTO,position);
             }
         });
     }
@@ -329,7 +335,7 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
     }
 
     @Override
-    public void showItemAlertDialog(final DataDTO dataDTO) {
+    public void showItemAlertDialog(final DataDTO dataDTO, final int position) {
         this.userPressedSid = dataDTO.getSid();
         this.userPressedTime = dataDTO.getTime();
 
@@ -349,35 +355,35 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onItemDialogClickListener(UPLOAD,dataDTO);
+                presenter.onItemDialogClickListener(UPLOAD,dataDTO,position);
                 dialog.dismiss();
             }
         });
         watchInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onItemDialogClickListener(WATCH_INFORMATION,dataDTO);
+                presenter.onItemDialogClickListener(WATCH_INFORMATION,dataDTO,position);
                 dialog.dismiss();
             }
         });
         shareEx.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onItemDialogClickListener(SHARE_EXPERIENCE,dataDTO);
+                presenter.onItemDialogClickListener(SHARE_EXPERIENCE,dataDTO,position);
                 dialog.dismiss();
             }
         });
         modifyTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onItemDialogClickListener(MODIFY_TIME,dataDTO);
+                presenter.onItemDialogClickListener(MODIFY_TIME,dataDTO,position);
                 dialog.dismiss();
             }
         });
         removeData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onItemDialogClickListener(REMOVE_DATA,dataDTO);
+                presenter.onItemDialogClickListener(REMOVE_DATA,dataDTO,position);
                 dialog.dismiss();
             }
         });
@@ -387,8 +393,42 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
     @Override
     public void selectPhoto(String mtName) {
         this.userPreessedMtName = mtName;
-        Intent it = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(it,IMAGE_REQUEST_CODE);
+
+        CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .start(this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Bitmap bitmap;
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK && result != null) {
+                Uri resultUri = result.getUri();
+                try{
+                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),resultUri);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    int quality = 30;
+                    bitmap.compress(Bitmap.CompressFormat.JPEG,quality,baos);
+                    byte[] bytes = baos.toByteArray();
+                    String message = getString(R.string.please_wait);
+                    presenter.onShowProgressToast(message);
+
+                    uploadPhotoToStorage(bytes);
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                if (result != null){
+                    Exception error = result.getError();
+                }
+            }
+        }
     }
 
     @Override
@@ -430,8 +470,7 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        String message = getString(R.string.delete_fail);
-                        presenter.onShowProgressToast(message);
+                        Log.i("Michael","沒有照片");
                     }
                 });
             }
@@ -502,50 +541,14 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Bitmap bitmap;
-
-        if (requestCode == IMAGE_REQUEST_CODE){
-            try{
-                Log.i("Michael","壓縮照片");
-                if (data != null){
-                    Uri uri = data.getData();
-                    ContentResolver or = this.getContentResolver();
-                    if (uri != null){
-                        bitmap = BitmapFactory.decodeStream(or.openInputStream(uri));
-                        Log.i("Michael","取得的照片 : "+bitmap);
-                        //壓縮照片
-                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                        int quality = 10;
-                        bitmap.compress(Bitmap.CompressFormat.JPEG,quality,baos);
-                        byte[] bytes = baos.toByteArray();
-                        bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-                        Log.i("Michael","壓縮後的圖片大小 : "+ (bitmap.getByteCount() / 1024 /1024 )+" , 寬度 : "+bitmap.getWidth()
-                                + " , 高度為 : "+bitmap.getHeight() + " , bytes 長度 : "
-                                + (bytes.length / 1024 ) + " kb "+ "quality = " + quality);
-                        //Uri 轉 Bitmap
-//                            uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(),bitmap,null,null));
-                        String message = getString(R.string.please_wait);
-                        presenter.onShowProgressToast(message);
-
-                        uploadPhotoToStorage(bytes);
-
-
-                    }else {
-                        Log.i("Michael","photo uri = null");
-                    }
-                }else {
-                    Log.i("Michael"," data = null");
-                }
-
-
-            }catch (Exception e){
-                e.printStackTrace();
-                Log.i("Michael","壓縮照片錯誤");
-            }
+    public void changeRecyclerView(int position) {
+        dataArrayList.remove(position);
+        mtPresenter.setData(dataArrayList);
+        if (adapter != null){
+            adapter.notifyDataSetChanged();
         }
     }
+
 
     private void uploadPhotoToStorage(byte[] bytes) {
         if(user != null){

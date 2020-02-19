@@ -27,7 +27,7 @@ public interface MountainCollectionVu {
 
     void setViewType(int position);
 
-    void showItemAlertDialog(DataDTO dataDTO);
+    void showItemAlertDialog(DataDTO dataDTO,int position);
 
     void selectPhoto(String mtName);
 
@@ -40,4 +40,6 @@ public interface MountainCollectionVu {
     void showDatePickerDialog(DataDTO dataDTO);
 
     void modifyFirestoreData(DataDTO data, long pickTime);
+
+    void changeRecyclerView(int position);
 }
