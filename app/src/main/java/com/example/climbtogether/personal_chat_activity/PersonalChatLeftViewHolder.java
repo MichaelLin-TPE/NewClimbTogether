@@ -56,6 +56,12 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
 
 
     public void setData(PersonalChatData personalChatData,String displayName, String friendPhotoUrl) {
+        if (friendPhotoUrl.isEmpty()){
+            ivUserPhoto.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        }else {
+            ivUserPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        }
+
         imageLoaderManager.setPhotoUrl(friendPhotoUrl,ivUserPhoto);
         tvName.setText(displayName);
         tvMessage.setText(personalChatData.getMessage());

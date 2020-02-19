@@ -21,6 +21,11 @@ public class FriendViewHolder extends RecyclerView.ViewHolder {
 
     private RecyclerView recyclerView;
 
+    private FriendViewAdapter.OnfriendItemClickListener listener;
+
+    public void setOnfriendItemClickListener(FriendViewAdapter.OnfriendItemClickListener listener){
+        this.listener = listener;
+    }
 
     public FriendViewHolder(@NonNull View itemView,Context context) {
         super(itemView);
@@ -32,6 +37,11 @@ public class FriendViewHolder extends RecyclerView.ViewHolder {
         adapter = new FriendViewAdapter(context,inviteArrayList);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(adapter);
-
+        adapter.setOnfriendItemClickListener(new FriendViewAdapter.OnfriendItemClickListener() {
+            @Override
+            public void onClick(FriendDTO data, int itemPosition) {
+                listener.onClick(data,itemPosition);
+            }
+        });
     }
 }

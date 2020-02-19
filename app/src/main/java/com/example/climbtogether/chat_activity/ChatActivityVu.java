@@ -32,4 +32,6 @@ public interface ChatActivityVu {
     void searchFriendInvite(String strangeEmail);
 
     void intentToPersonalChatActivity(String displayName, String mail, String photoUrl);
+
+    void showUserDialog();
 }

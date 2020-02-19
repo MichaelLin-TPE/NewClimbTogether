@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.climbtogether.R;
@@ -36,20 +37,20 @@ public class FriendViewAdapter extends RecyclerView.Adapter<FriendViewAdapter.Vi
 
     private StorageReference storage;
 
-    private FirebaseFirestore firestore;
-
     private ImageLoaderManager loaderManager;
 
-    private static final String FRIENDSHIP = "friendship";
-
-    private static final String FRIEND = "friend";
 
     private FirebaseUser user;
+
+    private OnfriendItemClickListener listener;
+
+    public void setOnfriendItemClickListener(OnfriendItemClickListener listener){
+        this.listener = listener;
+    }
 
     public FriendViewAdapter(Context context, ArrayList<FriendDTO> friendArrayList) {
         this.context = context;
         this.friendArrayList = friendArrayList;
-        firestore = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance().getReference();
         loaderManager = new ImageLoaderManager(context);
     }
@@ -65,7 +66,7 @@ public class FriendViewAdapter extends RecyclerView.Adapter<FriendViewAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         final FriendDTO data = friendArrayList.get(position);
 
         StorageReference river = storage.child(data.getEmail()+"/userPhoto/"+data.getEmail()+".jpg");
@@ -88,6 +89,13 @@ public class FriendViewAdapter extends RecyclerView.Adapter<FriendViewAdapter.Vi
             }
         });
 
+        holder.clickArae.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onClick(data,position);
+            }
+        });
+
     }
 
 
@@ -102,13 +110,19 @@ public class FriendViewAdapter extends RecyclerView.Adapter<FriendViewAdapter.Vi
 
         private TextView tvDisplayName,tvEmai;
 
+        private ConstraintLayout clickArae;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            clickArae = itemView.findViewById(R.id.friend_item_click_area);
             ivUserPhoto = itemView.findViewById(R.id.friend_item_user_photo);
             tvDisplayName = itemView.findViewById(R.id.friend_item_display_name);
             tvEmai = itemView.findViewById(R.id.friend_item_email);
 
 
         }
+    }
+    public interface OnfriendItemClickListener{
+        void onClick(FriendDTO data,int itemPosition);
     }
 }

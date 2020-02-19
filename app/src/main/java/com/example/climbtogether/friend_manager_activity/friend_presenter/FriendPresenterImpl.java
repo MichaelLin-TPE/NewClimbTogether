@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.example.climbtogether.friend_manager_activity.FriendDTO;
 import com.example.climbtogether.friend_manager_activity.FriendInviteDTO;
+import com.example.climbtogether.friend_manager_activity.view.FriendViewAdapter;
 import com.example.climbtogether.friend_manager_activity.view.FriendViewHolder;
 import com.example.climbtogether.friend_manager_activity.view.InviteViewHolder;
 
@@ -20,6 +21,11 @@ public class FriendPresenterImpl implements FriendPresenter {
     private boolean isFriendShow;
     private ArrayList<FriendInviteDTO> inviteArrayList;
     private ArrayList<FriendDTO> friendArrayList;
+
+
+    public void setOnfriendItemClickListener (FriendViewAdapter.OnfriendItemClickListener listener ,FriendViewHolder holder){
+        holder.setOnfriendItemClickListener(listener);
+    }
 
     @Override
     public int getItemViewType(int position) {
@@ -77,4 +83,5 @@ public class FriendPresenterImpl implements FriendPresenter {
     public void onBindFriendViewHolder(FriendViewHolder holder, int position) {
         holder.setData(friendArrayList);
     }
+
 }

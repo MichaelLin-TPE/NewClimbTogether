@@ -37,4 +37,6 @@
     <dimen name="invite_item_user_photo_size">60dp</dimen>
     <dimen name="add_user_icon_size_smaller">20dp</dimen>
     <dimen name="personal_user_photo_size">60dp</dimen>
+    <dimen name="chat_click_area">50dp</dimen>
+    <dimen name="delete_click_area">60dp</dimen>
 </resources>

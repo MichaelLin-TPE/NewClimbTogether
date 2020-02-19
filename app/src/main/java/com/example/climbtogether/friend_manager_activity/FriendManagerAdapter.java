@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.climbtogether.R;
 import com.example.climbtogether.friend_manager_activity.friend_presenter.FriendPresenter;
+import com.example.climbtogether.friend_manager_activity.view.FriendViewAdapter;
 import com.example.climbtogether.friend_manager_activity.view.FriendViewHolder;
 import com.example.climbtogether.friend_manager_activity.view.InviteViewHolder;
 
@@ -21,6 +22,12 @@ public class FriendManagerAdapter extends RecyclerView.Adapter {
     private FriendPresenter friendPresenter;
 
     private Context context;
+
+    private FriendViewAdapter.OnfriendItemClickListener listener;
+
+    public void setOnfriendItemClickListener(FriendViewAdapter.OnfriendItemClickListener listener){
+        this.listener = listener;
+    }
 
     public FriendManagerAdapter(FriendPresenter friendPresenter, Context context) {
         this.friendPresenter = friendPresenter;
@@ -53,9 +60,11 @@ public class FriendManagerAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof InviteViewHolder){
             friendPresenter.onBindInviteViewHolder((InviteViewHolder)holder,position);
+
         }
         if (holder instanceof FriendViewHolder){
             friendPresenter.onBindFriendViewHolder((FriendViewHolder)holder,position);
+            friendPresenter.setOnfriendItemClickListener(listener,(FriendViewHolder)holder);
         }
     }
 

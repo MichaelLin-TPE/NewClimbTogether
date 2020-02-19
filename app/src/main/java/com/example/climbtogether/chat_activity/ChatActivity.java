@@ -84,6 +84,8 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
 
     private String displayName;
 
+    private String friendPhotoUrl = "";
+
     private StorageReference storage;
 
     private ImageLoaderManager imageLoaderManager;
@@ -97,7 +99,14 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     private static final String INVITE = "invite";
 
     private TextView tvInviteProcess;
-    private  ImageView ivAddFriend , ivFriend;
+    private ImageView ivAddFriend, ivFriend;
+
+    private RoundedImageView ivPhoto;
+    private TextView tvDisplayName;
+    private TextView tvEmail;
+    private LinearLayout chatClickArea;
+
+    private ProgressBar dialogProgressbar;
 
     private boolean isInvited;
     private boolean isFriend;
@@ -310,7 +319,7 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
                                     chatData.setTime((long) map.get("time"));
                                     chatData.setMessage((String) map.get("message"));
                                     chatData.setPhotoUrl((String) map.get("photo_url"));
-                                    chatData.setDisPlayName((String)map.get("displayName"));
+                                    chatData.setDisPlayName((String) map.get("displayName"));
                                     chatDataArrayList.add(chatData);
                                     Log.i("Michael", "取得訊息 : " + chatDataArrayList.get(0).getMessage());
                                 }
@@ -375,11 +384,12 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
                                 Map<String, Object> map = document.getData();
                                 if (map != null) {
                                     displayName = (String) map.get("displayName");
+                                    friendPhotoUrl = (String) map.get("photoUrl");
                                 }
                                 //查詢朋友狀況
                                 if (user != null) {
                                     if (user.getEmail() != null) {
-                                        presenter.onSearchFriendShip(user.getEmail(),mail);
+                                        presenter.onSearchFriendShip(user.getEmail(), mail);
                                     }
                                 }
                             }
@@ -391,7 +401,7 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     }
 
     @Override
-    public void searchFriendShip(String email,final String strangeEmail) {
+    public void searchFriendShip(String email, final String strangeEmail) {
         firestore.collection(FRIENDSHIP).document(email).collection(FRIEND).document(strangeEmail)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -403,10 +413,10 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
                                 Map<String, Object> map = document.getData();
                                 if (map != null) {
                                     isFriend = true;
-                                    Log.i("Michael","是朋友");
+                                    Log.i("Michael", "是朋友");
                                 } else {
                                     isFriend = false;
-                                    Log.i("Michael","不是朋友");
+                                    Log.i("Michael", "不是朋友");
                                 }
                                 presenter.onSearchInvite(strangeEmail);
                             }
@@ -417,43 +427,25 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
 
     @Override
     public void searchFriendInvite(final String strangeEmail) {
-        Log.i("Michael","查詢是否邀請過");
+        Log.i("Michael", "查詢是否邀請過");
         firestore.collection(INVITE_FRIEND).document(strangeEmail).collection(INVITE).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()){
-                            if (task.getResult() != null){
-                                for (QueryDocumentSnapshot document : task.getResult()){
-                                    if (user != null){
-                                        if (user.getEmail() != null){
-                                            if (user.getEmail().equals(document.getId())){
-                                                isInvited = true;
-                                                Log.i("Michael","曾經邀請過");
-                                                break;
-                                            }
-                                        }
+                        if (task.isSuccessful() && task.getResult() != null) {
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                if (user != null && user.getEmail() != null) {
+
+                                    if (user.getEmail().equals(document.getId())) {
+                                        isInvited = true;
+                                        Log.i("Michael", "曾經邀請過");
+                                        break;
                                     }
+
                                 }
-                                //下載朋友圖
-                                Log.i("Michael","下載圖");
-                                StorageReference river = storage.child(strangeEmail + "/userPhoto/" + strangeEmail + ".jpg");
-                                river.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    @Override
-                                    public void onSuccess(Uri uri) {
-                                        String photoUrl = uri.toString();
-
-                                        presenter.onCatchUserData(displayName, photoUrl, strangeEmail, isFriend);
-
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.i("Michael", "使用者沒照片");
-                                        presenter.onCatchUserData(displayName, "", strangeEmail, isFriend);
-                                    }
-                                });
                             }
+                            presenter.onCatchUserData(displayName, friendPhotoUrl, strangeEmail, isFriend);
                         }
                     }
                 });
@@ -462,31 +454,21 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     @Override
     public void intentToPersonalChatActivity(String displayName, String mail, String photoUrl) {
         Intent it = new Intent(this, PersonalChatActivity.class);
-        it.putExtra("displayName",displayName);
-        it.putExtra("mail",mail);
-        it.putExtra("photoUrl",photoUrl);
+        it.putExtra("displayName", displayName);
+        it.putExtra("mail", mail);
+        it.putExtra("photoUrl", photoUrl);
         startActivity(it);
     }
 
 
     @Override
     public void showUserDialog(final String displayName, final String photoUrl, final String mail, boolean isFriend) {
-        View view = View.inflate(this, R.layout.user_dialog_custom_view, null);
-        RoundedImageView ivPhoto = view.findViewById(R.id.user_dialog_photo);
-        TextView tvDisplayName = view.findViewById(R.id.user_dialog_display_name);
-        TextView tvEmail = view.findViewById(R.id.user_dialog_email);
-        LinearLayout chatClickArea = view.findViewById(R.id.user_dialog_chat_clickArea);
-        tvInviteProcess = view.findViewById(R.id.user_dialog_invite_process);
-        ivAddFriend = view.findViewById(R.id.user_dialog_add_user);
-        ivFriend = view.findViewById(R.id.user_dialog_friend);
-
+        dialogProgressbar.setVisibility(View.GONE);
         chatClickArea.setVisibility(isFriend ? View.VISIBLE : View.GONE);
 
         tvInviteProcess.setVisibility(isInvited ? View.VISIBLE : View.GONE);
 
         ivAddFriend.setVisibility(!isFriend & isInvited ? View.GONE : View.VISIBLE);
-//
-//        ivAddFriend.setVisibility(isFriend ? View.GONE : View.VISIBLE);
 
         ivFriend.setVisibility(isFriend ? View.VISIBLE : View.GONE);
 
@@ -499,19 +481,11 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
         }
         tvDisplayName.setText(displayName);
         tvEmail.setText(mail);
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setView(view).create();
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        }
-
-        dialog.show();
 
         ivAddFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                presenter.onAddFriendClickListener(mail,user.getEmail());
+                presenter.onAddFriendClickListener(mail, user.getEmail());
             }
         });
         isInvited = false;
@@ -519,7 +493,7 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
         chatClickArea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onChatButtonClickListener(displayName,mail,photoUrl);
+                presenter.onChatButtonClickListener(displayName, mail, photoUrl);
             }
         });
 
@@ -533,16 +507,16 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     }
 
     @Override
-    public void sendInviteToStranger(String strangerEmail,String userEmail) {
+    public void sendInviteToStranger(String strangerEmail, String userEmail) {
 
-        Map<String , Object> map = new HashMap<>();
-        map.put("answer","");
+        Map<String, Object> map = new HashMap<>();
+        map.put("answer", "");
         firestore.collection(INVITE_FRIEND).document(strangerEmail).collection(INVITE).document(userEmail)
                 .set(map)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             presenter.onSendInviteSuccessful();
                         }
                     }
@@ -551,9 +525,8 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
 
     @Override
     public void showToast(String message) {
-        Toast.makeText(this,message,Toast.LENGTH_LONG).show();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
-
 
 
     @Override
@@ -582,20 +555,45 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     }
 
     @Override
+    public void showUserDialog() {
+        View view = View.inflate(this, R.layout.user_dialog_custom_view, null);
+        ivPhoto = view.findViewById(R.id.user_dialog_photo);
+        tvDisplayName = view.findViewById(R.id.user_dialog_display_name);
+        tvEmail = view.findViewById(R.id.user_dialog_email);
+        chatClickArea = view.findViewById(R.id.user_dialog_chat_clickArea);
+        tvInviteProcess = view.findViewById(R.id.user_dialog_invite_process);
+        ivAddFriend = view.findViewById(R.id.user_dialog_add_user);
+        ivFriend = view.findViewById(R.id.user_dialog_friend);
+        dialogProgressbar = view.findViewById(R.id.user_dialog_progressbar);
+        dialogProgressbar.setVisibility(View.VISIBLE);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view).create();
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        dialog.show();
+        presenter.onSearUserData();
+
+    }
+
+    @Override
     public void createChatDataToFirestore(final String message, final long currentTime) {
         final Map<String, Object> map = new HashMap<>();
-        firestore.collection("users").document(user.getEmail()).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()){
-                            if (task.getResult() != null){
+        if (user != null && user.getEmail() != null) {
+            firestore.collection("users").document(user.getEmail()).get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful() && task.getResult() != null) {
+
                                 DocumentSnapshot document = task.getResult();
                                 map.put("time", currentTime);
                                 map.put("message", message);
                                 map.put("email", user.getEmail());
                                 map.put("photo_url", "");
-                                map.put("displayName",(String)document.get("displayName"));
+                                map.put("displayName", document.get("displayName"));
                                 firestore.collection(DISCUSSION).document(listName).collection(CHAT_DATA).document()
                                         .set(map)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -606,11 +604,13 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
                                                 }
                                             }
                                         });
+
                             }
                         }
-                    }
-                });
-        Log.i("Michael","displayName : "+user.getDisplayName());
+                    });
+            Log.i("Michael", "displayName : " + user.getDisplayName());
+
+        }
 
     }
 

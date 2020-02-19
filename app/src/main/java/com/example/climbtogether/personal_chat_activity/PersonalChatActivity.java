@@ -304,8 +304,14 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 Log.i("Michael", "資料新增成功");
-                                countSecond = 0;
-                                checkDataChange();
+                                if (countSecond >= 22500){
+                                    countSecond = 0;
+                                    checkDataChange();
+                                }else{
+                                    countSecond = 0;
+                                }
+
+
                             }
                         }
                     });

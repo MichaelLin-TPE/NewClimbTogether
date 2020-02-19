@@ -2,6 +2,7 @@ package com.example.climbtogether.friend_manager_activity.friend_presenter;
 
 import com.example.climbtogether.friend_manager_activity.FriendDTO;
 import com.example.climbtogether.friend_manager_activity.FriendInviteDTO;
+import com.example.climbtogether.friend_manager_activity.view.FriendViewAdapter;
 import com.example.climbtogether.friend_manager_activity.view.FriendViewHolder;
 import com.example.climbtogether.friend_manager_activity.view.InviteViewHolder;
 
@@ -17,4 +18,6 @@ public interface FriendPresenter {
     void onBindInviteViewHolder(InviteViewHolder holder, int position);
 
     void onBindFriendViewHolder(FriendViewHolder holder, int position);
+
+    void setOnfriendItemClickListener (FriendViewAdapter.OnfriendItemClickListener listener , FriendViewHolder holder);
 }

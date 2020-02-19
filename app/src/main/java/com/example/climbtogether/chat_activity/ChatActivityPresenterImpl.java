@@ -6,6 +6,8 @@ public class ChatActivityPresenterImpl implements ChatActivityPresenter {
 
     private ChatActivityVu mView;
 
+    private String friendEmail;
+
     public ChatActivityPresenterImpl(ChatActivityVu mView){
         this.mView = mView;
     }
@@ -42,7 +44,9 @@ public class ChatActivityPresenterImpl implements ChatActivityPresenter {
 
     @Override
     public void onUserPhotoClickListener(String mail) {
-        mView.searchInfoFromFirebase(mail);
+        this.friendEmail = mail;
+        mView.showUserDialog();
+
     }
 
     @Override
@@ -76,5 +80,10 @@ public class ChatActivityPresenterImpl implements ChatActivityPresenter {
     @Override
     public void onChatButtonClickListener(String displayName, String mail, String photoUrl) {
         mView.intentToPersonalChatActivity(displayName,mail,photoUrl);
+    }
+
+    @Override
+    public void onSearUserData() {
+        mView.searchInfoFromFirebase(friendEmail);
     }
 }
