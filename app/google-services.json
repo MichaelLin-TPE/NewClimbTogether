@@ -8,6 +8,43 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:687642928001:android:bd0802e5d40afb76a4fe80",
+        "android_client_info": {
+          "package_name": "com.example.changeicon"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "687642928001-f4qd2bm0h0n5fj2p153o7dtd5uqbq7ml.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.changeicon",
+            "certificate_hash": "00d7337d49986052fd9fd604f4db476e8076034e"
+          }
+        },
+        {
+          "client_id": "687642928001-j63fdb9smi4h71r23uqt6tu28bejci2c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4WFPW-dZmFmyRVXE7GDDkv8PxN4jTtVM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "687642928001-j63fdb9smi4h71r23uqt6tu28bejci2c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:687642928001:android:da264b9821a3875ca4fe80",
         "android_client_info": {
           "package_name": "com.example.climbtogether"
@@ -19,6 +56,43 @@
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.climbtogether",
+            "certificate_hash": "00d7337d49986052fd9fd604f4db476e8076034e"
+          }
+        },
+        {
+          "client_id": "687642928001-j63fdb9smi4h71r23uqt6tu28bejci2c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4WFPW-dZmFmyRVXE7GDDkv8PxN4jTtVM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "687642928001-j63fdb9smi4h71r23uqt6tu28bejci2c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:687642928001:android:d2c9d6ee2592bffea4fe80",
+        "android_client_info": {
+          "package_name": "com.example.newchangeicon"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "687642928001-o8phrvebdseuni2gvnvv53ncljj5u2qk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.newchangeicon",
             "certificate_hash": "00d7337d49986052fd9fd604f4db476e8076034e"
           }
         },

@@ -12,4 +12,8 @@ public interface PersonalChatPresenter {
     void onCatchChatData(ArrayList<PersonalChatData> chatArrayList);
 
     void onDataChangeEvent( ArrayList<PersonalChatData> chatArrayList);
+
+    void onSendNotificationToFriend(String friendEmail,String message,String displayName);
+
+    void onPostFcmToFriend(String token, String message, String displayName);
 }

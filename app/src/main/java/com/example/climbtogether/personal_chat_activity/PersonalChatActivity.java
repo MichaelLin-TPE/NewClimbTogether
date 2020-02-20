@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -104,6 +105,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                 edMessage.setText("");
                 long time = System.currentTimeMillis();
                 presenter.onSendMessageButtonClickListener(message, time);
+                presenter.onSendNotificationToFriend(friendEmail,message,displayName);
             }
         });
     }
@@ -344,5 +346,28 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
         }
         adapter.notifyDataSetChanged();
         recyclerView.scrollToPosition(chatArrayList.size() -1);
+    }
+
+    @Override
+    public void searchFriendData(String friendEmail, final String message, final String displayName) {
+        firestore.collection("users").document(friendEmail)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null){
+                            DocumentSnapshot snapshot = task.getResult();
+                            String token = (String)snapshot.get("token");
+                            if (token != null){
+                                presenter.onPostFcmToFriend(token,message,displayName);
+                            }
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public String getDisplayName() {
+        return new UserDataManager(this).getDisplayName();
     }
 }

@@ -31,6 +31,7 @@ import com.example.climbtogether.friend_manager_activity.FriendManagerActivity;
 import com.example.climbtogether.login_activity.LoginActivity;
 import com.example.climbtogether.mountain_collection_activity.MountainCollectionActivity;
 import com.example.climbtogether.tool.ImageLoaderManager;
+import com.example.climbtogether.tool.UserDataManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -90,6 +91,8 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
     private ImageLoaderManager imageLoaderManager;
 
+    private UserDataManager userDataManager;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -126,6 +129,21 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     private void updateUI(FirebaseUser currentUser) {
         if (currentUser != null) {
             presenter.onChangeView(false);
+            if (currentUser != null && currentUser.getEmail() != null){
+                firestore.collection("users")
+                        .document(currentUser.getEmail())
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful() && task.getResult() != null){
+                                    DocumentSnapshot snapshot = task.getResult();
+                                    userDataManager.saveUserData((String)snapshot.get("mail"),(String)snapshot.get("displayName"),(String)snapshot.get("photoUrl"));
+                                }
+                            }
+                        });
+            }
+
         } else {
             presenter.onChangeView(true);
         }
@@ -383,6 +401,10 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         if (currentUser != null && currentUser.getEmail() != null){
             Map<String,Object> map = new HashMap<>();
             map.put("photoUrl",photoUrl);
+            UserDataManager userDataManager = new UserDataManager(this);
+            if (!userDataManager.getToken().isEmpty()){
+                map.put("token",userDataManager.getToken());
+            }
             firestore.collection("users").document(currentUser.getEmail())
                     .set(map, SetOptions.merge());
         }
@@ -397,7 +419,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         storage = FirebaseStorage.getInstance().getReference();
         firestore = FirebaseFirestore.getInstance();
         imageLoaderManager = new ImageLoaderManager(this);
-
+        userDataManager = new UserDataManager(this);
         initPresenter();
         initView();
         presenter.onShowRecycler();

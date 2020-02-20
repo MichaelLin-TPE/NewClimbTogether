@@ -12,4 +12,8 @@ public interface PersonalChatVu {
     void setRecyclerView(ArrayList<PersonalChatData> chatArrayList);
 
     void changeRecyclerView(ArrayList<PersonalChatData> chatArrayList);
+
+    void searchFriendData(String friendEmail,String message,String displayName);
+
+    String getDisplayName();
 }

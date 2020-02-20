@@ -1,5 +1,13 @@
 package com.example.climbtogether.personal_chat_activity;
 
+import android.util.Log;
+
+import com.example.climbtogether.personal_chat_activity.fcm_object.FcmNotification;
+import com.example.climbtogether.personal_chat_activity.fcm_object.FcmObject;
+import com.example.climbtogether.tool.HttpConnection;
+import com.google.gson.Gson;
+
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 public class PersonalChatPresenterImpl implements PersonalChatPresenter {
@@ -33,5 +41,37 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
     @Override
     public void onDataChangeEvent(ArrayList<PersonalChatData> chatArrayList) {
         mView.changeRecyclerView(chatArrayList);
+    }
+
+    @Override
+    public void onSendNotificationToFriend(String friendEmail,String message,String displayName) {
+        mView.searchFriendData(friendEmail,message,displayName);
+    }
+
+    @Override
+    public void onPostFcmToFriend(String token, String message, String displayName) {
+        HttpConnection connection = new HttpConnection();
+        String url = "https://fcm.googleapis.com/fcm/send";
+        FcmObject fcmObject = new FcmObject();
+        fcmObject.setTo(token);
+        fcmObject.setCollapsekey("type_a");
+        FcmNotification data = new FcmNotification();
+        data.setBody(message);
+        data.setTitle(mView.getDisplayName());
+        fcmObject.setNotification(data);
+        String jsonStr = new Gson().toJson(fcmObject);
+
+        Log.i("Michael",jsonStr);
+        connection.startConnection(url, jsonStr, new HttpConnection.OnPostNotificationListener() {
+            @Override
+            public void onSuccessful(String result) {
+                Log.i("Michael",result);
+            }
+
+            @Override
+            public void onFail(String exception) {
+                Log.i("Michael","錯誤 : "+exception);
+            }
+        });
     }
 }

@@ -82,4 +82,5 @@
     <string name="delete">移除好友</string>
     <string name="warning">刪除警告</string>
     <string name="confirm_to_delete">確定要刪除此好友嗎?\n刪除好友後將會連聊天訊息一併刪除唷.</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
 </resources>

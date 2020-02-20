@@ -108,6 +108,8 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
 
     private ArrayList<DataDTO> dataArrayList;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -579,6 +581,7 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
     }
 
     private void modifyFirestoreData(String downloadUrl,String email) {
+
         Map<String,Object> map = new HashMap<>();
         map.put("name", userPreessedMtName);
         map.put("topTime", userPressedTime);

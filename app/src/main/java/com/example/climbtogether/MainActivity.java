@@ -1,20 +1,45 @@
 package com.example.climbtogether;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.PluralsRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.example.climbtogether.home_activity.HomePageActivity;
+import com.example.climbtogether.tool.UserDataManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingService;
 
 public class MainActivity extends AppCompatActivity implements MainActivityVu {
 
     private MainActivityPresenter mainPresenter;
 
     private Toolbar toolbar;
+
+    private UserDataManager userDataManager;
+
+    private FirebaseAuth mAuth;
+
+    private FirebaseUser user;
+
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +56,54 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
             }
         });
 
+        userDataManager = new UserDataManager(this);
 
+        //申請推播TOKEN
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (task.isSuccessful() && task.getResult() != null){
+                            String token = task.getResult().getToken();
+
+                            Log.i("Michael","new Token : "+token);
+                            userDataManager.saveNotificationToken(token);
+                        }
+
+                    }
+                });
+        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            String channelId = getString(R.string.default_notification_channel_id);
+            String channelName = "default_notification_channel_name";
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(new NotificationChannel(channelId,channelName,NotificationManager.IMPORTANCE_LOW));
+        }
+
+
+        saveCurrentUserData();
+
+
+    }
+
+    private void saveCurrentUserData() {
+        mAuth = FirebaseAuth.getInstance();
+        firestore = FirebaseFirestore.getInstance();
+        user = mAuth.getCurrentUser();
+        if (user != null && user.getEmail() != null){
+            firestore.collection("users")
+                    .document(user.getEmail())
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful() && task.getResult() != null){
+                                DocumentSnapshot snapshot = task.getResult();
+                                userDataManager.saveUserData((String)snapshot.get("mail"),(String)snapshot.get("displayName"),(String)snapshot.get("photoUrl"));
+                            }
+                        }
+                    });
+        }
     }
 
     private void initActionBar() {
