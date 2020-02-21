@@ -1,6 +1,7 @@
 package com.example.climbtogether.personal_chat_activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,16 +15,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.climbtogether.MyFirbaseMessagingService;
 import com.example.climbtogether.R;
 import com.example.climbtogether.personal_chat_activity.personal_presenter.PersonalPresenter;
 import com.example.climbtogether.personal_chat_activity.personal_presenter.PersonalPresenterImpl;
+import com.example.climbtogether.tool.CommentKeyBoardFix;
 import com.example.climbtogether.tool.UserDataManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -65,12 +71,16 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     private boolean isStillPosting;
 
-    private int countSecond = 0, secondSize =0;
+    private int countSecond = 0, secondSize = 0;
+
+    private MyFirbaseMessagingService service;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_personal_chat);
+        service = new MyFirbaseMessagingService();
         initPresenter();
         initFirebase();
         initBundle();
@@ -105,7 +115,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                 edMessage.setText("");
                 long time = System.currentTimeMillis();
                 presenter.onSendMessageButtonClickListener(message, time);
-                presenter.onSendNotificationToFriend(friendEmail,message,displayName);
+                presenter.onSendNotificationToFriend(friendEmail, message, displayName);
             }
         });
     }
@@ -128,7 +138,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                                     if (task.getResult() != null) {
                                         for (QueryDocumentSnapshot document : task.getResult()) {
                                             PersonalChatData data = new PersonalChatData();
-                                            data.setEmail((String)document.getData().get("email"));
+                                            data.setEmail((String) document.getData().get("email"));
                                             data.setMessage((String) document.getData().get("message"));
                                             data.setTime((long) document.getData().get("time"));
                                             chatArrayList.add(data);
@@ -155,7 +165,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
             if (user.getEmail() != null) {
 
                 documentPath = friendEmail + "And" + user.getEmail();
-                Log.i("Michael","聊天檢查路徑 : "+documentPath);
+                Log.i("Michael", "聊天檢查路徑 : " + documentPath);
                 firestore.collection(PERSONAL_CHAT).document(documentPath).collection(CHAT_DATA)
                         .orderBy("time", Query.Direction.ASCENDING)
                         .get()
@@ -166,7 +176,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                                     if (task.getResult() != null) {
                                         for (QueryDocumentSnapshot document : task.getResult()) {
                                             PersonalChatData data = new PersonalChatData();
-                                            data.setEmail((String)document.getData().get("email"));
+                                            data.setEmail((String) document.getData().get("email"));
                                             data.setMessage((String) document.getData().get("message"));
                                             data.setTime((long) document.getData().get("time"));
                                             chatArrayList.add(data);
@@ -226,7 +236,6 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     private void checkDataChange() {
         //這裡監控 回家做
-
         isStillPosting = true;
         new Thread(new Runnable() {
             @Override
@@ -262,6 +271,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                                                     Log.i("Michael", "資料數量相同");
                                                     secondSize = firstSize;
                                                 } else {
+                                                    Log.i("Michael","資料更新");
                                                     countSecond = 0;
                                                     presenter.onDataChangeEvent(chatArrayList);
                                                     secondSize = firstSize;
@@ -284,6 +294,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     }
 
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -295,7 +306,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
     public void createDataToFirestroe(String message, long time) {
         if (user.getEmail() != null || user != null) {
             Map<String, Object> map = new HashMap<>();
-            map.put("email",user.getEmail());
+            map.put("email", user.getEmail());
             map.put("message", message);
             map.put("time", time);
             firestore.collection(PERSONAL_CHAT).document(documentPath).collection(CHAT_DATA)
@@ -306,10 +317,10 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 Log.i("Michael", "資料新增成功");
-                                if (countSecond >= 22500){
+                                if (countSecond >= 22500) {
                                     countSecond = 0;
                                     checkDataChange();
-                                }else{
+                                } else {
                                     countSecond = 0;
                                 }
 
@@ -334,18 +345,18 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-        recyclerView.scrollToPosition(chatArrayList.size()-1);
+        recyclerView.scrollToPosition(chatArrayList.size() - 1);
 
     }
 
     @Override
     public void changeRecyclerView(ArrayList<PersonalChatData> chatArrayList) {
         personalPresenter.setData(chatArrayList);
-        if (adapter == null){
+        if (adapter == null) {
             presenter.onCatchChatData(chatArrayList);
         }
         adapter.notifyDataSetChanged();
-        recyclerView.scrollToPosition(chatArrayList.size() -1);
+        recyclerView.scrollToPosition(chatArrayList.size() - 1);
     }
 
     @Override
@@ -355,11 +366,11 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null){
+                        if (task.isSuccessful() && task.getResult() != null) {
                             DocumentSnapshot snapshot = task.getResult();
-                            String token = (String)snapshot.get("token");
-                            if (token != null){
-                                presenter.onPostFcmToFriend(token,message,displayName);
+                            String token = (String) snapshot.get("token");
+                            if (token != null) {
+                                presenter.onPostFcmToFriend(token, message, displayName);
                             }
                         }
                     }

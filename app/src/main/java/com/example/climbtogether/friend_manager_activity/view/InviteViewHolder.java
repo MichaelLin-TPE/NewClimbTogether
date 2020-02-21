@@ -109,7 +109,6 @@ public class InviteViewHolder extends RecyclerView.ViewHolder {
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             createUserData(userEmail,friendEmail);
-                            Log.i("Michael", "新增成功");
                         }
                     }
                 });
@@ -127,12 +126,26 @@ public class InviteViewHolder extends RecyclerView.ViewHolder {
                                 if (user != null) {
                                     if (user.getEmail() != null) {
                                         if (map != null) {
-                                            becomeToFriend(friendEmail,userEmail,map);
+                                            becomeToNewFriend(userEmail,friendEmail,map);
                                         }
                                     }
                                 }
 
                             }
+                        }
+                    }
+                });
+    }
+
+    private void becomeToNewFriend(String friendEmail, String userEmail, Map<String, Object> map) {
+        firestore.collection(FRIENDSHIP).document(userEmail)
+                .collection(FRIEND).document(friendEmail)
+                .set(map)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.i("Michael", "新增成功");
                         }
                     }
                 });

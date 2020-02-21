@@ -25,6 +25,13 @@ public class MyFirbaseMessagingService extends FirebaseMessagingService {
         super();
     }
 
+
+
+
+    public void setOnMessageListener(OnMessageListener listener){
+        Log.i("Michael","Listener : "+listener);
+    }
+
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
@@ -36,7 +43,6 @@ public class MyFirbaseMessagingService extends FirebaseMessagingService {
 
             if (/* Check if data needs to be processed by long running job */ true) {
                 // For long-running tasks (10 seconds or more) use WorkManager.
-                scheduleJob();
                 Log.i("MyFirebaseService","title "+remoteMessage.getNotification().getTitle());
                 Log.i("MyFirebaseService","body "+remoteMessage.getNotification().getBody());
             } else {
@@ -55,13 +61,12 @@ public class MyFirbaseMessagingService extends FirebaseMessagingService {
         // message, here is where that should be initiated. See sendNotification method below.
     }
 
-
-
     private void handleNow() {
+
     }
 
-    private void scheduleJob() {
 
+    private void scheduleJob(String message) {
     }
 
     @Override
@@ -89,7 +94,8 @@ public class MyFirbaseMessagingService extends FirebaseMessagingService {
     }
 
     public void sendNotification(String messageBody) {
-
+//        Log.i("Michael","Listener : "+listener);
+//        listener.onReceiveMessage(messageBody);
         Log.i("Michael","messageBody : "+messageBody);
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -120,4 +126,10 @@ public class MyFirbaseMessagingService extends FirebaseMessagingService {
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
+
+    public interface OnMessageListener{
+        void onReceiveMessage(String message);
+    }
+
+
 }

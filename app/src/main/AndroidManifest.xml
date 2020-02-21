@@ -12,6 +12,7 @@
         android:icon="@mipmap/hiking_logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/climb_together_round"
+        android:windowSoftInputMode="adjustResize"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
@@ -38,11 +39,10 @@
 
 
         <activity android:name=".personal_chat_activity.PersonalChatActivity"
-                 android:windowSoftInputMode="stateVisible|adjustPan"/>
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden"/>
         <activity android:name=".friend_manager_activity.FriendManagerActivity" /> <!-- 這是掌控KeyBoard的關鍵 -->
         <activity
-            android:name=".chat_activity.ChatActivity"
-            android:windowSoftInputMode="stateVisible|adjustPan" />
+            android:name=".chat_activity.ChatActivity" />
         <activity android:name=".mountain_collection_activity.MountainCollectionActivity" />
         <activity android:name=".login_activity.LoginActivity" />
         <activity android:name=".member_activity.MemberActivity" />

@@ -15,4 +15,5 @@ public interface PersonalFragmentPresenter {
 
     void onItemClickListener(String displayName, String friendEmail, String photoUrl);
 
+    void onNoMessageEvent();
 }

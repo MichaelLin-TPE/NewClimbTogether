@@ -464,11 +464,24 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     @Override
     public void showUserDialog(final String displayName, final String photoUrl, final String mail, boolean isFriend) {
         dialogProgressbar.setVisibility(View.GONE);
+        Log.i("Michael","isFriend : "+isFriend+" , isInvite : "+isInvited);
         chatClickArea.setVisibility(isFriend ? View.VISIBLE : View.GONE);
 
         tvInviteProcess.setVisibility(isInvited ? View.VISIBLE : View.GONE);
 
-        ivAddFriend.setVisibility(!isFriend & isInvited ? View.GONE : View.VISIBLE);
+        if (isFriend){
+            ivAddFriend.setVisibility(View.GONE);
+        }else if (isInvited){
+            ivAddFriend.setVisibility(View.GONE);
+        }else {
+            ivAddFriend.setVisibility(View.VISIBLE);
+        }
+
+//        ivAddFriend.setVisibility(isFriend & !isInvited ? View.GONE : View.VISIBLE);
+//
+//        if (isInvited){
+//            ivAddFriend.setVisibility(View.GONE);
+//        }
 
         ivFriend.setVisibility(isFriend ? View.VISIBLE : View.GONE);
 

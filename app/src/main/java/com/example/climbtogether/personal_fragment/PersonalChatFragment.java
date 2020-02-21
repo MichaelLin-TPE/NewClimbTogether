@@ -243,6 +243,14 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
             searchFriendsData(friendsArrayList.get(searchCount),currentEmail);
         }else {
             searchCount = 0;
+            if (chatDataArrayList.size() != 0){
+                if (chatDataArrayList.get(0).getMessage().isEmpty() || chatDataArrayList.get(0).getMessage() == null){
+                    Log.i("Michael","沒有聊天訊息");
+                    presenter.onShowProgress(false);
+                    presenter.onNoMessageEvent();
+                    return;
+                }
+            }
             Log.i("Michael","所有資料讀取完畢");
             presenter.onCatchAllDataSucessful(chatDataArrayList);
         }
@@ -350,9 +358,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
         user = mAuth.getCurrentUser();
         if (user != null){
             Log.i("Michael","有用戶");
-
             searchData();
-
 
         }else {
             chatDataArrayList = new ArrayList<>();

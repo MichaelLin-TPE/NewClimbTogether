@@ -51,5 +51,10 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
         mView.intentToPersonalChatActivity(displayName,friendEmail,photoUrl);
     }
 
+    @Override
+    public void onNoMessageEvent() {
+        mView.showNoChatDataView(true);
+    }
+
 
 }
