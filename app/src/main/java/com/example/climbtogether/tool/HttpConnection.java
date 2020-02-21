@@ -23,8 +23,8 @@ public class HttpConnection {
                     URL url = new URL(apiUrl);
                     conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestProperty("Authorization","key=AAAAoBq2Y4E:APA91bESb9fIIjfak6Oufggjspojl-DaravquMxLvFaK3CFRbikmlFn-xW8s6KDweNxSXxZRYN0aOoAypj9tetihtktiVgHmxmPhvsLzBttDu06KalWHpIahXrDa_480HTRWJq2lYoGg");
-                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    conn.setRequestProperty("Accept", "application/json");
+                    conn.setRequestProperty("Content-Type", "application/json");
+//                    conn.setRequestProperty("Accept", "application/json");
                     conn.setRequestMethod("POST");
                     conn.setConnectTimeout(10000);
                     conn.setReadTimeout(10000);

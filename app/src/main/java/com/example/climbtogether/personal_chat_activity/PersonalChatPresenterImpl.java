@@ -2,6 +2,7 @@ package com.example.climbtogether.personal_chat_activity;
 
 import android.util.Log;
 
+import com.example.climbtogether.personal_chat_activity.fcm_object.FcmData;
 import com.example.climbtogether.personal_chat_activity.fcm_object.FcmNotification;
 import com.example.climbtogether.personal_chat_activity.fcm_object.FcmObject;
 import com.example.climbtogether.tool.HttpConnection;
@@ -53,12 +54,16 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
         HttpConnection connection = new HttpConnection();
         String url = "https://fcm.googleapis.com/fcm/send";
         FcmObject fcmObject = new FcmObject();
+        FcmData fcmData = new FcmData();
+        fcmData.setDataContent(message);
+        fcmData.setDataTitle(displayName);
         fcmObject.setTo(token);
-        fcmObject.setCollapsekey("type_a");
+//        fcmObject.setCollapsekey("type_a");
         FcmNotification data = new FcmNotification();
         data.setBody(message);
         data.setTitle(mView.getDisplayName());
         fcmObject.setNotification(data);
+        fcmObject.setData(fcmData);
         String jsonStr = new Gson().toJson(fcmObject);
 
         Log.i("Michael",jsonStr);

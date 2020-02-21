@@ -47,6 +47,8 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -142,10 +144,35 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
                                 }
                             }
                         });
+
+                //申請推播TOKEN
+                FirebaseInstanceId.getInstance().getInstanceId()
+                        .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                if (task.isSuccessful() && task.getResult() != null){
+                                    String token = task.getResult().getToken();
+
+                                    Log.i("Michael","new Token : "+token);
+                                    userDataManager.saveNotificationToken(token);
+                                    updateUserToken(token);
+                                }
+
+                            }
+                        });
             }
 
         } else {
             presenter.onChangeView(true);
+        }
+    }
+
+    private void updateUserToken(String token) {
+        if (currentUser != null && currentUser.getEmail() != null){
+            Map<String,Object> map = new HashMap<>();
+            map.put("token",token);
+            firestore.collection("users").document(currentUser.getEmail())
+                    .set(map, SetOptions.merge());
         }
     }
 
@@ -199,9 +226,20 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
                 }
             });
-
+            removeUserToken();
 
         }
+    }
+
+    private void removeUserToken() {
+        if (currentUser != null && currentUser.getEmail() != null){
+            Map<String,Object> map = new HashMap<>();
+            map.put("token","remove");
+            firestore.collection("users")
+                    .document(currentUser.getEmail())
+                    .set(map,SetOptions.merge());
+        }
+
     }
 
     @Override

@@ -22,10 +22,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements MainActivityVu {
 
@@ -45,6 +49,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        firestore = FirebaseFirestore.getInstance();
 
         initPresenter();
         initActionBar();
@@ -68,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
 
                             Log.i("Michael","new Token : "+token);
                             userDataManager.saveNotificationToken(token);
+                            updateUserToken(token);
                         }
 
                     }
@@ -86,10 +95,18 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
 
     }
 
+    private void updateUserToken(String token) {
+        if (user != null && user.getEmail() != null){
+            Map<String,Object> map = new HashMap<>();
+            map.put("token",token);
+            firestore.collection("users").document(user.getEmail())
+                    .set(map, SetOptions.merge());
+        }
+    }
+
     private void saveCurrentUserData() {
-        mAuth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance();
-        user = mAuth.getCurrentUser();
+
+
         if (user != null && user.getEmail() != null){
             firestore.collection("users")
                     .document(user.getEmail())

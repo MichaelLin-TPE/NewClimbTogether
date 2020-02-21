@@ -155,7 +155,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
             if (user.getEmail() != null) {
 
                 documentPath = friendEmail + "And" + user.getEmail();
-
+                Log.i("Michael","聊天檢查路徑 : "+documentPath);
                 firestore.collection(PERSONAL_CHAT).document(documentPath).collection(CHAT_DATA)
                         .orderBy("time", Query.Direction.ASCENDING)
                         .get()

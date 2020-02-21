@@ -12,6 +12,17 @@ public class FcmObject implements Serializable {
     @SerializedName("notification")
     private FcmNotification notification;
 
+    @SerializedName("data")
+    private FcmData data;
+
+    public FcmData getData() {
+        return data;
+    }
+
+    public void setData(FcmData data) {
+        this.data = data;
+    }
+
     public String getCollapsekey() {
         return collapsekey;
     }
