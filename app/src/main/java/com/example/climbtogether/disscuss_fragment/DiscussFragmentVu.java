@@ -16,4 +16,6 @@ public interface DiscussFragmentVu {
     void clearView();
 
     void intentToChatActivity(String listName);
+
+    void intentToShareActivity(String listName);
 }

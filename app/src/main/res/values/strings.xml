@@ -83,4 +83,7 @@
     <string name="warning">刪除警告</string>
     <string name="confirm_to_delete">確定要刪除此好友嗎?\n刪除好友後將會連聊天訊息一併刪除唷.</string>
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="please_add_some_content">寫點什麼都好....</string>
+    <string name="upload_article">分享</string>
+    <string name="share">分享</string>
 </resources>

@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.example.climbtogether.R;
 import com.example.climbtogether.chat_activity.ChatActivity;
 import com.example.climbtogether.login_activity.LoginActivity;
+import com.example.climbtogether.share_activity.ShareActivity;
 import com.example.climbtogether.tool.SpaceItemDecoration;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -216,6 +217,12 @@ public class DiscussFragment extends Fragment implements DiscussFragmentVu {
     public void intentToChatActivity(String listName) {
         Intent it = new Intent(context, ChatActivity.class);
         it.putExtra("listName",listName);
+        startActivity(it);
+    }
+
+    @Override
+    public void intentToShareActivity(String listName) {
+        Intent it = new Intent(context, ShareActivity.class);
         startActivity(it);
     }
 }

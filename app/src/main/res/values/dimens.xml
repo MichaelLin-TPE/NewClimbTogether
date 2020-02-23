@@ -39,4 +39,7 @@
     <dimen name="personal_user_photo_size">60dp</dimen>
     <dimen name="chat_click_area">50dp</dimen>
     <dimen name="delete_click_area">60dp</dimen>
+    <dimen name="share_item_photo">450dp</dimen>
+    <dimen name="like_icon_size">30dp</dimen>
+    <dimen name="article_photo_size">300dp</dimen>
 </resources>

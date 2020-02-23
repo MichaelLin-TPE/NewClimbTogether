@@ -10,4 +10,5 @@
     <color name="item_yellow">#F8EFB4</color>
     <color name="white">#FFFFFF</color>
     <color name="speech_bubble_user">#F8EFB4</color>
+    <color name="floating_button_green">#B9EC7C</color>
 </resources>

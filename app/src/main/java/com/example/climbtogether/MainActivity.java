@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.isSuccessful() && task.getResult() != null){
                                 DocumentSnapshot snapshot = task.getResult();
-                                userDataManager.saveUserData((String)snapshot.get("mail"),(String)snapshot.get("displayName"),(String)snapshot.get("photoUrl"));
+                                userDataManager.saveUserData((String)snapshot.get("email"),(String)snapshot.get("displayName"),(String)snapshot.get("photoUrl"));
                             }
                         }
                     });

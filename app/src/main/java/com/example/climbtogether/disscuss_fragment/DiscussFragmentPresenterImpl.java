@@ -6,6 +6,10 @@ public class DiscussFragmentPresenterImpl implements DiscussFragmentPresenter {
 
     private DiscussFragmentVu mView;
 
+    private static final String DISCUSS = "登山即時討論區";
+
+    private static final String SHARE = "登山心得分享";
+
     public DiscussFragmentPresenterImpl(DiscussFragmentVu mView){
         this.mView = mView;
     }
@@ -44,6 +48,14 @@ public class DiscussFragmentPresenterImpl implements DiscussFragmentPresenter {
 
     @Override
     public void onDiscussItemClickListener(String listName) {
-        mView.intentToChatActivity(listName);
+        switch (listName){
+            case DISCUSS:
+                mView.intentToChatActivity(listName);
+                break;
+            case SHARE:
+                mView.intentToShareActivity(listName);
+                break;
+        }
+
     }
 }

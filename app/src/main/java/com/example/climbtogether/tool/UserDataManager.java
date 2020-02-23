@@ -31,6 +31,7 @@ public class UserDataManager {
         editor.putString("token",token);
         editor.apply();
     }
+
     public String getToken(){
         return sharedPreferences.getString("token","");
     }
