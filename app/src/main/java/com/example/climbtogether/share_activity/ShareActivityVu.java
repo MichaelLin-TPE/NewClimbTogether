@@ -15,5 +15,11 @@ public interface ShareActivityVu {
 
     void createArticle(String selectPhotoUrl, String content);
 
-    void setRecyclerView(ArrayList<ShareArticleDTO> shareArray,ArrayList<LikeMemberDTO> listMemberArray);
+    void setRecyclerView(ArrayList<ShareArticleDTO> shareArray,ArrayList<LikeMemberDTO> listMemberArray,ArrayList<ReplyObject> replyArray);
+
+    void showProgress(boolean isShow);
+
+    void showReplayDialog(ReplyObject data,ShareArticleDTO shareArticleDTO);
+
+    void sendReply(String content, ArrayList<ReplyDTO> replyArray, ShareArticleDTO shareArticleDTO);
 }

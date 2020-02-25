@@ -1,5 +1,7 @@
 package com.example.climbtogether.share_activity;
 
+import java.util.ArrayList;
+
 public class ShareArticleDTO {
     private String diaplayName;
 
@@ -11,7 +13,17 @@ public class ShareArticleDTO {
 
     private String content;
 
-    private Long like;
+    private long like;
+
+    private ArrayList<ReplyDTO> replyArray;
+
+    public ArrayList<ReplyDTO> getReplyArray() {
+        return replyArray;
+    }
+
+    public void setReplyArray(ArrayList<ReplyDTO> replyArray) {
+        this.replyArray = replyArray;
+    }
 
     public String getDiaplayName() {
         return diaplayName;
@@ -53,11 +65,11 @@ public class ShareArticleDTO {
         this.content = content;
     }
 
-    public Long getLike() {
+    public long getLike() {
         return like;
     }
 
-    public void setLike(Long like) {
+    public void setLike(long like) {
         this.like = like;
     }
 }

@@ -8,11 +8,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,12 +21,14 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.climbtogether.R;
+import com.example.climbtogether.tool.ImageLoaderManager;
 import com.example.climbtogether.tool.UserDataManager;
-import com.google.android.gms.common.FirstPartyScopes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,11 +39,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.nostra13.universalimageloader.utils.L;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -72,6 +72,8 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     private FirebaseFirestore firestore;
 
+    private ProgressBar progressBar;
+
     private StorageReference storage;
 
     private ArrayList<ShareArticleDTO> shareArray;
@@ -90,11 +92,23 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     private ShareAdapter adapter;
 
+    private ArrayList<ReplyDTO> replayArray,replyDialogArray;
+
+    private ArrayList<ReplyObject> replayArrayList;
+
+    private ImageLoaderManager imageLoaderManager;
+
+    private ReplyDialogAdapter replyAdapter;
+
+    private int itemPosition;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share);
         userDataManager = new UserDataManager(this);
+        imageLoaderManager = new ImageLoaderManager(this);
         initFirebase();
         initPresenter();
         initView();
@@ -103,15 +117,18 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
     }
 
     private void searchData() {
+        clearView();
+        presenter.onShowProgress();
         firestore.collection(SHARE).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         shareArray = new ArrayList<>();
                         likeMemberArray = new ArrayList<>();
+                        ShareArticleDTO data = null;
                         if (task.isSuccessful() && task.getResult() != null) {
                             for (QueryDocumentSnapshot snapshot : task.getResult()) {
-                                ShareArticleDTO data = new ShareArticleDTO();
+                                data = new ShareArticleDTO();
                                 data.setContent((String) snapshot.get("content"));
                                 data.setDiaplayName((String) snapshot.get("user"));
                                 data.setEmail((String) snapshot.get("userEmail"));
@@ -120,18 +137,67 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                 data.setLike((Long) snapshot.get("like"));
                                 shareArray.add(data);
                             }
-                            searchForLikeMember();
+                            replayArrayList = new ArrayList<>();
+                            searchReplyData();
                         }
                     }
                 });
 
     }
 
+    private void clearView() {
+        shareArray = new ArrayList<>();
+        likeMemberArray = new ArrayList<>();
+        replayArrayList = new ArrayList<>();
+        if (adapter != null){
+            adapter = new ShareAdapter(shareArray,likeMemberArray,user.getEmail(),replayArrayList,this);
+
+            recyclerView.setAdapter(adapter);
+        }
+    }
+
+    private void searchReplyData() {
+        replayArray = new ArrayList<>();
+        if (memberCount < shareArray.size()) {
+            firestore.collection(SHARE).document(shareArray.get(memberCount).getContent())
+                    .collection(REPLY)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                Log.i("Michael","搜尋回覆內容");
+                                ReplyObject data = new ReplyObject();
+                                data.setArticleName(shareArray.get(memberCount).getContent());
+                                for (QueryDocumentSnapshot snapshot : task.getResult()) {
+                                    ReplyDTO reply = new ReplyDTO();
+                                    reply.setContent((String) snapshot.get("content"));
+                                    reply.setUserName((String) snapshot.get("user"));
+                                    reply.setUserPhoto((String) snapshot.get("userPhoto"));
+                                    Log.i("Michael","留言 : "+snapshot.get("content"));
+                                    replayArray.add(reply);
+                                }
+                                data.setReplyArray(replayArray);
+                                replayArrayList.add(data);
+
+                                memberCount++;
+                                searchReplyData();
+                            }
+                        }
+                    });
+        }else {
+            memberCount = 0;
+            searchForLikeMember();
+        }
+
+
+    }
+
     private void searchForLikeMember() {
         if (user != null && user.getEmail() != null) {
             if (memberCount < shareArray.size()) {
-                Log.i("Michael","文章資料長度 : "+shareArray.size()+" , 筆數 : "+memberCount +" , 文章 : "+shareArray.get(memberCount).getContent());
-                Log.i("Michael","搜尋按讚人數");
+                Log.i("Michael", "文章資料長度 : " + shareArray.size() + " , 筆數 : " + memberCount + " , 文章 : " + shareArray.get(memberCount).getContent());
+                Log.i("Michael", "搜尋按讚人數");
                 firestore.collection(SHARE).document(shareArray.get(memberCount).getContent()).collection(ADD_LIKE)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -142,7 +208,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                     ArrayList<String> nameList = new ArrayList<>();
                                     ArrayList<Boolean> isCheckArray = new ArrayList<>();
                                     data.setContent(shareArray.get(memberCount).getContent());
-                                    Log.i("Michael","文章 : "+shareArray.get(memberCount).getContent());
+                                    Log.i("Michael", "文章 : " + shareArray.get(memberCount).getContent());
                                     for (QueryDocumentSnapshot snapshot : task.getResult()) {
 
                                         if (user.getEmail().equals(snapshot.getId())) {
@@ -150,7 +216,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                         } else {
                                             isCheckArray.add(false);
                                         }
-                                        Log.i("Michael","按讚的有 : "+snapshot.getId());
+                                        Log.i("Michael", "按讚的有 : " + snapshot.getId());
                                         nameList.add(snapshot.getId());
                                     }
                                     data.setIsCheckArray(isCheckArray);
@@ -158,19 +224,20 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                     likeMemberArray.add(data);
                                     memberCount++;
                                     searchForLikeMember();
-                                }else {
-                                    Log.i("Michael","搜尋失敗");
+                                } else {
+                                    Log.i("Michael", "搜尋失敗");
                                 }
                             }
                         });
             } else {
-
-                presenter.onCatchAllData(shareArray, likeMemberArray);
+                memberCount = 0;
+                presenter.onCatchAllData(shareArray, likeMemberArray,replayArrayList);
             }
         }
 
 
     }
+
 
     private void initFirebase() {
         mAuth = FirebaseAuth.getInstance();
@@ -184,6 +251,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
     }
 
     private void initView() {
+        progressBar = findViewById(R.id.share_progressbar);
         toolbar = findViewById(R.id.share_toolbar);
         recyclerView = findViewById(R.id.share_recycler_view);
         setSupportActionBar(toolbar);
@@ -295,6 +363,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         map.put("userPhotoUrl", userDataManager.getPhotoUrl());
         map.put("userEmail", userDataManager.getEmail());
 
+
         firestore.collection(SHARE).document(content).set(map)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -302,35 +371,42 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                         if (task.isSuccessful()) {
                             presenter.onShowSuccessShareArticle();
                             Log.i("Michael", "文章上傳成功");
+                            searchData();
                         }
                     }
                 });
     }
 
     @Override
-    public void setRecyclerView(ArrayList<ShareArticleDTO> shareArray, ArrayList<LikeMemberDTO> listMemberArray) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    public void setRecyclerView(ArrayList<ShareArticleDTO> shareArray, ArrayList<LikeMemberDTO> listMemberArray,ArrayList<ReplyObject> replyArray) {
 
-        adapter = new ShareAdapter(shareArray, listMemberArray, user.getEmail(), this);
+        presenter.onCloseProgress();
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new ShareAdapter(shareArray, listMemberArray, user.getEmail(),replyArray, this);
         recyclerView.setAdapter(adapter);
 
         adapter.setonArticleItemClickListener(new ShareAdapter.onArticleItemClickListener() {
             @Override
             public void onAddLike(int itemPosition, int memberIndex) {
+                long likeCount = shareArray.get(itemPosition).getLike();
                 if (likeMemberArray.get(itemPosition).getIsCheckArray() == null
-                        || likeMemberArray.get(itemPosition).getIsCheckArray().size() == 0){
-                    changeAddLikeData(true,itemPosition);
+                        || likeMemberArray.get(itemPosition).getIsCheckArray().size() == 0) {
+                    changeAddLikeData(true, itemPosition, likeCount);
                     likeMemberArray.get(itemPosition).getIsCheckArray().add(true);
+                    shareArray.get(itemPosition).setLike(likeCount + 1);
                     adapter.notifyDataSetChanged();
                     return;
                 }
-                if (likeMemberArray.get(itemPosition).getIsCheckArray().get(memberIndex)){
-                    likeMemberArray.get(itemPosition).getIsCheckArray().set(memberIndex,false);
-                    changeAddLikeData(likeMemberArray.get(itemPosition).getIsCheckArray().get(memberIndex),itemPosition);
+                if (likeMemberArray.get(itemPosition).getIsCheckArray().get(memberIndex)) {
+                    likeMemberArray.get(itemPosition).getIsCheckArray().set(memberIndex, false);
+                    changeAddLikeData(likeMemberArray.get(itemPosition).getIsCheckArray().get(memberIndex), itemPosition, likeCount);
+                    shareArray.get(itemPosition).setLike(likeCount - 1);
                     adapter.notifyDataSetChanged();
-                }else {
-                    likeMemberArray.get(itemPosition).getIsCheckArray().set(memberIndex,true);
-                    changeAddLikeData(likeMemberArray.get(itemPosition).getIsCheckArray().get(memberIndex),itemPosition);
+                } else {
+                    likeMemberArray.get(itemPosition).getIsCheckArray().set(memberIndex, true);
+                    changeAddLikeData(likeMemberArray.get(itemPosition).getIsCheckArray().get(memberIndex), itemPosition, likeCount);
+                    shareArray.get(itemPosition).setLike(likeCount + 1);
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -349,35 +425,131 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
             public void onUserClick(ShareArticleDTO data) {
 
             }
+
+            @Override
+            public void onReplyClick(ReplyObject data,ShareArticleDTO shareArticleDTO,int position) {
+                itemPosition = position;
+                presenter.onReplyButtonClick(data,shareArticleDTO);
+
+            }
         });
 
     }
 
-    private void changeAddLikeData(Boolean isCheck,int itemPosition) {
-        if (user != null && user.getEmail() != null){
-            if (isCheck){
-                Map<String,Object> map = new HashMap<>();
+    @Override
+    public void showReplayDialog(ReplyObject data,ShareArticleDTO shareArticleDTO) {
+        View view = View.inflate(this,R.layout.reply_custom_dialog,null);
+        RoundedImageView ivUserPhoto = view.findViewById(R.id.reply_dialog_user_photo);
+        TextView tvName = view.findViewById(R.id.reply_dialog_user_displayName);
+        TextView tvContent = view.findViewById(R.id.reply_dialog_content);
+        RecyclerView replayRv = view.findViewById(R.id.reply_dialog_recycler_view);
+        EditText edContent = view.findViewById(R.id.reply_dialog_edit_content);
+        ImageView ivSend = view.findViewById(R.id.reply_dialog_iv_send);
+
+        replayRv.setLayoutManager(new LinearLayoutManager(this));
+        this.replyDialogArray = data.getReplyArray();
+        replyAdapter = new ReplyDialogAdapter(replyDialogArray,this);
+        replayRv.setAdapter(replyAdapter);
+
+        tvName.setText(shareArticleDTO.getDiaplayName());
+        imageLoaderManager.setPhotoUrl(shareArticleDTO.getUserPhoto(),ivUserPhoto);
+        tvContent.setText(shareArticleDTO.getContent());
+
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view).create();
+        Window window = dialog.getWindow();
+        if (window != null){
+            window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+        dialog.show();
+
+
+        ivSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String content = edContent.getText().toString();
+                presenter.onButtonSendReplyClick(data.getReplyArray(),content,shareArticleDTO);
+                edContent.setText("");
+            }
+        });
+
+
+
+    }
+
+    @Override
+    public void sendReply(String content, ArrayList<ReplyDTO> replyArray, ShareArticleDTO shareArticleDTO) {
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("content",content);
+        map.put("user",userDataManager.getDisplayName());
+        map.put("userPhoto",userDataManager.getPhotoUrl());
+        firestore.collection(SHARE).document(shareArticleDTO.getContent())
+                .collection(REPLY)
+                .document(content)
+                .set(map)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            ReplyDTO data = new ReplyDTO();
+                            data.setUserPhoto(userDataManager.getPhotoUrl());
+                            data.setContent(content);
+                            data.setUserName(userDataManager.getDisplayName());
+                            replyDialogArray.add(data);
+                            replyAdapter.notifyDataSetChanged();
+
+                            replayArrayList.get(itemPosition).setReplyArray(replyDialogArray);
+                            adapter.notifyDataSetChanged();
+                            Log.i("Michael","新增留言成功");
+                        }
+                    }
+                });
+
+    }
+
+    @Override
+    public void showProgress(boolean isShow) {
+        progressBar.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    }
+
+
+
+    private void changeAddLikeData(Boolean isCheck, int itemPosition, long likeCount) {
+        if (user != null && user.getEmail() != null) {
+            if (isCheck) {
+                Map<String, Object> map = new HashMap<>();
                 firestore.collection(SHARE).document(shareArray.get(itemPosition).getContent())
                         .collection(ADD_LIKE).document(user.getEmail())
                         .set(map)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()){
-                                    Log.i("Michael","點讚新增成功");
+                                if (task.isSuccessful()) {
+                                    Log.i("Michael", "點讚新增成功");
+                                    Map<String, Object> countMap = new HashMap<>();
+                                    countMap.put("like", likeCount + 1);
+                                    firestore.collection(SHARE).document(shareArray.get(itemPosition).getContent())
+                                            .set(countMap, SetOptions.merge());
                                 }
                             }
                         });
-            }else {
+            } else {
                 firestore.collection(SHARE).document(shareArray.get(itemPosition).getContent())
                         .collection(ADD_LIKE).document(user.getEmail())
                         .delete()
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                Log.i("Michael","刪除點讚成功");
+                                Log.i("Michael", "刪除點讚成功");
+                                Map<String, Object> countMap = new HashMap<>();
+                                countMap.put("like", likeCount - 1);
+                                firestore.collection(SHARE).document(shareArray.get(itemPosition).getContent())
+                                        .set(countMap, SetOptions.merge());
                             }
                         });
+
             }
 
         }

@@ -44,7 +44,34 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
     }
 
     @Override
-    public void onCatchAllData(ArrayList<ShareArticleDTO> shareArray,ArrayList<LikeMemberDTO> listMemberArray) {
-        mView.setRecyclerView(shareArray,listMemberArray);
+    public void onCatchAllData(ArrayList<ShareArticleDTO> shareArray,ArrayList<LikeMemberDTO> listMemberArray,ArrayList<ReplyObject> replyArray) {
+        mView.setRecyclerView(shareArray,listMemberArray,replyArray);
+    }
+
+    @Override
+    public void onShowProgress() {
+        mView.showProgress(true);
+    }
+
+    @Override
+    public void onCloseProgress() {
+        mView.showProgress(false);
+    }
+
+    @Override
+    public void onReplyButtonClick(ReplyObject data,ShareArticleDTO shareArticleDTO) {
+        mView.showReplayDialog(data,shareArticleDTO);
+    }
+
+    @Override
+    public void onButtonSendReplyClick(ArrayList<ReplyDTO> replyArray, String content, ShareArticleDTO shareArticleDTO) {
+        if (content == null || content.isEmpty()){
+            String message = "留下些甚麼吧...";
+            mView.showErrorMessage(message);
+            return;
+        }
+        mView.sendReply(content,replyArray,shareArticleDTO);
+
+
     }
 }

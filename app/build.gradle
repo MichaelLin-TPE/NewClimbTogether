@@ -53,7 +53,7 @@ dependencies {
 
     //圓角圖套件
     implementation 'com.makeramen:roundedimageview:2.3.0'
-
+    implementation 'com.github.lovetuzitong:MultiImageSelector:1.2'
     //裁減圖套件
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
     implementation 'androidx.work:work-runtime:2.3.2'

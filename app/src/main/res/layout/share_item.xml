@@ -61,14 +61,33 @@
         android:src="@drawable/send"
         app:layout_constraintTop_toBottomOf="@id/share_item_photo"
         android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toRightOf="@id/share_item_reply"
+        android:layout_marginStart="15dp"
+        android:layout_width="@dimen/like_icon_size"
+        android:layout_height="@dimen/like_icon_size"/>
+    <ImageView
+        android:id="@+id/share_item_reply"
+        android:src="@drawable/speech_bubble"
+        app:layout_constraintTop_toBottomOf="@id/share_item_photo"
+        android:layout_marginTop="10dp"
         app:layout_constraintLeft_toRightOf="@id/share_item_like"
         android:layout_marginStart="15dp"
         android:layout_width="@dimen/like_icon_size"
         android:layout_height="@dimen/like_icon_size"/>
 
     <TextView
-        android:id="@+id/share_item_content_displayName"
+        android:id="@+id/share_item_like_people"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/black"
+        android:textSize="@dimen/normal_text_size"
         app:layout_constraintTop_toBottomOf="@id/share_item_like"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/share_item_content_displayName"
+        app:layout_constraintTop_toBottomOf="@id/share_item_like_people"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginTop="10dp"
         android:textColor="@color/black"
@@ -80,7 +99,7 @@
     <TextView
         android:id="@+id/share_item_content"
         tools:text="XXXXX"
-        app:layout_constraintTop_toBottomOf="@id/share_item_like"
+        app:layout_constraintTop_toBottomOf="@id/share_item_like_people"
         app:layout_constraintLeft_toRightOf="@id/share_item_content_displayName"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
@@ -88,6 +107,41 @@
         android:textSize="@dimen/normal_text_size"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
+
+<!--    <com.makeramen.roundedimageview.RoundedImageView-->
+<!--        android:id="@+id/share_item_reply_user_photo"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        app:riv_oval="true"-->
+<!--        android:scaleType="fitCenter"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/share_item_content_displayName"-->
+<!--        app:layout_constraintLeft_toLeftOf="parent"-->
+<!--        android:layout_width="@dimen/user_photo_size_reply"-->
+<!--        android:layout_height="@dimen/user_photo_size_reply"/>-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/share_item_reply_user_displayName"-->
+<!--        android:layout_marginStart="10dp"-->
+<!--        app:layout_constraintTop_toTopOf="@id/share_item_reply_user_photo"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/share_item_reply_user_photo"-->
+<!--        app:layout_constraintLeft_toRightOf="@id/share_item_reply_user_photo"-->
+<!--        android:textSize="@dimen/normal_text_size"-->
+<!--        android:textColor="@color/black"-->
+<!--        tools:text="ddd"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"/>-->
+
+    <TextView
+        android:id="@+id/share_item_reply_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@id/share_item_content_displayName"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textSize="@dimen/normal_text_size"
+        tools:text="ddd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
 
 
 
