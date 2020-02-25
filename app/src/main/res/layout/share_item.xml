@@ -30,6 +30,7 @@
 
     <ImageView
         android:id="@+id/share_item_settings"
+        android:contentDescription="@null"
         android:src="@drawable/settings"
         app:layout_constraintTop_toTopOf="@id/share_item_user_displayName"
         app:layout_constraintBottom_toBottomOf="@id/share_item_user_displayName"
@@ -37,29 +38,31 @@
         android:layout_width="@dimen/like_icon_size"
         android:layout_height="@dimen/like_icon_size"/>
 
-    <com.makeramen.roundedimageview.RoundedImageView
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/share_item_view_pager"
         app:layout_constraintTop_toBottomOf="@id/share_item_user_photo"
         android:layout_marginTop="10dp"
-        app:riv_corner_radius="15dip"
-        android:id="@+id/share_item_photo"
-        android:scaleType="centerCrop"
-        android:contentDescription="@null"
         android:layout_width="match_parent"
         android:layout_height="@dimen/share_item_photo"/>
 
+
+
     <ImageView
         android:id="@+id/share_item_like"
+        android:contentDescription="@null"
         android:src="@drawable/like_not_press"
-        app:layout_constraintTop_toBottomOf="@id/share_item_photo"
+        app:layout_constraintTop_toBottomOf="@id/share_item_view_pager"
         android:layout_marginTop="10dp"
-        app:layout_constraintLeft_toLeftOf="@id/share_item_photo"
+        app:layout_constraintLeft_toLeftOf="@id/share_item_view_pager"
         android:layout_width="@dimen/like_icon_size"
         android:layout_height="@dimen/like_icon_size"/>
 
     <ImageView
         android:id="@+id/share_item_send"
+        android:contentDescription="@null"
         android:src="@drawable/send"
-        app:layout_constraintTop_toBottomOf="@id/share_item_photo"
+        app:layout_constraintTop_toBottomOf="@id/share_item_view_pager"
         android:layout_marginTop="10dp"
         app:layout_constraintLeft_toRightOf="@id/share_item_reply"
         android:layout_marginStart="15dp"
@@ -67,8 +70,9 @@
         android:layout_height="@dimen/like_icon_size"/>
     <ImageView
         android:id="@+id/share_item_reply"
+        android:contentDescription="@null"
         android:src="@drawable/speech_bubble"
-        app:layout_constraintTop_toBottomOf="@id/share_item_photo"
+        app:layout_constraintTop_toBottomOf="@id/share_item_view_pager"
         android:layout_marginTop="10dp"
         app:layout_constraintLeft_toRightOf="@id/share_item_like"
         android:layout_marginStart="15dp"

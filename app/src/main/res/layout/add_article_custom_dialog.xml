@@ -6,23 +6,29 @@
     android:padding="15dp"
     android:layout_height="wrap_content">
 
-
-    <com.makeramen.roundedimageview.RoundedImageView
-        android:id="@+id/article_photo"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/article_view_pager"
+        android:layout_width="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:contentDescription="@null"
-        app:riv_corner_radius="15dip"
-        android:scaleType="fitCenter"
-        android:src="@drawable/empty_photo"
-        android:layout_width="match_parent"
         android:layout_height="@dimen/article_photo_size"/>
+
+    <ImageView
+        app:layout_constraintTop_toTopOf="@id/article_view_pager"
+        app:layout_constraintLeft_toLeftOf="@id/article_view_pager"
+        app:layout_constraintRight_toRightOf="@id/article_view_pager"
+        app:layout_constraintBottom_toBottomOf="@id/article_view_pager"
+        android:id="@+id/article_add_btn"
+        android:src="@drawable/plus"
+        android:elevation="0.1dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <EditText
         android:id="@+id/article_edit_content"
         android:background="@null"
-        app:layout_constraintTop_toBottomOf="@id/article_photo"
+        app:layout_constraintTop_toBottomOf="@id/article_view_pager"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginTop="10dp"
         android:inputType="text"

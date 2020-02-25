@@ -11,9 +11,9 @@ public interface ShareActivityVu {
 
     void showErrorMessage(String message);
 
-    void shareArticle(UserDataManager userDataManager, String content, byte[] selectPhotoBytes);
+    void shareArticle(UserDataManager userDataManager, String content, ArrayList<byte[]> photoBytesArray);
 
-    void createArticle(String selectPhotoUrl, String content);
+    void createArticle(ArrayList<String> downloadUrlArray, String content);
 
     void setRecyclerView(ArrayList<ShareArticleDTO> shareArray,ArrayList<LikeMemberDTO> listMemberArray,ArrayList<ReplyObject> replyArray);
 

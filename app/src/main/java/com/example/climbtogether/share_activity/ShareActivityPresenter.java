@@ -9,9 +9,9 @@ public interface ShareActivityPresenter {
 
     void onAddArticleClick();
 
-    void onShareButtonClick(UserDataManager userDataManager, String content, byte[] selectPhotoBytes);
+    void onShareButtonClick(UserDataManager userDataManager, String content, ArrayList<byte[]> photoBytesArray);
 
-    void onCatchSelectPhotoUrl(String url,String content);
+    void onCatchSelectPhotoUrl(ArrayList<String> downloadUrlArray,String content);
 
     void onShowSuccessShareArticle();
 

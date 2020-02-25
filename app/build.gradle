@@ -8,7 +8,7 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "com.example.climbtogether"
-        minSdkVersion 26
+        minSdkVersion 29
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -57,5 +57,9 @@ dependencies {
     //裁減圖套件
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
     implementation 'androidx.work:work-runtime:2.3.2'
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation 'com.github.LuckSiege.PictureSelector:picture_library:v2.4.6'
+
 
 }

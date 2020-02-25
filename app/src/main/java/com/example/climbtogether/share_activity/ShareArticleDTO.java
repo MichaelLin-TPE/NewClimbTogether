@@ -11,9 +11,28 @@ public class ShareArticleDTO {
 
     private String selectPhoto;
 
+    private String selectPhoto1;
+    private String selectPhoto2;
+
     private String content;
 
     private long like;
+
+    public String getSelectPhoto1() {
+        return selectPhoto1;
+    }
+
+    public void setSelectPhoto1(String selectPhoto1) {
+        this.selectPhoto1 = selectPhoto1;
+    }
+
+    public String getSelectPhoto2() {
+        return selectPhoto2;
+    }
+
+    public void setSelectPhoto2(String selectPhoto2) {
+        this.selectPhoto2 = selectPhoto2;
+    }
 
     private ArrayList<ReplyDTO> replyArray;
 

@@ -4,10 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.PluralsRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,6 +46,11 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
     private FirebaseUser user;
 
     private FirebaseFirestore firestore;
+
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +99,26 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
 
         saveCurrentUserData();
 
+        //先判斷動態權限
 
+        verifyStoragePermissions(this);
+
+
+    }
+
+    private void verifyStoragePermissions(MainActivity mainActivity) {
+        try {
+
+            int permission = ActivityCompat.checkSelfPermission(mainActivity,
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(mainActivity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateUserToken(String token) {

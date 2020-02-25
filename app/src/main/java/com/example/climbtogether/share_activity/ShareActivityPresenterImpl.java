@@ -23,18 +23,18 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
     }
 
     @Override
-    public void onShareButtonClick(UserDataManager userDataManager, String content, byte[] selectPhotoBytes) {
+    public void onShareButtonClick(UserDataManager userDataManager, String content, ArrayList<byte[]> photoBytesArray) {
         if (content == null || content.isEmpty()){
             String message = "請輸入內容";
             mView.showErrorMessage(message);
             return;
         }
-        mView.shareArticle(userDataManager,content,selectPhotoBytes);
+        mView.shareArticle(userDataManager,content,photoBytesArray);
     }
 
     @Override
-    public void onCatchSelectPhotoUrl(String selectPhotoUrl,String content) {
-        mView.createArticle(selectPhotoUrl,content);
+    public void onCatchSelectPhotoUrl(ArrayList<String> downloadUrlArray,String content) {
+        mView.createArticle(downloadUrlArray,content);
     }
 
     @Override

@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import com.example.climbtogether.R;
 import com.example.climbtogether.tool.ImageLoaderManager;
@@ -23,11 +24,11 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
 
     private Context context;
 
-    private ImageLoaderManager imageLoaderManager;
-
     private onArticleItemClickListener listener;
 
     private ArrayList<LikeMemberDTO> likeMemberArray;
+
+    private ImageLoaderManager imageLoaderManager;
 
     private String userEmail;
 
@@ -46,8 +47,8 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
         this.context = context;
         this.likeMemberArray = likeMemberArray;
         this.replyArray = replyArray;
-        imageLoaderManager = new ImageLoaderManager(context);
         this.userEmail = userEmail;
+        imageLoaderManager = new ImageLoaderManager(context);
     }
 
     @NonNull
@@ -62,8 +63,23 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
         holder.tvName.setText(data.getDiaplayName());
         holder.tvContentName.setText(data.getDiaplayName());
         holder.tvContent.setText(data.getContent());
+
+        ArrayList<String> downloadUrl = new ArrayList<>();
+        if (!data.getSelectPhoto().isEmpty()){
+            downloadUrl.add(data.getSelectPhoto());
+        }
+        if (!data.getSelectPhoto1().isEmpty()){
+            downloadUrl.add(data.getSelectPhoto1());
+        }
+        if (!data.getSelectPhoto2().isEmpty()){
+            downloadUrl.add(data.getSelectPhoto2());
+        }
+        ShareActivityViewPagerAdapter adapter = new ShareActivityViewPagerAdapter(context,downloadUrl);
+
+        holder.viewPager.setAdapter(adapter);
+
+        //大頭貼
         imageLoaderManager.setPhotoUrl(data.getUserPhoto(),holder.ivUserPhoto);
-        imageLoaderManager.setPhotoUrl(data.getSelectPhoto(),holder.ivSelectPhoto);
 
 
         //計算按讚有幾位
@@ -138,18 +154,20 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
 
         private TextView tvName,tvContent,tvContentName,tvPeopleLike,tvReplyCount;
 
-        private RoundedImageView ivUserPhoto,ivSelectPhoto;
+        private RoundedImageView ivUserPhoto;
 
         private ImageView ivLike,ivSend,ivSettings,ivReply;
+
+        private ViewPager viewPager;
 
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            viewPager = itemView.findViewById(R.id.share_item_view_pager);
             tvName = itemView.findViewById(R.id.share_item_user_displayName);
             tvContent = itemView.findViewById(R.id.share_item_content);
             tvContentName = itemView.findViewById(R.id.share_item_content_displayName);
             ivUserPhoto = itemView.findViewById(R.id.share_item_user_photo);
-            ivSelectPhoto = itemView.findViewById(R.id.share_item_photo);
             ivLike = itemView.findViewById(R.id.share_item_like);
             ivSend = itemView.findViewById(R.id.share_item_send);
             ivSettings = itemView.findViewById(R.id.share_item_settings);

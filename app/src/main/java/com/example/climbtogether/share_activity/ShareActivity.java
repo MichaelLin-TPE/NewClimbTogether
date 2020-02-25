@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.climbtogether.R;
+import com.example.climbtogether.tool.GlideEngine;
 import com.example.climbtogether.tool.ImageLoaderManager;
 import com.example.climbtogether.tool.UserDataManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,13 +45,20 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.luck.picture.lib.PictureSelector;
+import com.luck.picture.lib.config.PictureMimeType;
+import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.listener.OnResultCallbackListener;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ShareActivity extends AppCompatActivity implements ShareActivityVu {
@@ -63,8 +72,6 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
     private ShareActivityPresenter presenter;
 
     private UserDataManager userDataManager;
-
-    private RoundedImageView ivPhoto;
 
     private FirebaseAuth mAuth;
 
@@ -88,6 +95,8 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     private byte[] selectPhotoBytes;
 
+    private ViewPager viewPager;
+
     private int memberCount = 0;
 
     private ShareAdapter adapter;
@@ -101,6 +110,15 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
     private ReplyDialogAdapter replyAdapter;
 
     private int itemPosition;
+
+    private ArrayList<Bitmap> bitmapArrayList;
+
+    private ArrayList<byte[]> photoBytesArray;
+
+    private ArrayList<String> downloadUrlArray;
+
+    private String shareContent;
+    private int photoCount = 0;
 
 
     @Override
@@ -132,7 +150,9 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                 data.setContent((String) snapshot.get("content"));
                                 data.setDiaplayName((String) snapshot.get("user"));
                                 data.setEmail((String) snapshot.get("userEmail"));
-                                data.setSelectPhoto((String) snapshot.get("selectPhotoUrl"));
+                                data.setSelectPhoto((String) snapshot.get("selectPhotoUrl0"));
+                                data.setSelectPhoto1((String)snapshot.get("selectPhotoUrl1"));
+                                data.setSelectPhoto2((String)snapshot.get("selectPhotoUrl2"));
                                 data.setUserPhoto((String) snapshot.get("userPhotoUrl"));
                                 data.setLike((Long) snapshot.get("like"));
                                 shareArray.add(data);
@@ -278,7 +298,8 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
     @Override
     public void onShowAddArticleDialog() {
         View view = View.inflate(this, R.layout.add_article_custom_dialog, null);
-        ivPhoto = view.findViewById(R.id.article_photo);
+        viewPager = view.findViewById(R.id.article_view_pager);
+        ImageView addBtn = view.findViewById(R.id.article_add_btn);
 
         TextView tvShare = view.findViewById(R.id.article_text_share);
         TextView tvCancel = view.findViewById(R.id.article_text_cancel);
@@ -304,7 +325,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
             @Override
             public void onClick(View view) {
                 String content = edContent.getText().toString();
-                presenter.onShareButtonClick(userDataManager, content, selectPhotoBytes);
+                presenter.onShareButtonClick(userDataManager, content, photoBytesArray);
                 dialog.dismiss();
             }
         });
@@ -314,13 +335,43 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                 dialog.dismiss();
             }
         });
-
-        ivPhoto.setOnClickListener(new View.OnClickListener() {
+        addBtn.setVisibility(View.VISIBLE);
+        addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .start(ShareActivity.this);
+                PictureSelector.create(ShareActivity.this)
+                        .openGallery(PictureMimeType.ofImage())
+                        .loadImageEngine(GlideEngine.createGlideEngine())
+                        .maxSelectNum(3)
+                        .enableCrop(true)
+                        .hideBottomControls(false)
+                        .showCropFrame(false)
+                        .freeStyleCropEnabled(true)
+                        .forResult(new OnResultCallbackListener() {
+                            @Override
+                            public void onResult(List<LocalMedia> result) {
+                                addBtn.setVisibility(View.GONE);
+                                bitmapArrayList = new ArrayList<>();
+                                photoBytesArray = new ArrayList<>();
+                                for (int i = 0 ; i < result.size() ;i ++){
+                                    File file = new File(result.get(i).getCutPath());
+                                    Uri uri = Uri.fromFile(file);
+                                    try{
+                                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),uri);
+                                        bitmapArrayList.add(bitmap);
+                                        //再次解壓縮
+                                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(bitmap.getByteCount());
+                                        bitmap.compress(Bitmap.CompressFormat.JPEG, 60, outputStream);
+                                        photoBytesArray.add(outputStream.toByteArray());
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                }
+                                Log.i("Michael","準備好上傳的bytes長度 : "+photoBytesArray.size());
+                                DialogViewPagerAdapter adapter = new DialogViewPagerAdapter(ShareActivity.this,bitmapArrayList);
+                                viewPager.setAdapter(adapter);
+                            }
+                        });
             }
         });
     }
@@ -331,37 +382,79 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
     }
 
     @Override
-    public void shareArticle(UserDataManager userDataManager, String content, byte[] selectPhotoBytes) {
-        StorageReference river = storage.child(userDataManager.getEmail() + "/" + SHARE + "/" + content + ".jpg");
-        UploadTask uploadTask = river.putBytes(selectPhotoBytes);
-        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                river.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        String url = uri.toString();
-                        presenter.onCatchSelectPhotoUrl(url, content);
-                    }
-                });
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
+    public void shareArticle(UserDataManager userDataManager, String content, ArrayList<byte[]> photoBytesArray) {
 
-            }
-        });
+        this.photoBytesArray = photoBytesArray;
+        this.shareContent = content;
+        downloadUrlArray = new ArrayList<>();
+        uploadPhoto();
+        //難題來了 命名方式
+
+    }
+
+    private void uploadPhoto() {
+        if (photoCount < photoBytesArray.size()){
+            StorageReference river = storage.child(userDataManager.getEmail() + "/" + SHARE + "/" + shareContent +"/"+shareContent+photoCount+ ".jpg");
+            UploadTask uploadTask = river.putBytes(photoBytesArray.get(photoCount));
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    river.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            String url = uri.toString();
+                            downloadUrlArray.add(url);
+                            photoCount++;
+                            uploadPhoto();
+                        }
+                    });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+        }else {
+            presenter.onCatchSelectPhotoUrl(downloadUrlArray, shareContent);
+        }
+
     }
 
     @Override
-    public void createArticle(String selectPhotoUrl, String content) {
+    public void createArticle(ArrayList<String> downloadUrlArray, String content) {
         Map<String, Object> map = new HashMap<>();
-        map.put("content", content);
-        map.put("like", 0);
-        map.put("selectPhotoUrl", selectPhotoUrl);
-        map.put("user", userDataManager.getDisplayName());
-        map.put("userPhotoUrl", userDataManager.getPhotoUrl());
-        map.put("userEmail", userDataManager.getEmail());
+        int urlSize = downloadUrlArray.size();
+        if (urlSize == 1){
+            map.put("content", content);
+            map.put("like", 0);
+            map.put("selectPhotoUrl0", downloadUrlArray.get(0));
+            map.put("selectPhotoUrl1", "");
+            map.put("selectPhotoUrl2", "");
+            map.put("user", userDataManager.getDisplayName());
+            map.put("userPhotoUrl", userDataManager.getPhotoUrl());
+            map.put("userEmail", userDataManager.getEmail());
+        }else if (urlSize == 2){
+            map.put("content", content);
+            map.put("like", 0);
+            map.put("selectPhotoUrl0", downloadUrlArray.get(0));
+            map.put("selectPhotoUrl1", downloadUrlArray.get(1));
+            map.put("selectPhotoUrl2", "");
+            map.put("user", userDataManager.getDisplayName());
+            map.put("userPhotoUrl", userDataManager.getPhotoUrl());
+            map.put("userEmail", userDataManager.getEmail());
+        }else {
+            map.put("content", content);
+            map.put("like", 0);
+            map.put("selectPhotoUrl0", downloadUrlArray.get(0));
+            map.put("selectPhotoUrl1", downloadUrlArray.get(1));
+            map.put("selectPhotoUrl2", downloadUrlArray.get(2));
+            map.put("user", userDataManager.getDisplayName());
+            map.put("userPhotoUrl", userDataManager.getPhotoUrl());
+            map.put("userEmail", userDataManager.getEmail());
+        }
+
+
 
 
         firestore.collection(SHARE).document(content).set(map)
@@ -555,27 +648,5 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Bitmap bitmap;
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK && result != null) {
-                Uri resultUri = result.getUri();
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), resultUri);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    int quality = 30;
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos);
-                    selectPhotoBytes = baos.toByteArray();
-                    bitmap = BitmapFactory.decodeByteArray(selectPhotoBytes, 0, selectPhotoBytes.length);
-                    ivPhoto.setImageBitmap(bitmap);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
 
-    }
 }
