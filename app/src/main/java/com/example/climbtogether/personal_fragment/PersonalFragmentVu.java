@@ -16,4 +16,6 @@ public interface PersonalFragmentVu {
     void intentToPersonalChatActivity(String displayName, String friendEmail, String photoUrl);
 
     void showNoChatDataView(boolean isShow);
+
+    void showDeleteConfirmDialog(String documentPath);
 }

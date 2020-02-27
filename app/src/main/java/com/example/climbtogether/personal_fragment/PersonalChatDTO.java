@@ -12,6 +12,16 @@ public class PersonalChatDTO {
 
     private long time;
 
+    private String documentPath;
+
+    public String getDocumentPath() {
+        return documentPath;
+    }
+
+    public void setDocumentPath(String documentPath) {
+        this.documentPath = documentPath;
+    }
+
     public String getPhotoUrl() {
         return photoUrl;
     }

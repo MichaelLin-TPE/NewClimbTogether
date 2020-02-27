@@ -8,6 +8,8 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
 
     private ShareActivityVu mView;
 
+    private ShareArticleDTO data;
+
     public ShareActivityPresenterImpl(ShareActivityVu mView) {
         this.mView = mView;
     }
@@ -73,5 +75,48 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
         mView.sendReply(content,replyArray,shareArticleDTO);
 
 
+    }
+
+    @Override
+    public void onUserPhotoClickListener(ShareArticleDTO data) {
+        this.data = data;
+        mView.showUserDialog();
+
+    }
+
+    @Override
+    public void onShowUserDialog(ShareArticleDTO data, boolean isInvite, boolean isFriend) {
+        mView.setProgressStart(false);
+        mView.showUserDialog(data,isInvite,isFriend);
+    }
+
+    @Override
+    public void onSetDialogViewChange() {
+        mView.setProgressStart(true);
+    }
+
+    @Override
+    public void onSearchFriendShip() {
+        mView.searchForFriendship(data);
+    }
+
+    @Override
+    public void onAddFriendButtonClickListener(String strangerEmail, String userEmail) {
+        mView.sendInviteToStranger(strangerEmail,userEmail);
+    }
+
+    @Override
+    public void onSendMessageClickListener(ShareArticleDTO data) {
+        mView.checkFriendship(data);
+    }
+
+    @Override
+    public void onIsFriend(ShareArticleDTO data,boolean isFriendSend) {
+        this.data = data;
+        if (isFriendSend){
+            mView.intentToPersonalChatActivity(data);
+        }else {
+            mView.showNoticeDialog(data);
+        }
     }
 }

@@ -7,6 +7,15 @@ public class PersonalChatData {
 
     private String email;
 
+    private String documentPath;
+
+    public String getDocumentPath() {
+        return documentPath;
+    }
+
+    public void setDocumentPath(String documentPath) {
+        this.documentPath = documentPath;
+    }
 
     public String getEmail() {
         return email;

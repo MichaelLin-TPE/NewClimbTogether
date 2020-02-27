@@ -56,5 +56,10 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
         mView.showNoChatDataView(true);
     }
 
+    @Override
+    public void onShowDeleteMessageConfirmDialog(String documentPath) {
+        mView.showDeleteConfirmDialog(documentPath);
+    }
+
 
 }

@@ -1,6 +1,8 @@
 package com.example.climbtogether.personal_fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -83,6 +85,8 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
     private ArrayList<String> friendsArrayList;
     
     private String currentEmail;
+
+    private int itemPosition;
 
     private PersonalFragmentAdapter adapter;
 
@@ -219,6 +223,13 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                 presenter.onItemClickListener(displayName,friendEmail,photoUrl);
             }
         });
+//        adapter.setOnChatItemLongClickListener(new PersonalFragmentAdapter.OnChatItemLongClickListener() {
+//            @Override
+//            public void onClick(String documentPath,int itemPosition1) {
+//                itemPosition = itemPosition1;
+//                presenter.onShowDeleteMessageConfirmDialog(documentPath);
+//            }
+//        });
     }
 
     @Override
@@ -237,6 +248,63 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
         tvNotice.setText(isShow ? getString(R.string.no_chat_data) : "");
     }
 
+    @Override
+    public void showDeleteConfirmDialog(String documentPath) {
+        AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                .setTitle(getString(R.string.warning))
+                .setMessage(getString(R.string.confirm_to_delete_message))
+                .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        chatDataArrayList.remove(itemPosition);
+                        adapter.notifyDataSetChanged();
+                        deleteMessage(documentPath);
+                    }
+                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    private void deleteMessage(String documentPath) {
+        ArrayList<String> documentArray = new ArrayList<>();
+        firestore.collection(PERSONAL_CHAT)
+                .document(documentPath)
+                .collection(CHAT_DATA)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null){
+                            for (QueryDocumentSnapshot snapshot : task.getResult()){
+                                documentArray.add(snapshot.getId());
+                            }
+                            if (documentArray.size() != 0){
+                                for (String id : documentArray){
+                                    firestore.collection(PERSONAL_CHAT)
+                                            .document(documentPath)
+                                            .collection(CHAT_DATA)
+                                            .document(id)
+                                            .delete()
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()){
+                                                        Log.i("Michael","刪除成功");
+                                                    }
+                                                }
+                                            });
+                                }
+                            }
+                        }
+                    }
+                });
+
+    }
+
     private void searchAllData() {
         if (searchCount < friendsArrayList.size()){
             Log.i("Michael","朋友有幾個 : "+friendsArrayList.size());
@@ -244,6 +312,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
         }else {
             searchCount = 0;
             if (chatDataArrayList.size() != 0){
+                Log.i("Michael","第一筆聊天訊息 : "+chatDataArrayList.get(0).getMessage());
                 if (chatDataArrayList.get(0).getMessage().isEmpty() || chatDataArrayList.get(0).getMessage() == null){
                     Log.i("Michael","沒有聊天訊息");
                     presenter.onShowProgress(false);
@@ -291,17 +360,23 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                                 PersonalChatData chatData = new PersonalChatData();
                                 chatData.setEmail((String)document.get("email"));
                                 chatData.setMessage((String)document.get("message"));
+                                Log.i("Michael","Message : "+(String)document.get("message"));
                                 chatData.setTime((long)document.get("time"));
                                 chatArrayList.add(chatData);
                             }
                             if (chatArrayList.size() != 0){
+
                                 int size = chatArrayList.size() - 1;
+                                Log.i("Michael","有聊天訊息 : "+chatArrayList.get(size).getMessage());
                                 data.setMessage(chatArrayList.get(size).getMessage());
                                 data.setTime(chatArrayList.get(size).getTime());
+                                data.setDocumentPath(path);
                                 chatDataArrayList.add(data);
+                                Log.i("Michael","chatDataArrayList 第一筆 : "+chatDataArrayList.get(0).getMessage()+" , 長度 : "+chatDataArrayList.size());
                                 searchCount++;
                                 searchAllData();
                             }else {
+                                Log.i("Michael","有做到ReSearch");
                                 String path = friendEmail+"And"+currentEmail;
                                 reSearchChatData(path,data);
                             }
@@ -332,13 +407,11 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                                 int size = chatArrayList.size() - 1;
                                 data.setMessage(chatArrayList.get(size).getMessage());
                                 data.setTime(chatArrayList.get(size).getTime());
+                                data.setDocumentPath(path);
                                 chatDataArrayList.add(data);
                                 searchCount++;
                                 searchAllData();
                             }else {
-                                data.setMessage("");
-                                data.setTime(0);
-                                chatDataArrayList.add(data);
                                 searchCount++;
                                 searchAllData();
                             }

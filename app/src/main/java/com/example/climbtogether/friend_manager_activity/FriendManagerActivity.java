@@ -24,6 +24,7 @@ import com.example.climbtogether.R;
 import com.example.climbtogether.friend_manager_activity.friend_presenter.FriendPresenter;
 import com.example.climbtogether.friend_manager_activity.friend_presenter.FriendPresenterImpl;
 import com.example.climbtogether.friend_manager_activity.view.FriendViewAdapter;
+import com.example.climbtogether.friend_manager_activity.view.InviteViewAdapter;
 import com.example.climbtogether.personal_chat_activity.PersonalChatActivity;
 import com.example.climbtogether.tool.ImageLoaderManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,6 +42,7 @@ import com.google.firebase.storage.StorageReference;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class FriendManagerActivity extends AppCompatActivity implements FriendManagerVu {
 
@@ -211,7 +213,123 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
             }
         });
 
+        adapter.setOnCheckInviteListener(new InviteViewAdapter.OnCheckInviteIconClickListener() {
+            @Override
+            public void onClickYes(boolean isAdd, FriendInviteDTO data, int itemPosition) {
+                deleteInviteData(data, itemPosition);
+                createFriendData(data);
+            }
+
+            @Override
+            public void onClickNo(boolean isAdd, FriendInviteDTO data, int itemPosition) {
+                deleteInviteData(data, itemPosition);
+            }
+        });
+
     }
+
+    private void createFriendData(final FriendInviteDTO data) {
+        firestore.collection("users").document(data.getEmail()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult() != null) {
+                                DocumentSnapshot document = task.getResult();
+                                Map<String, Object> map = document.getData();
+                                if (user != null) {
+                                    if (user.getEmail() != null) {
+                                        if (map != null) {
+                                            becomeToFriend(user.getEmail(),data.getEmail(),map);
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void becomeToFriend(final String userEmail, final String friendEmail, Map<String,Object> map) {
+        firestore.collection(FRIENDSHIP).document(userEmail)
+                .collection(FRIEND).document(friendEmail)
+                .set(map)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            createUserData(userEmail,friendEmail);
+                        }
+                    }
+                });
+    }
+
+    private void createUserData(final String userEmail, final String friendEmail) {
+        firestore.collection("users").document(userEmail).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult() != null) {
+                                DocumentSnapshot document = task.getResult();
+                                Map<String, Object> map = document.getData();
+                                if (user != null) {
+                                    if (user.getEmail() != null) {
+                                        if (map != null) {
+                                            becomeToNewFriend(userEmail,friendEmail,map);
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void becomeToNewFriend(String friendEmail, String userEmail, Map<String, Object> map) {
+        firestore.collection(FRIENDSHIP).document(userEmail)
+                .collection(FRIEND).document(friendEmail)
+                .set(map)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.i("Michael", "新增成功");
+                            inviteArrayList = new ArrayList<>();
+                            friendArrayList = new ArrayList<>();
+                            friendPresenter.setData(inviteArrayList,friendArrayList);
+                            adapter = new FriendManagerAdapter(friendPresenter,FriendManagerActivity.this);
+                            recyclerView.setAdapter(adapter);
+                            checkAllData();
+                        }
+                    }
+                });
+    }
+
+    private void deleteInviteData(FriendInviteDTO data, final int itemPosition) {
+        if (user != null) {
+            if (user.getEmail() != null) {
+                firestore.collection(INVITE_FRIEND).document(user.getEmail()).collection(INVITE).document(data.getEmail())
+                        .delete()
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Log.i("Michael", "已刪除");
+                                    inviteArrayList.remove(itemPosition);
+                                    adapter.notifyDataSetChanged();
+                                }
+                            }
+                        });
+            }
+        } else {
+            Log.i("Michael", "user null");
+        }
+    }
+
+
 
     @Override
     public void showUserDialog(final FriendDTO data, final int itemPosition) {

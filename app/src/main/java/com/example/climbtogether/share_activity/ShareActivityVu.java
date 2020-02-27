@@ -22,4 +22,20 @@ public interface ShareActivityVu {
     void showReplayDialog(ReplyObject data,ShareArticleDTO shareArticleDTO);
 
     void sendReply(String content, ArrayList<ReplyDTO> replyArray, ShareArticleDTO shareArticleDTO);
+
+    void searchForFriendship(ShareArticleDTO data);
+
+    void showUserDialog(ShareArticleDTO data, boolean isInvite, boolean isFriend);
+
+    void showUserDialog();
+
+    void setProgressStart(boolean b);
+
+    void sendInviteToStranger(String strangerEmail, String userEmail);
+
+    void checkFriendship(ShareArticleDTO data);
+
+    void intentToPersonalChatActivity(ShareArticleDTO data);
+
+    void showNoticeDialog(ShareArticleDTO data);
 }

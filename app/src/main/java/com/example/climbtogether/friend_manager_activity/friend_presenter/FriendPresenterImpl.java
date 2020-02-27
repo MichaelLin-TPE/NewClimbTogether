@@ -6,6 +6,7 @@ import com.example.climbtogether.friend_manager_activity.FriendDTO;
 import com.example.climbtogether.friend_manager_activity.FriendInviteDTO;
 import com.example.climbtogether.friend_manager_activity.view.FriendViewAdapter;
 import com.example.climbtogether.friend_manager_activity.view.FriendViewHolder;
+import com.example.climbtogether.friend_manager_activity.view.InviteViewAdapter;
 import com.example.climbtogether.friend_manager_activity.view.InviteViewHolder;
 
 import java.util.ArrayList;
@@ -25,6 +26,11 @@ public class FriendPresenterImpl implements FriendPresenter {
 
     public void setOnfriendItemClickListener (FriendViewAdapter.OnfriendItemClickListener listener ,FriendViewHolder holder){
         holder.setOnfriendItemClickListener(listener);
+    }
+
+    @Override
+    public void setOnCheckInviteListener(InviteViewHolder holder, InviteViewAdapter.OnCheckInviteIconClickListener checkListener) {
+        holder.setOnCheckInviteListener(checkListener);
     }
 
     @Override
@@ -83,5 +89,6 @@ public class FriendPresenterImpl implements FriendPresenter {
     public void onBindFriendViewHolder(FriendViewHolder holder, int position) {
         holder.setData(friendArrayList);
     }
+
 
 }

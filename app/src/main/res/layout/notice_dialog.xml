@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/button_shape_not_press"
+    android:padding="15dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <ImageView
+        android:id="@+id/notice_dialog_iv"
+        android:contentDescription="@null"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:src="@drawable/hiking_logo"
+        android:layout_width="@dimen/weather_big_icon"
+        android:layout_height="@dimen/weather_big_icon"/>
+
+    <TextView
+        android:id="@+id/notice_dialog_notice"
+        app:layout_constraintLeft_toLeftOf="@id/notice_dialog_iv"
+        app:layout_constraintRight_toRightOf="@id/notice_dialog_iv"
+        app:layout_constraintTop_toBottomOf="@id/notice_dialog_iv"
+        android:layout_marginTop="15dp"
+        android:text="@string/chat_notice"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+    <TextView
+        android:id="@+id/notice_dialog_text_confirm"
+        android:text="@string/send_invite_to_stranger"
+        android:textColor="@color/colorPrimaryDark"
+        app:layout_constraintTop_toBottomOf="@id/notice_dialog_notice"
+        app:layout_constraintLeft_toLeftOf="@id/notice_dialog_notice"
+        app:layout_constraintRight_toRightOf="@id/notice_dialog_notice"
+        android:layout_marginTop="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/notice_dialog_text_display_name"
+        android:textColor="@color/colorPrimaryDark"
+        tools:text="Joyce"
+        app:layout_constraintTop_toBottomOf="@id/notice_dialog_text_confirm"
+        app:layout_constraintLeft_toLeftOf="@id/notice_dialog_text_confirm"
+        app:layout_constraintRight_toRightOf="@id/notice_dialog_text_confirm"
+        android:layout_marginTop="15dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:id="@+id/notice_dialog_iv_check"
+        app:layout_constraintTop_toBottomOf="@id/notice_dialog_text_display_name"
+        app:layout_constraintLeft_toLeftOf="@id/notice_dialog_text_confirm"
+        app:layout_constraintRight_toLeftOf="@id/notice_dialog_text_display_name"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/check"
+        android:layout_width="@dimen/invite_item_check_icon_size"
+        android:layout_height="@dimen/invite_item_check_icon_size"/>
+    <ImageView
+        android:id="@+id/notice_dialog_iv_cancel"
+        app:layout_constraintTop_toBottomOf="@id/notice_dialog_text_display_name"
+        app:layout_constraintRight_toRightOf="@id/notice_dialog_text_confirm"
+        app:layout_constraintLeft_toRightOf="@id/notice_dialog_text_display_name"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/stop"
+        android:layout_width="@dimen/invite_item_check_icon_size"
+        android:layout_height="@dimen/invite_item_check_icon_size"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

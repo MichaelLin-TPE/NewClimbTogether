@@ -64,6 +64,10 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
         holder.tvContentName.setText(data.getDiaplayName());
         holder.tvContent.setText(data.getContent());
 
+        if (data.getEmail().equals(userEmail)){
+            holder.ivSend.setVisibility(View.GONE);
+        }
+
         ArrayList<String> downloadUrl = new ArrayList<>();
         if (!data.getSelectPhoto().isEmpty()){
             downloadUrl.add(data.getSelectPhoto());
@@ -140,7 +144,24 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
                 listener.onReplyClick(replyObject,data,position);
             }
         });
-
+        holder.ivSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onSendClick(data);
+            }
+        });
+        holder.ivUserPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onUserClick(data);
+            }
+        });
+        holder.ivSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onSetting(data,position);
+            }
+        });
 
     }
 
