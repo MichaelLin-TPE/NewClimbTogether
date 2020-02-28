@@ -112,6 +112,13 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
         holder.ivLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                for (int i = 0 ; i< likeData.getIsCheckArray().size() ; i++){
+                    if (likeData.getIsCheckArray().get(i)){
+                        memberLikeIndex = i;
+                        isUserCheck = true;
+                        break;
+                    }
+                }
                 listener.onAddLike(position,memberLikeIndex);
             }
         });

@@ -237,7 +237,6 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         if (user != null && user.getEmail() != null) {
             if (memberCount < shareArray.size()) {
                 Log.i("Michael", "文章資料長度 : " + shareArray.size() + " , 筆數 : " + memberCount + " , 文章 : " + shareArray.get(memberCount).getContent());
-                Log.i("Michael", "搜尋按讚人數");
                 firestore.collection(SHARE).document(shareArray.get(memberCount).getContent()).collection(ADD_LIKE)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -252,6 +251,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                     for (QueryDocumentSnapshot snapshot : task.getResult()) {
 
                                         if (user.getEmail().equals(snapshot.getId())) {
+                                            Log.i("Michael","使用者按讚 , 文章 : "+shareArray.get(memberCount).getContent());
                                             isCheckArray.add(true);
                                         } else {
                                             isCheckArray.add(false);
@@ -262,6 +262,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                     data.setIsCheckArray(isCheckArray);
                                     data.setMemberEmail(nameList);
                                     likeMemberArray.add(data);
+                                    Log.i("Michael", "按讚的長度 : "+isCheckArray.size());
                                     memberCount++;
                                     searchForLikeMember();
                                 } else {
@@ -503,6 +504,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                 long likeCount = shareArray.get(itemPosition).getLike();
                 if (likeMemberArray.get(itemPosition).getIsCheckArray() == null
                         || likeMemberArray.get(itemPosition).getIsCheckArray().size() == 0) {
+                    Log.i("Michael","沒有讚的後加1");
                     changeAddLikeData(true, itemPosition, likeCount);
                     likeMemberArray.get(itemPosition).getIsCheckArray().add(true);
                     shareArray.get(itemPosition).setLike(likeCount + 1);
@@ -510,12 +512,14 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                     return;
                 }
                 if (likeMemberArray.get(itemPosition).getIsCheckArray().get(memberIndex)) {
+                    Log.i("Michael","有讚的時候-1");
                     likeMemberArray.get(itemPosition).getIsCheckArray().set(memberIndex, false);
                     changeAddLikeData(likeMemberArray.get(itemPosition).getIsCheckArray().get(memberIndex), itemPosition, likeCount);
                     shareArray.get(itemPosition).setLike(likeCount - 1);
                     adapter.notifyDataSetChanged();
                 } else {
                     likeMemberArray.get(itemPosition).getIsCheckArray().set(memberIndex, true);
+                    Log.i("Michael","有讚的時候+1");
                     changeAddLikeData(likeMemberArray.get(itemPosition).getIsCheckArray().get(memberIndex), itemPosition, likeCount);
                     shareArray.get(itemPosition).setLike(likeCount + 1);
                     adapter.notifyDataSetChanged();
