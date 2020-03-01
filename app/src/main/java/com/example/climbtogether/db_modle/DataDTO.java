@@ -1,4 +1,4 @@
-package com.example.climbtogether.mountain_fragment.db_modle;
+package com.example.climbtogether.db_modle;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -126,7 +126,6 @@ public class DataDTO {
         check = cursor.getString(cursor.getColumnIndex("check_top"));
         time = cursor.getLong(cursor.getColumnIndex("time"));
         userPhoto = cursor.getString(cursor.getColumnIndex("user_photo"));
-
     }
 
     public ContentValues toContentValues(){

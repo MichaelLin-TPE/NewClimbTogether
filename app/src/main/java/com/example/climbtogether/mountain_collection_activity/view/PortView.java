@@ -2,29 +2,24 @@ package com.example.climbtogether.mountain_collection_activity.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.example.climbtogether.R;
-import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
+import com.example.climbtogether.db_modle.DataDTO;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-
-import io.opencensus.trace.propagation.SpanContextParseException;
 
 public class PortView extends ConstraintLayout {
     private TextView tvTitle, tvHeight, tvTime;

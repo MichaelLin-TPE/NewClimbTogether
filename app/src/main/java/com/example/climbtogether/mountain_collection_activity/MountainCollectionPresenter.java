@@ -1,8 +1,6 @@
 package com.example.climbtogether.mountain_collection_activity;
 
-import android.graphics.Bitmap;
-
-import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
+import com.example.climbtogether.db_modle.DataDTO;
 
 import java.util.ArrayList;
 

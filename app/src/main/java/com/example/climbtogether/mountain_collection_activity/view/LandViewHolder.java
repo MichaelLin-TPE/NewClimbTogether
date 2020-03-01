@@ -5,7 +5,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
+import com.example.climbtogether.db_modle.DataDTO;
 
 public class LandViewHolder extends RecyclerView.ViewHolder {
 

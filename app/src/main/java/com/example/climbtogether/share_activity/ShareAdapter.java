@@ -160,6 +160,9 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
         holder.ivUserPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Log.i("Michael","點擊item位置 : "+position+" , EMAIL : "+data.getEmail());
+
                 listener.onUserClick(data);
             }
         });

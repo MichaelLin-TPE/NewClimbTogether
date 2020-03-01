@@ -1,15 +1,7 @@
 package com.example.climbtogether.mountain_fragment;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.climbtogether.R;
-import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
+import com.example.climbtogether.db_modle.DataDTO;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.text.SimpleDateFormat;

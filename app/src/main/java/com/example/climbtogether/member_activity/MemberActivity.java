@@ -140,7 +140,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                 if (task.isSuccessful() && task.getResult() != null){
                                     DocumentSnapshot snapshot = task.getResult();
-                                    userDataManager.saveUserData((String)snapshot.get("mail"),(String)snapshot.get("displayName"),(String)snapshot.get("photoUrl"));
+                                    userDataManager.saveUserData((String)snapshot.get("email"),(String)snapshot.get("displayName"),(String)snapshot.get("photoUrl"));
                                 }
                             }
                         });
@@ -445,6 +445,17 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
             }
             firestore.collection("users").document(currentUser.getEmail())
                     .set(map, SetOptions.merge());
+            firestore.collection("users").document(currentUser.getEmail())
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful() && task.getResult() != null){
+                                DocumentSnapshot snapshot = task.getResult();
+                                userDataManager.saveUserData((String)snapshot.get("email"),(String) snapshot.get("displayName"),photoUrl);
+                            }
+                        }
+                    });
         }
     }
 

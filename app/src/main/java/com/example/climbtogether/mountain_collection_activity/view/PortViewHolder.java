@@ -5,9 +5,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
-
-import java.util.ArrayList;
+import com.example.climbtogether.db_modle.DataDTO;
 
 public class PortViewHolder extends RecyclerView.ViewHolder {
 

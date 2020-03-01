@@ -11,10 +11,6 @@ import com.example.climbtogether.mountain_collection_activity.view.LandViewHolde
 import com.example.climbtogether.mountain_collection_activity.view.PortView;
 import com.example.climbtogether.mountain_collection_activity.view.PortViewHolder;
 import com.example.climbtogether.mountain_collection_activity.view_presenter.MtPresenter;
-import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
-import com.nostra13.universalimageloader.utils.L;
-
-import java.util.ArrayList;
 
 import static com.example.climbtogether.mountain_collection_activity.view_presenter.MtPresenterImpl.LAND_VIEW;
 import static com.example.climbtogether.mountain_collection_activity.view_presenter.MtPresenterImpl.PORT_VIEW;

@@ -44,4 +44,7 @@
     <dimen name="article_photo_size">300dp</dimen>
     <dimen name="user_photo_size_reply">40dp</dimen>
     <dimen name="user_photo_smaller_size_reply">30dp</dimen>
+    <dimen name="pic_count_width">50dp</dimen>
+    <dimen name="pic_count_height">25dp</dimen>
+    <dimen name="equipment_icon_size">20dp</dimen>
 </resources>

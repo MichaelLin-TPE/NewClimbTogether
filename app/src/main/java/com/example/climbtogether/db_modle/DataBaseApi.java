@@ -1,4 +1,4 @@
-package com.example.climbtogether.mountain_fragment.db_modle;
+package com.example.climbtogether.db_modle;
 
 import java.util.ArrayList;
 
@@ -11,6 +11,8 @@ public interface DataBaseApi {
     ArrayList<DataDTO> getInformationOrderByTimeNotFar();
 
     ArrayList<DataDTO> getInformationOrderByTimFar();
+
+    ArrayList<EquipmentDTO> getStuffInformation(String stuffType);
 
     void update(DataDTO data);
 

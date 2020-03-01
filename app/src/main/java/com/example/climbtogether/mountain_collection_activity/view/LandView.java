@@ -1,8 +1,6 @@
 package com.example.climbtogether.mountain_collection_activity.view;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,11 +10,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.example.climbtogether.R;
-import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
+import com.example.climbtogether.db_modle.DataDTO;
 import com.example.climbtogether.tool.ImageLoaderManager;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

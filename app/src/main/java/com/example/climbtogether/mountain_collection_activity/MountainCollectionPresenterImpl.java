@@ -1,12 +1,11 @@
 package com.example.climbtogether.mountain_collection_activity;
 
-import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.example.climbtogether.R;
-import com.example.climbtogether.mountain_fragment.db_modle.DataBaseApi;
-import com.example.climbtogether.mountain_fragment.db_modle.DataBaseImpl;
-import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
+import com.example.climbtogether.db_modle.DataBaseApi;
+import com.example.climbtogether.db_modle.DataBaseImpl;
+import com.example.climbtogether.db_modle.DataDTO;
 
 import java.util.ArrayList;
 

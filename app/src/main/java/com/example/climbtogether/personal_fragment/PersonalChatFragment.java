@@ -223,13 +223,13 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                 presenter.onItemClickListener(displayName,friendEmail,photoUrl);
             }
         });
-//        adapter.setOnChatItemLongClickListener(new PersonalFragmentAdapter.OnChatItemLongClickListener() {
-//            @Override
-//            public void onClick(String documentPath,int itemPosition1) {
-//                itemPosition = itemPosition1;
-//                presenter.onShowDeleteMessageConfirmDialog(documentPath);
-//            }
-//        });
+        adapter.setOnChatItemLongClickListener(new PersonalFragmentAdapter.OnChatItemLongClickListener() {
+            @Override
+            public void onClick(String documentPath,int itemPosition1) {
+                itemPosition = itemPosition1;
+                presenter.onShowDeleteMessageConfirmDialog(documentPath);
+            }
+        });
     }
 
     @Override
@@ -298,6 +298,17 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                                                 }
                                             });
                                 }
+                                firestore.collection(PERSONAL_CHAT)
+                                        .document(documentPath)
+                                        .delete()
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()){
+                                                    Log.i("Michael","路徑刪除成功");
+                                                }
+                                            }
+                                        });
                             }
                         }
                     }

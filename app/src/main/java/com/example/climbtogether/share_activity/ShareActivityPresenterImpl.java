@@ -1,5 +1,7 @@
 package com.example.climbtogether.share_activity;
 
+import android.util.Log;
+
 import com.example.climbtogether.tool.UserDataManager;
 
 import java.util.ArrayList;
@@ -114,8 +116,10 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
     public void onIsFriend(ShareArticleDTO data,boolean isFriendSend) {
         this.data = data;
         if (isFriendSend){
+            Log.i("Michael","是朋友");
             mView.intentToPersonalChatActivity(data);
         }else {
+            Log.i("Michael","不是朋友");
             mView.showNoticeDialog(data);
         }
     }

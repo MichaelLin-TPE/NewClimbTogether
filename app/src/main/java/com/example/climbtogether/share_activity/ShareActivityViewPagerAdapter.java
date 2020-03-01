@@ -42,8 +42,13 @@ public class ShareActivityViewPagerAdapter extends PagerAdapter {
         View view = inflater.inflate(R.layout.share_view_pager_item,null);
         RoundedImageView ivPhoto = view.findViewById(R.id.share_select_photo);
         TextView tvCount = view.findViewById(R.id.share_text_pic_count);
+        if (downloadUrlArray.size() == 1){
+            tvCount.setVisibility(View.GONE);
+        }else {
+            tvCount.setVisibility(View.VISIBLE);
+            tvCount.setText(String.format(Locale.getDefault(),"%d/%d",position+1,downloadUrlArray.size()));
+        }
 
-        tvCount.setText(String.format(Locale.getDefault(),"%d/%d",position+1,downloadUrlArray.size()));
 
         loaderManager.setPhotoUrl(downloadUrlArray.get(position),ivPhoto);
 

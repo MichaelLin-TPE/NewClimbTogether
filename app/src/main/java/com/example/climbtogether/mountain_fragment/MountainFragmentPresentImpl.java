@@ -3,10 +3,9 @@ package com.example.climbtogether.mountain_fragment;
 import android.util.Log;
 
 import com.example.climbtogether.R;
-import com.example.climbtogether.home_fragment.news_view.MountainNewsVu;
-import com.example.climbtogether.mountain_fragment.db_modle.DataBaseApi;
-import com.example.climbtogether.mountain_fragment.db_modle.DataBaseImpl;
-import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
+import com.example.climbtogether.db_modle.DataBaseApi;
+import com.example.climbtogether.db_modle.DataBaseImpl;
+import com.example.climbtogether.db_modle.DataDTO;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -77,12 +76,21 @@ public class MountainFragmentPresentImpl implements MountainFragmentPresenter {
                 dataDTO.setTime(time);
                 Log.i("Michael", "修改過後的資料 check : " + dataDTO.getCheck() + " , 第 " + dataDTO.getSid() + " 筆資料");
                 db.update(dataDTO);
-                mView.setDataChange(db.getAllInformation(), isShow);
+                if (levelType == null || levelType.isEmpty()){
+                    mView.setDataChange(db.getAllInformation(), isShow);
+                }else {
+                    mView.setDataChange(db.getLevelAInformation(levelType),isShow);
+                }
+
             }else {
                 dataDTO.setTime(0);
                 Log.i("Michael", "修改過後的資料 check : " + dataDTO.getCheck() + " , 第 " + dataDTO.getSid() + " 筆資料");
                 db.update(dataDTO);
-                mView.setDataChange(db.getAllInformation(), isShow);
+                if (levelType == null || levelType.isEmpty()){
+                    mView.setDataChange(db.getAllInformation(), isShow);
+                }else {
+                    mView.setDataChange(db.getLevelAInformation(levelType),isShow);
+                }
             }
 
         }catch (Exception e){

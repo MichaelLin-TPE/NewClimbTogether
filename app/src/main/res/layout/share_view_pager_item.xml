@@ -11,10 +11,13 @@
         android:layout_marginEnd="15dp"
         android:elevation="0.1dp"
         android:id="@+id/share_text_pic_count"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
+        android:layout_marginTop="5dp"
         android:textSize="@dimen/normal_text_size"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:gravity="center"
+        android:background="@drawable/pic_count_background"
+        android:layout_width="@dimen/pic_count_width"
+        android:layout_height="@dimen/pic_count_height"/>
 
     <com.makeramen.roundedimageview.RoundedImageView
         app:layout_constraintTop_toTopOf="parent"

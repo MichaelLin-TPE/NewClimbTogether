@@ -1,4 +1,4 @@
-package com.example.climbtogether.mountain_fragment.db_modle;
+package com.example.climbtogether.db_modle;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -133,6 +133,23 @@ public class DataBaseImpl implements DataBaseApi {
         cursor.close();
         db.close();
         return data;
+    }
+
+    @Override
+    public ArrayList<EquipmentDTO> getStuffInformation(String stuffType) {
+        ArrayList<EquipmentDTO> equipmentArrayList = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatatbase();
+        Cursor cursor = db.rawQuery("SELECT * FROM "+stuffType,null);
+        if (cursor.moveToFirst()){
+            do {
+                EquipmentDTO data = new EquipmentDTO();
+                data.fromCursor(cursor);
+                equipmentArrayList.add(data);
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return equipmentArrayList;
     }
 
     @Override

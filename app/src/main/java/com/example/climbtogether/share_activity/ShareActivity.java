@@ -760,6 +760,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                     if (snapshot.getId().equals(data.getEmail())){
                                         isFriendSend = true;
                                     }
+
                                 }
                                 presenter.onIsFriend(data,isFriendSend);
                             }

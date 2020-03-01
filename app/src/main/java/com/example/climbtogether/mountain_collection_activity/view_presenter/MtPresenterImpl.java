@@ -1,11 +1,9 @@
 package com.example.climbtogether.mountain_collection_activity.view_presenter;
 
-import com.example.climbtogether.mountain_collection_activity.view.LandView;
 import com.example.climbtogether.mountain_collection_activity.view.LandViewHolder;
 import com.example.climbtogether.mountain_collection_activity.view.PortView;
 import com.example.climbtogether.mountain_collection_activity.view.PortViewHolder;
-import com.example.climbtogether.mountain_fragment.db_modle.DataDTO;
-import com.nostra13.universalimageloader.utils.L;
+import com.example.climbtogether.db_modle.DataDTO;
 
 import java.util.ArrayList;
 
