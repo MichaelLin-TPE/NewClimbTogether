@@ -16,5 +16,9 @@ public interface DataBaseApi {
 
     void update(DataDTO data);
 
+    EquipmentDTO getEquipmentBySid(String table,int sid);
+
+    void updateEquipmentData(EquipmentDTO data,String table);
+
     DataDTO getDataBySid(int sid);
 }

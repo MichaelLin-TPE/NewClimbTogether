@@ -39,16 +39,23 @@ public class StuffItemAdapter extends RecyclerView.Adapter<StuffItemAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         EquipmentDTO data = dataArrayList.get(position);
 
         holder.tvTitle.setText(data.getName());
 
         holder.tvDescription.setText(data.getDescription());
 
+        if (data.getCheck().equals("false")){
+            holder.checkBox.setChecked(false);
+        }else {
+            holder.checkBox.setChecked(true);
+        }
+
         holder.checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onClick(data.getName());
+                listener.onClick(data.getName(),data.getSid(),data.getSort());
             }
         });
     }
@@ -73,6 +80,6 @@ public class StuffItemAdapter extends RecyclerView.Adapter<StuffItemAdapter.View
     }
 
     public interface OnItemCheckBoxClickListener{
-        void onClick(String name);
+        void onClick(String name,int sid,String sort);
     }
 }

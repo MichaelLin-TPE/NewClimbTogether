@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.SplittableRandom;
 
 public class DataBaseImpl implements DataBaseApi {
     private static final String DB_NAME="mountain_db.db";
@@ -105,7 +106,7 @@ public class DataBaseImpl implements DataBaseApi {
     public ArrayList<DataDTO> getInformationOrderByTimeNotFar() {
         ArrayList<DataDTO> data = new ArrayList<>();
         SQLiteDatabase db = getReadableDatatbase();
-        Cursor cursor = db.rawQuery("SELECT * FROM mountain_table ORDER BY ",null);
+        Cursor cursor = db.rawQuery("SELECT * FROM mountain_table ORDER BY time",null);
         if (cursor.moveToFirst()){
             do{
                 DataDTO dataDTO = new DataDTO();
@@ -162,6 +163,34 @@ public class DataBaseImpl implements DataBaseApi {
         }
         db.close();
     }
+
+    @Override
+    public void updateEquipmentData(EquipmentDTO data,String table) {
+        SQLiteDatabase db = getWriteableDatabase();
+        try{
+            db.update(table,data.toContentValues(),"sid=?",new String[]{""+data.getSid()});
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        db.close();
+    }
+
+    @Override
+    public EquipmentDTO getEquipmentBySid(String table, int sid) {
+        EquipmentDTO data = null;
+        SQLiteDatabase db = getReadableDatatbase();
+        String sql = String.format(Locale.getDefault(),"SELECT * FROM %s WHERE sid=%d",table,sid);
+        Cursor cursor = db.rawQuery(sql,null);
+        if (cursor.moveToFirst()){
+            data = new EquipmentDTO();
+            data.fromCursor(cursor);
+        }
+        cursor.close();
+        db.close();
+        return data;
+    }
+
+
 
     @Override
     public DataDTO getDataBySid(int sid) {

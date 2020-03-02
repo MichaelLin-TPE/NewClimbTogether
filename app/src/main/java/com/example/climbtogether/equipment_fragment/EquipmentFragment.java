@@ -101,6 +101,23 @@ public class EquipmentFragment extends Fragment implements EquipmentVu{
 
         recyclerView.setAdapter(adapter);
 
+        adapter.setOnItemCheckBoxListener(new StuffItemAdapter.OnItemCheckBoxClickListener() {
+            @Override
+            public void onClick(String name, int sid, String sort) {
+                presenter.onItemCheckListener(name,sid,sort);
+            }
+        });
+    }
 
+    @Override
+    public void setUpdateData(ArrayList<EquipmentDTO> bodyArrayList, ArrayList<EquipmentDTO> moveArrayList, ArrayList<EquipmentDTO> campArrayList, ArrayList<EquipmentDTO> foodArrayList, ArrayList<EquipmentDTO> electronicArrayList, ArrayList<EquipmentDTO> drogArrayList, ArrayList<EquipmentDTO> otherArrayList) {
+        stuffPresenter.setBodyData(bodyArrayList);
+        stuffPresenter.setMoveData(moveArrayList);
+        stuffPresenter.setCampData(campArrayList);
+        stuffPresenter.setFoodData(foodArrayList);
+        stuffPresenter.setElectronicData(electronicArrayList);
+        stuffPresenter.setDrogData(drogArrayList);
+        stuffPresenter.setOtherData(otherArrayList);
+        adapter.notifyDataSetChanged();
     }
 }

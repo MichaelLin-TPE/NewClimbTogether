@@ -23,6 +23,12 @@ public class EquipmentViewHolder extends RecyclerView.ViewHolder {
     private TextView tvTitle;
 
     private Context context;
+
+    private StuffItemAdapter.OnItemCheckBoxClickListener listener;
+
+    public void setOnItemCheckBoxClickListener(StuffItemAdapter.OnItemCheckBoxClickListener listener){
+        this.listener = listener;
+    }
     public EquipmentViewHolder(@NonNull View itemView, Context context) {
         super(itemView);
         this.context = context;
@@ -38,8 +44,8 @@ public class EquipmentViewHolder extends RecyclerView.ViewHolder {
         recyclerView.setAdapter(adapter);
         adapter.setOnItemCheckBoxClickListener(new StuffItemAdapter.OnItemCheckBoxClickListener() {
             @Override
-            public void onClick(String name) {
-                Log.i("Michael","點擊了 : "+name);
+            public void onClick(String name,int sid,String sort) {
+                listener.onClick(name,sid,sort);
             }
         });
     }

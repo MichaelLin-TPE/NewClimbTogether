@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.climbtogether.db_modle.EquipmentDTO;
 import com.example.climbtogether.equipment_fragment.EquipmentViewHolder;
+import com.example.climbtogether.equipment_fragment.StuffItemAdapter;
 
 import java.util.ArrayList;
 
@@ -27,4 +28,6 @@ public interface StuffPresenter {
     void setOtherData(ArrayList<EquipmentDTO> otherArrayList);
 
     void onBindViewHolder(EquipmentViewHolder holder, int position);
+
+    void setOnItemCheckBoxListener(EquipmentViewHolder holder, StuffItemAdapter.OnItemCheckBoxClickListener listener);
 }

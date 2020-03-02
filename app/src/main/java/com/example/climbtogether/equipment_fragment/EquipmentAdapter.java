@@ -19,6 +19,12 @@ public class EquipmentAdapter extends RecyclerView.Adapter {
 
     private Context context;
 
+    private StuffItemAdapter.OnItemCheckBoxClickListener listener;
+
+    public void setOnItemCheckBoxListener(StuffItemAdapter.OnItemCheckBoxClickListener listener){
+        this.listener = listener;
+    }
+
     public EquipmentAdapter(StuffPresenter stuffPresenter, Context context) {
         this.stuffPresenter = stuffPresenter;
         this.context = context;
@@ -36,6 +42,7 @@ public class EquipmentAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof EquipmentViewHolder){
             stuffPresenter.onBindViewHolder((EquipmentViewHolder)holder,position);
+            stuffPresenter.setOnItemCheckBoxListener((EquipmentViewHolder)holder,listener);
         }
     }
 

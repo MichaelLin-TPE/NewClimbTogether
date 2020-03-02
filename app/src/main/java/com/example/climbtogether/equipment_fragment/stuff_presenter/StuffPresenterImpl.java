@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.climbtogether.db_modle.EquipmentDTO;
 import com.example.climbtogether.equipment_fragment.EquipmentViewHolder;
+import com.example.climbtogether.equipment_fragment.StuffItemAdapter;
 
 import java.util.ArrayList;
 
@@ -135,6 +136,11 @@ public class StuffPresenterImpl implements StuffPresenter {
             title = "其他配件";
             holder.setData(otherArrayList,title);
         }
+    }
+
+    @Override
+    public void setOnItemCheckBoxListener(EquipmentViewHolder holder, StuffItemAdapter.OnItemCheckBoxClickListener listener) {
+        holder.setOnItemCheckBoxClickListener(listener);
     }
 
 

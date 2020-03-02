@@ -1,5 +1,6 @@
 package com.example.climbtogether.db_modle;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 
 public class EquipmentDTO {
@@ -9,6 +10,26 @@ public class EquipmentDTO {
     private String name;
 
     private String description;
+
+    private String check;
+
+    private String sort;
+
+    public String getCheck() {
+        return check;
+    }
+
+    public String getSort() {
+        return sort;
+    }
+
+    public void setSort(String sort) {
+        this.sort = sort;
+    }
+
+    public void setCheck(String check) {
+        this.check = check;
+    }
 
     public int getSid() {
         return sid;
@@ -38,6 +59,14 @@ public class EquipmentDTO {
         sid = cursor.getInt(cursor.getColumnIndex("sid"));
         name = cursor.getString(cursor.getColumnIndex("name"));
         description = cursor.getString(cursor.getColumnIndex("description"));
+        check = cursor.getString(cursor.getColumnIndex("check_box"));
+        sort = cursor.getString(cursor.getColumnIndex("sort"));
+    }
+
+    public ContentValues toContentValues(){
+        ContentValues data = new ContentValues();
+        data.put("check_box",this.check);
+        return data;
     }
 
 }
