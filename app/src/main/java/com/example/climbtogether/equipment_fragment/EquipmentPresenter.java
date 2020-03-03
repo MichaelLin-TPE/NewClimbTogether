@@ -8,4 +8,6 @@ public interface EquipmentPresenter {
     void onButtonAddListClickListener();
 
     void onButtonGoListClickListener();
+
+    void onClearView();
 }

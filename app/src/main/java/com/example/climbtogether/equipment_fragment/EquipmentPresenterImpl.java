@@ -190,13 +190,6 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
         int listIndex = 0;
         boolean isRepeat = false;
 
-        if (dataBaseApi.getAllMyEquipment().size() != 0){
-            for (EquipmentListDTO dataDto : dataBaseApi.getAllMyEquipment()){
-                if (dataDto.getName().equals(data.getName())){
-                    return;
-                }
-            }
-        }
         if (myList.size() != 0){
             for (int i = 0 ; i < myList.size() ; i ++){
                 if (myList.get(i).getName().equals(data.getName())){
@@ -223,15 +216,11 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
     @Override
     public void onButtonAddListClickListener() {
         if (myList != null){
-            for (EquipmentListDTO data : myList){
-                dataBaseApi.insert(data);
-            }
-            myList = new ArrayList<>();
-            Log.i("Michael","新增完第一筆資料為 : "+dataBaseApi.getAllMyEquipment().get(0).getName());
-
-            String message = "新增裝備成功";
-            mView.showAddListSuccessfulMessage(message);
-            resetDatabase();
+//            for (EquipmentListDTO data : myList){
+//                dataBaseApi.insert(data);
+//            }
+            mView.setGoToMyEquipmentEnable();
+            mView.saveMyEquipmentToFirebase(myList);
         }else {
             String message = "請選擇你要的裝備";
             mView.showAddListSuccessfulMessage(message);
@@ -296,11 +285,17 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
         otherArrayList = dataBaseApi.getStuffInformation(OTHER);
 
         mView.setUpdateData(bodyArrayList,moveArrayList,campArrayList,foodArrayList,electronicArrayList,drogArrayList,otherArrayList);
+        myList = new ArrayList<>();
     }
 
     @Override
     public void onButtonGoListClickListener() {
         mView.intentToMyEquipmentActivity();
+    }
+
+    @Override
+    public void onClearView() {
+        resetDatabase();
     }
 
     private void updateData(String table ,int sid) {

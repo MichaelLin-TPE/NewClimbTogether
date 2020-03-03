@@ -1,5 +1,6 @@
 package com.example.climbtogether.my_equipment_activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -12,6 +13,13 @@ import android.view.View;
 
 import com.example.climbtogether.R;
 import com.example.climbtogether.db_modle.EquipmentListDTO;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -21,6 +29,15 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
 
     private RecyclerView recyclerView;
 
+    private FirebaseFirestore firestore;
+
+    private FirebaseAuth mAuth;
+
+    private FirebaseUser user;
+
+    private static final String MY_EQUIPMENT = "my_equipment";
+
+    private static final String EQUIPMENT = "equipment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +45,41 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
         setContentView(R.layout.activity_my_equipment);
         initPresenter();
         initView();
-        presenter.onPrepareData();
+        initFirebase();
+        searchData();
+    }
+
+    private void initFirebase() {
+        firestore = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+    }
+
+    private void searchData() {
+        ArrayList<EquipmentListDTO> dataArrayList = new ArrayList<>();
+
+        if (user != null && user.getEmail() != null){
+            firestore.collection(MY_EQUIPMENT)
+                    .document(user.getEmail())
+                    .collection(EQUIPMENT)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful() && task.getResult() != null){
+                                for (QueryDocumentSnapshot snapshot : task.getResult()){
+                                    EquipmentListDTO data = new EquipmentListDTO();
+                                    data.setName(snapshot.getId());
+                                    data.setDescription((String)snapshot.get("description"));
+                                    dataArrayList.add(data);
+                                }
+                                if (dataArrayList.size() != 0){
+                                    presenter.onCatchDataSuccessful(dataArrayList);
+                                }
+                            }
+                        }
+                    });
+        }
     }
 
     private void initView() {

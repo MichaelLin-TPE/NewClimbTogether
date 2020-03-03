@@ -3,6 +3,7 @@ package com.example.climbtogether.equipment_fragment;
 import android.content.Context;
 
 import com.example.climbtogether.db_modle.EquipmentDTO;
+import com.example.climbtogether.db_modle.EquipmentListDTO;
 
 import java.util.ArrayList;
 
@@ -15,4 +16,8 @@ public interface EquipmentVu {
 
     void showAddListSuccessfulMessage(String message);
     void intentToMyEquipmentActivity();
+
+    void saveMyEquipmentToFirebase(ArrayList<EquipmentListDTO> myList);
+
+    void setGoToMyEquipmentEnable();
 }
