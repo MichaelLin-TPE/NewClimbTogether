@@ -90,4 +90,7 @@
     <string name="chat_notice">加入好友後才可以私訊對方唷~*</string>
     <string name="send_invite_to_stranger">是否要傳送好友邀請給</string>
     <string name="confirm_to_delete_message">確定要刪除所有的訊息嗎?</string>
+    <string name="equipment_list">裝備清單</string>
+    <string name="add_equipment">增加清單</string>
+    <string name="go_equipment_list">前往清單</string>
 </resources>

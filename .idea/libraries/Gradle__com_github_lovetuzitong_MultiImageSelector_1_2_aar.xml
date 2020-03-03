@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.github.lovetuzitong:MultiImageSelector:1.2@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/097899f4bed5c2713b3db2cc1a749fc3/jetified-MultiImageSelector-1.2/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/097899f4bed5c2713b3db2cc1a749fc3/jetified-MultiImageSelector-1.2/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5e57b3f2d33e68e81f112742fe547ce9/jetified-MultiImageSelector-1.2/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5e57b3f2d33e68e81f112742fe547ce9/jetified-MultiImageSelector-1.2/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

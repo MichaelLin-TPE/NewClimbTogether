@@ -1,6 +1,7 @@
 package com.example.climbtogether.equipment_fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -11,11 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.climbtogether.R;
 import com.example.climbtogether.db_modle.EquipmentDTO;
 import com.example.climbtogether.equipment_fragment.stuff_presenter.StuffPresenter;
 import com.example.climbtogether.equipment_fragment.stuff_presenter.StuffPresenterImpl;
+import com.example.climbtogether.my_equipment_activity.MyEquipmentActivity;
 
 import java.util.ArrayList;
 
@@ -30,6 +34,8 @@ public class EquipmentFragment extends Fragment implements EquipmentVu{
     private EquipmentAdapter adapter;
 
     private RecyclerView recyclerView;
+
+    private Button btnAddList,btnGoList;
 
     @Override
     public void onAttach(Context context) {
@@ -76,6 +82,22 @@ public class EquipmentFragment extends Fragment implements EquipmentVu{
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
+        btnAddList = view.findViewById(R.id.equipment_btn_add_list);
+        btnGoList = view.findViewById(R.id.equipment_btn_go_list);
+
+        btnAddList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presenter.onButtonAddListClickListener();
+            }
+        });
+        btnGoList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presenter.onButtonGoListClickListener();
+            }
+        });
+
     }
 
 
@@ -119,5 +141,16 @@ public class EquipmentFragment extends Fragment implements EquipmentVu{
         stuffPresenter.setDrogData(drogArrayList);
         stuffPresenter.setOtherData(otherArrayList);
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showAddListSuccessfulMessage(String message) {
+        Toast.makeText(context,message,Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void intentToMyEquipmentActivity() {
+        Intent it = new Intent(context, MyEquipmentActivity.class);
+        context.startActivity(it);
     }
 }

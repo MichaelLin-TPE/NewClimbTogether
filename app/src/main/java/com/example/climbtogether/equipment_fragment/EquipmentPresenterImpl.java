@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.climbtogether.db_modle.DataBaseApi;
 import com.example.climbtogether.db_modle.DataBaseImpl;
 import com.example.climbtogether.db_modle.EquipmentDTO;
+import com.example.climbtogether.db_modle.EquipmentListDTO;
 
 import java.util.ArrayList;
 
@@ -30,10 +31,16 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
 
     public static final String OTHER = "other_stuff";
 
+    public static final String EQUIPMENT = "equipment_list";
+
+    private ArrayList<EquipmentListDTO> myList;
+
     public EquipmentPresenterImpl(EquipmentVu mView) {
         this.mView = mView;
 
         dataBaseApi = new DataBaseImpl(mView.getVuContext());
+
+        myList = new ArrayList<>();
 
     }
 
@@ -46,6 +53,43 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
         electronicArrayList = dataBaseApi.getStuffInformation(ELECTRONIC);
         drogArrayList = dataBaseApi.getStuffInformation(DROG);
         otherArrayList = dataBaseApi.getStuffInformation(OTHER);
+
+
+        for (EquipmentDTO data : bodyArrayList){
+            if (data.getCheck().equals("true")){
+                insertMyList(data);
+            }
+        }
+        for (EquipmentDTO data : moveArrayList){
+            if (data.getCheck().equals("true")){
+                insertMyList(data);
+            }
+        }
+        for (EquipmentDTO data : campArrayList){
+            if (data.getCheck().equals("true")){
+                insertMyList(data);
+            }
+        }
+        for (EquipmentDTO data : foodArrayList){
+            if (data.getCheck().equals("true")){
+                insertMyList(data);
+            }
+        }
+        for (EquipmentDTO data : electronicArrayList){
+            if (data.getCheck().equals("true")){
+                insertMyList(data);
+            }
+        }
+        for (EquipmentDTO data : drogArrayList){
+            if (data.getCheck().equals("true")){
+                insertMyList(data);
+            }
+        }
+        for (EquipmentDTO data : otherArrayList){
+            if (data.getCheck().equals("true")){
+                insertMyList(data);
+            }
+        }
 
         mView.setRecyclerView(bodyArrayList, moveArrayList, campArrayList, foodArrayList, electronicArrayList, drogArrayList, otherArrayList);
     }
@@ -128,6 +172,8 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
                 break;
         }
 
+        insertMyList(data);
+
         bodyArrayList = dataBaseApi.getStuffInformation(BODY);
         moveArrayList = dataBaseApi.getStuffInformation(MOVE);
         campArrayList = dataBaseApi.getStuffInformation(CAMP);
@@ -137,5 +183,130 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
         otherArrayList = dataBaseApi.getStuffInformation(OTHER);
 
         mView.setUpdateData(bodyArrayList,moveArrayList,campArrayList,foodArrayList,electronicArrayList,drogArrayList,otherArrayList);
+    }
+
+    private void insertMyList(EquipmentDTO data) {
+        EquipmentListDTO list = new EquipmentListDTO();
+        int listIndex = 0;
+        boolean isRepeat = false;
+
+        if (dataBaseApi.getAllMyEquipment().size() != 0){
+            for (EquipmentListDTO dataDto : dataBaseApi.getAllMyEquipment()){
+                if (dataDto.getName().equals(data.getName())){
+                    return;
+                }
+            }
+        }
+        if (myList.size() != 0){
+            for (int i = 0 ; i < myList.size() ; i ++){
+                if (myList.get(i).getName().equals(data.getName())){
+                    listIndex = i;
+                    isRepeat = true;
+
+                    break;
+                }
+            }
+        }
+        if (isRepeat){
+            Log.i("Michael","資料刪除");
+            myList.remove(listIndex);
+        }else {
+            list.setName(data.getName());
+            Log.i("Michael","資料新增成功");
+            list.setDescription(data.getDescription());
+            myList.add(list);
+        }
+
+
+    }
+
+    @Override
+    public void onButtonAddListClickListener() {
+        if (myList != null){
+            for (EquipmentListDTO data : myList){
+                dataBaseApi.insert(data);
+            }
+            myList = new ArrayList<>();
+            Log.i("Michael","新增完第一筆資料為 : "+dataBaseApi.getAllMyEquipment().get(0).getName());
+
+            String message = "新增裝備成功";
+            mView.showAddListSuccessfulMessage(message);
+            resetDatabase();
+        }else {
+            String message = "請選擇你要的裝備";
+            mView.showAddListSuccessfulMessage(message);
+        }
+
+    }
+
+    private void resetDatabase() {
+
+        bodyArrayList = dataBaseApi.getStuffInformation(BODY);
+        moveArrayList = dataBaseApi.getStuffInformation(MOVE);
+        campArrayList = dataBaseApi.getStuffInformation(CAMP);
+        foodArrayList = dataBaseApi.getStuffInformation(FOOD);
+        electronicArrayList = dataBaseApi.getStuffInformation(ELECTRONIC);
+        drogArrayList = dataBaseApi.getStuffInformation(DROG);
+        otherArrayList = dataBaseApi.getStuffInformation(OTHER);
+
+        for (EquipmentDTO data : bodyArrayList){
+            if (data.getCheck().equals("true")){
+                Log.i("Michael","資料 : "+data.getSid()+" , 改成false");
+                updateData(BODY,data.getSid());
+            }
+        }
+        for (EquipmentDTO data : moveArrayList){
+            if (data.getCheck().equals("true")){
+                updateData(MOVE,data.getSid());
+            }
+        }
+        for (EquipmentDTO data : campArrayList){
+            if (data.getCheck().equals("true")){
+                updateData(CAMP,data.getSid());
+            }
+        }
+        for (EquipmentDTO data : foodArrayList){
+            if (data.getCheck().equals("true")){
+                updateData(FOOD,data.getSid());
+            }
+        }
+        for (EquipmentDTO data : electronicArrayList){
+            if (data.getCheck().equals("true")){
+                updateData(ELECTRONIC,data.getSid());
+            }
+        }
+        for (EquipmentDTO data : drogArrayList){
+            if (data.getCheck().equals("true")){
+                updateData(DROG,data.getSid());
+            }
+        }
+        for (EquipmentDTO data : otherArrayList){
+            if (data.getCheck().equals("true")){
+                updateData(OTHER,data.getSid());
+            }
+        }
+        Log.i("Michael","更新畫面");
+
+        bodyArrayList = dataBaseApi.getStuffInformation(BODY);
+        moveArrayList = dataBaseApi.getStuffInformation(MOVE);
+        campArrayList = dataBaseApi.getStuffInformation(CAMP);
+        foodArrayList = dataBaseApi.getStuffInformation(FOOD);
+        electronicArrayList = dataBaseApi.getStuffInformation(ELECTRONIC);
+        drogArrayList = dataBaseApi.getStuffInformation(DROG);
+        otherArrayList = dataBaseApi.getStuffInformation(OTHER);
+
+        mView.setUpdateData(bodyArrayList,moveArrayList,campArrayList,foodArrayList,electronicArrayList,drogArrayList,otherArrayList);
+    }
+
+    @Override
+    public void onButtonGoListClickListener() {
+        mView.intentToMyEquipmentActivity();
+    }
+
+    private void updateData(String table ,int sid) {
+        Log.i("Michael","重製資料");
+        EquipmentDTO data = dataBaseApi.getEquipmentBySid(table,sid);
+        data.setCheck("false");
+        dataBaseApi.updateEquipmentData(data,table);
     }
 }

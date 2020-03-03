@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import static com.example.climbtogether.tool.Constant.APPLY_MT;
 import static com.example.climbtogether.tool.Constant.CENTER_WEATHER;
+import static com.example.climbtogether.tool.Constant.EQUIPMENT;
 import static com.example.climbtogether.tool.Constant.FRIEND_MANAGER;
 import static com.example.climbtogether.tool.Constant.SEARCH_BED;
 import static com.example.climbtogether.tool.Constant.TOP_PEAK;
@@ -27,6 +28,7 @@ public class MemberActivityPresenterImpl implements MemberActivityPresenter {
         btnList.add(mView.getVuContext().getString(R.string.apply_mt));
         btnList.add(mView.getVuContext().getString(R.string.center_weather));
         btnList.add(mView.getVuContext().getString(R.string.friend_manager));
+        btnList.add(mView.getVuContext().getString(R.string.equipment_list));
 
         mView.setRecyclerView(btnList);
 
@@ -78,6 +80,11 @@ public class MemberActivityPresenterImpl implements MemberActivityPresenter {
                 break;
             case FRIEND_MANAGER:
                 mView.intentToFriendManagerActivity();
+                break;
+            case EQUIPMENT:
+                mView.intentToMyEquipmentActivity();
+
+                break;
             default:
                 break;
         }

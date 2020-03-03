@@ -12,6 +12,8 @@ public interface DataBaseApi {
 
     ArrayList<DataDTO> getInformationOrderByTimFar();
 
+    ArrayList<EquipmentListDTO> getAllMyEquipment();
+
     ArrayList<EquipmentDTO> getStuffInformation(String stuffType);
 
     void update(DataDTO data);
@@ -21,4 +23,8 @@ public interface DataBaseApi {
     void updateEquipmentData(EquipmentDTO data,String table);
 
     DataDTO getDataBySid(int sid);
+
+    void delete(int sid);
+
+    void insert(EquipmentListDTO data);
 }

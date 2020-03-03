@@ -4,4 +4,8 @@ public interface EquipmentPresenter {
     void onPrepareData();
 
     void onItemCheckListener(String name, int sid, String sort);
+
+    void onButtonAddListClickListener();
+
+    void onButtonGoListClickListener();
 }

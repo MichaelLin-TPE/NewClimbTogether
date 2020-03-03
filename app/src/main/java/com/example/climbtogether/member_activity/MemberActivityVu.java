@@ -28,4 +28,6 @@ public interface MemberActivityVu {
     void downloadUserPhoto();
 
     void intentToFriendManagerActivity();
+
+    void intentToMyEquipmentActivity();
 }

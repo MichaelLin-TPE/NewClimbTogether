@@ -30,6 +30,7 @@ import com.example.climbtogether.R;
 import com.example.climbtogether.friend_manager_activity.FriendManagerActivity;
 import com.example.climbtogether.login_activity.LoginActivity;
 import com.example.climbtogether.mountain_collection_activity.MountainCollectionActivity;
+import com.example.climbtogether.my_equipment_activity.MyEquipmentActivity;
 import com.example.climbtogether.tool.ImageLoaderManager;
 import com.example.climbtogether.tool.UserDataManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -312,6 +313,13 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     }
 
     @Override
+    public void intentToMyEquipmentActivity() {
+        Intent it = new Intent(this, MyEquipmentActivity.class);
+        startActivity(it);
+        finish();
+    }
+
+    @Override
     public void uploadUserPhoto() {
 
 //        Intent it = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -527,6 +535,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         iconArray.add(R.drawable.apply);
         iconArray.add(R.drawable.weather);
         iconArray.add(R.drawable.add_user);
+        iconArray.add(R.drawable.backpack);
 
         adapter = new MemberRecyclerViewAdapter(iconArray, btnList, this);
         currentUser = mAuth.getCurrentUser();
