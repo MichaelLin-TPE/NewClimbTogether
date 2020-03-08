@@ -41,13 +41,11 @@ public class ReplyDialogAdapter extends RecyclerView.Adapter<ReplyDialogAdapter.
         ReplyDTO data = dataArrayList.get(position);
         imageLoaderManager.setPhotoUrl(data.getUserPhoto(),holder.ivUserPhoto);
         holder.tvName.setText(data.getUserName());
-        Log.i("Michael","留言 : "+data.getContent());
         holder.tvContent.setText(data.getContent());
     }
 
     @Override
     public int getItemCount() {
-        Log.i("Michael","reply長度 : "+dataArrayList.size());
         return dataArrayList == null ? 0 : dataArrayList.size();
     }
 

@@ -36,17 +36,14 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
 
     private int memberLikeIndex;
 
-    private ArrayList<ReplyObject> replyArray;
-
     public void setonArticleItemClickListener(onArticleItemClickListener listener){
         this.listener = listener;
     }
 
-    public ShareAdapter(ArrayList<ShareArticleDTO> dataArrayList,ArrayList<LikeMemberDTO> likeMemberArray,String userEmail,ArrayList<ReplyObject> replyArray, Context context) {
+    public ShareAdapter(ArrayList<ShareArticleDTO> dataArrayList,ArrayList<LikeMemberDTO> likeMemberArray,String userEmail, Context context) {
         this.dataArrayList = dataArrayList;
         this.context = context;
         this.likeMemberArray = likeMemberArray;
-        this.replyArray = replyArray;
         this.userEmail = userEmail;
         imageLoaderManager = new ImageLoaderManager(context);
     }
@@ -117,6 +114,8 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
                         memberLikeIndex = i;
                         isUserCheck = true;
                         break;
+                    }else {
+                        memberLikeIndex = 0;
                     }
                 }
                 listener.onAddLike(position,memberLikeIndex);
@@ -125,15 +124,9 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
 
 
 
-
-        ReplyObject replyObject = replyArray.get(position);
-
-        Log.i("Michael","聊天內容有幾筆 : "+replyArray.size());
-
-        int replyCount = replyObject.getReplyArray().size();
-        if (replyCount > 0){
+        if (data.getReply() > 0){
             holder.tvReplyCount.setVisibility(View.VISIBLE);
-            holder.tvReplyCount.setText(String.format(Locale.getDefault(),"有%d筆留言...",replyCount));
+            holder.tvReplyCount.setText(String.format(Locale.getDefault(),"有%d筆留言...",data.getReply()));
         }else {
             holder.tvReplyCount.setVisibility(View.GONE);
         }
@@ -141,14 +134,14 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
         holder.ivReply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onReplyClick(replyObject,data,position);
+                listener.onReplyClick(data,position);
             }
         });
 
         holder.tvReplyCount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onReplyClick(replyObject,data,position);
+                listener.onReplyClick(data,position);
             }
         });
         holder.ivSend.setOnClickListener(new View.OnClickListener() {
@@ -160,8 +153,6 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
         holder.ivUserPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Log.i("Michael","點擊item位置 : "+position+" , EMAIL : "+data.getEmail());
 
                 listener.onUserClick(data);
             }
@@ -218,6 +209,6 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
 
         void onUserClick(ShareArticleDTO data);
 
-        void onReplyClick(ReplyObject replyObject,ShareArticleDTO shareArticleDTO,int itemPosition);
+        void onReplyClick(ShareArticleDTO shareArticleDTO,int itemPosition);
     }
 }

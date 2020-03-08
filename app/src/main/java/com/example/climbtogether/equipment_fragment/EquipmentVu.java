@@ -20,4 +20,6 @@ public interface EquipmentVu {
     void saveMyEquipmentToFirebase(ArrayList<EquipmentListDTO> myList);
 
     void setGoToMyEquipmentEnable();
+
+    void intentToLoginActivity();
 }

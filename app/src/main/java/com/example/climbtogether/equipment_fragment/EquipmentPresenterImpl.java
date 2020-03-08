@@ -97,6 +97,7 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
     @Override
     public void onItemCheckListener(String name, int sid, String sort) {
         EquipmentDTO data = null;
+        Log.i("Michael","分類 : "+sort);
         //還差Insert
         switch (sort) {
             case "body":
@@ -215,7 +216,7 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
 
     @Override
     public void onButtonAddListClickListener() {
-        if (myList != null){
+        if (myList != null && myList.size() != 0){
 //            for (EquipmentListDTO data : myList){
 //                dataBaseApi.insert(data);
 //            }
@@ -296,6 +297,11 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
     @Override
     public void onClearView() {
         resetDatabase();
+    }
+
+    @Override
+    public void onNotLoginEvent() {
+        mView.intentToLoginActivity();
     }
 
     private void updateData(String table ,int sid) {

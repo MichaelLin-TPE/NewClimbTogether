@@ -10,4 +10,6 @@ public interface EquipmentPresenter {
     void onButtonGoListClickListener();
 
     void onClearView();
+
+    void onNotLoginEvent();
 }

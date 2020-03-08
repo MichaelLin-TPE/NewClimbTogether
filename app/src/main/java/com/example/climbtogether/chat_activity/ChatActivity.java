@@ -305,7 +305,7 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     @Override
     public void searchChatDataFromFirestore(String email) {
         final ArrayList<ChatData> chatDataArrayList = new ArrayList<>();
-        firestore.collection(DISCUSSION).document(listName).collection(CHAT_DATA).orderBy("time", Query.Direction.ASCENDING)
+        firestore.collection(DISCUSSION).document("登山即時討論區").collection(CHAT_DATA).orderBy("time", Query.Direction.ASCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

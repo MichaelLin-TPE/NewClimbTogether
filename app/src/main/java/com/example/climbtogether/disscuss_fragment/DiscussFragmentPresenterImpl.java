@@ -1,22 +1,19 @@
 package com.example.climbtogether.disscuss_fragment;
 
+import com.example.climbtogether.R;
+
 import java.util.ArrayList;
 
 public class DiscussFragmentPresenterImpl implements DiscussFragmentPresenter {
 
     private DiscussFragmentVu mView;
 
-    private static final String DISCUSS = "登山即時討論區";
+    private static final String DISCUSS = "登山\n即時討論區";
 
-    private static final String SHARE = "登山心得分享";
+    private static final String SHARE = "登山\n動態分享";
 
     public DiscussFragmentPresenterImpl(DiscussFragmentVu mView){
         this.mView = mView;
-    }
-
-    @Override
-    public void onSearchFirestoreData() {
-        mView.searchFirestoreData();
     }
 
     @Override
@@ -29,17 +26,6 @@ public class DiscussFragmentPresenterImpl implements DiscussFragmentPresenter {
         mView.intentToLoginActivity();
     }
 
-    @Override
-    public void onCatchDataSuccessful(ArrayList<String> listArrayList) {
-        mView.showProgressbar(false);
-        mView.setRecyclerView(listArrayList);
-    }
-
-    @Override
-    public void onShowProgressbar() {
-        mView.showProgressbar(true);
-        mView.setViewMaintain(false);
-    }
 
     @Override
     public void onClearView() {
@@ -57,5 +43,14 @@ public class DiscussFragmentPresenterImpl implements DiscussFragmentPresenter {
                 break;
         }
 
+    }
+
+    @Override
+    public void onPrepareData() {
+        ArrayList<String> listNameArray = new ArrayList<>();
+        listNameArray.add(mView.getVuContext().getString(R.string.discuss_chat));
+        listNameArray.add(mView.getVuContext().getString(R.string.share_news));
+        mView.showProgressbar(false);
+        mView.setRecyclerView(listNameArray);
     }
 }

@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -94,7 +95,11 @@ public class DiscussFragment extends Fragment implements DiscussFragmentVu {
     public void onResume() {
         super.onResume();
         presenter.onClearView();
-        presenter.onSearchFirestoreData();
+        if (user != null){
+            presenter.onPrepareData();
+        }else {
+            presenter.onNotLoginEvent();
+        }
     }
 
     private void checkLoginStatus() {
@@ -126,7 +131,9 @@ public class DiscussFragment extends Fragment implements DiscussFragmentVu {
 
         recyclerView = view.findViewById(R.id.discuss_fragment_recycler_view);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),1);
+
+        recyclerView.setLayoutManager(gridLayoutManager);
 
         int pix = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, getResources().getDisplayMetrics());
 
@@ -149,33 +156,13 @@ public class DiscussFragment extends Fragment implements DiscussFragmentVu {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         adapter = new DiscussFragmentAdapter(context);
-        presenter.onSearchFirestoreData();
-
-    }
-
-    @Override
-    public void searchFirestoreData() {
         if (user != null){
-            presenter.onShowProgressbar();
-            final ArrayList<String> listArrayList = new ArrayList<>();
-            firestore.collection(DISCUSSION).get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()){
-                                if (task.getResult() != null){
-                                    for (QueryDocumentSnapshot document : task.getResult()){
-                                        listArrayList.add(document.getId());
-                                    }
-                                    presenter.onCatchDataSuccessful(listArrayList);
-                                }
-                            }
-                        }
-                    });
+            presenter.onPrepareData();
         }else {
             presenter.onNotLoginEvent();
         }
     }
+
 
     @Override
     public void setViewMaintain(boolean isShow) {
@@ -224,5 +211,10 @@ public class DiscussFragment extends Fragment implements DiscussFragmentVu {
     public void intentToShareActivity(String listName) {
         Intent it = new Intent(context, ShareActivity.class);
         startActivity(it);
+    }
+
+    @Override
+    public Context getVuContext() {
+        return getActivity();
     }
 }

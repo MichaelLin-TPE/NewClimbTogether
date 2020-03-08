@@ -205,6 +205,9 @@ public class MountainFragmentPresentImpl implements MountainFragmentPresenter {
 
     @Override
     public void onMountainItemClick(DataDTO data) {
+        Log.i("Michael","點擊 : "+data.getName());
 
+
+        mView.intentToMtDetailActivity(data);
     }
 }

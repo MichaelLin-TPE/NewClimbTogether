@@ -3,7 +3,9 @@ package com.example.climbtogether.db_modle;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-public class DataDTO {
+import java.io.Serializable;
+
+public class DataDTO implements Serializable {
     private int sid;
 
     private String name;
@@ -25,6 +27,16 @@ public class DataDTO {
     private String userPhoto;
 
     private long time;
+
+    private String allTitle;
+
+    public String getAllTitle() {
+        return allTitle;
+    }
+
+    public void setAllTitle(String allTitle) {
+        this.allTitle = allTitle;
+    }
 
     public String getUserPhoto() {
         return userPhoto;
@@ -126,6 +138,7 @@ public class DataDTO {
         check = cursor.getString(cursor.getColumnIndex("check_top"));
         time = cursor.getLong(cursor.getColumnIndex("time"));
         userPhoto = cursor.getString(cursor.getColumnIndex("user_photo"));
+        allTitle = cursor.getString(cursor.getColumnIndex("all_title"));
     }
 
     public ContentValues toContentValues(){

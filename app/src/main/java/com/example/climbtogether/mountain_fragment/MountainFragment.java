@@ -4,10 +4,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.climbtogether.R;
+import com.example.climbtogether.detail_activity.DetailActivity;
 import com.example.climbtogether.login_activity.LoginActivity;
 import com.example.climbtogether.db_modle.DataDTO;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -390,6 +393,15 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         Toast.makeText(context, isSHow.equals("true") ? "此筆資料已加入我的戰績" : "已從我的戰績移除", Toast.LENGTH_LONG).show();
     }
 
+    @Override
+    public void intentToMtDetailActivity(DataDTO data) {
+        Intent it = new Intent(context ,DetailActivity.class);
+        it.putExtra("data",data);
+        context.startActivity(it);
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void showDatePick(final int sid) {
         datePicker = new DatePicker(context);

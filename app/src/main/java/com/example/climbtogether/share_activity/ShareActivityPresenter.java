@@ -15,13 +15,13 @@ public interface ShareActivityPresenter {
 
     void onShowSuccessShareArticle();
 
-    void onCatchAllData(ArrayList<ShareArticleDTO> shareArray,ArrayList<LikeMemberDTO> listMemberArray,ArrayList<ReplyObject> replyArray);
+    void onCatchAllData(ArrayList<ShareArticleDTO> shareArray, ArrayList<LikeMemberDTO> listMemberArray);
 
     void onShowProgress();
 
     void onCloseProgress();
 
-    void onReplyButtonClick(ReplyObject data,ShareArticleDTO shareArticleDTO);
+    void onReplyButtonClick(ShareArticleDTO shareArticleDTO);
 
     void onButtonSendReplyClick(ArrayList<ReplyDTO> replyArray, String content, ShareArticleDTO shareArticleDTO);
 

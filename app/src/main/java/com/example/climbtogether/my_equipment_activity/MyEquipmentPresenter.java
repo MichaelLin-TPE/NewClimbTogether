@@ -7,5 +7,7 @@ import java.util.ArrayList;
 public interface MyEquipmentPresenter {
     void onBackButtonClick();
 
-    void onCatchDataSuccessful(ArrayList<EquipmentListDTO> dataArrayList);
+    void onCatchDataSuccessful(ArrayList<EquipmentListDTO> dataArrayList, ArrayList<EquipmentListDTO> preparedArrayList);
+
+    void onViewMaintain();
 }

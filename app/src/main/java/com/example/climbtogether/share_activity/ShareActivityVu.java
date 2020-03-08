@@ -15,11 +15,11 @@ public interface ShareActivityVu {
 
     void createArticle(ArrayList<String> downloadUrlArray, String content);
 
-    void setRecyclerView(ArrayList<ShareArticleDTO> shareArray,ArrayList<LikeMemberDTO> listMemberArray,ArrayList<ReplyObject> replyArray);
+    void setRecyclerView(ArrayList<ShareArticleDTO> shareArray, ArrayList<LikeMemberDTO> listMemberArray);
 
     void showProgress(boolean isShow);
 
-    void showReplayDialog(ReplyObject data,ShareArticleDTO shareArticleDTO);
+    void showReplayDialog(ShareArticleDTO shareArticleDTO);
 
     void sendReply(String content, ArrayList<ReplyDTO> replyArray, ShareArticleDTO shareArticleDTO);
 

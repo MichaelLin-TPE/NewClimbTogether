@@ -2,34 +2,48 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/discuss_item_click_area"
-    android:background="@drawable/discuss_selector"
     android:padding="10dp"
-    android:layout_height="250dp">
+    android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/discuss_item_icon"
-        android:layout_marginTop="35dp"
-        app:layout_constraintLeft_toLeftOf="@id/discuss_item_title"
-        app:layout_constraintRight_toRightOf="@id/discuss_item_title"
+    <androidx.constraintlayout.widget.ConstraintLayout
+
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/discuss_item_title"
-        android:src="@drawable/conversation"
-        android:layout_width="@dimen/mountain_item_photo_width"
-        android:layout_height="@dimen/mountain_item_photo_width"/>
-
-    <TextView
-        android:id="@+id/discuss_item_title"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@id/discuss_item_icon"
-        app:layout_constraintVertical_chainStyle="spread_inside"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:textSize="@dimen/large_text_size"
-        android:textColor="@color/colorPrimaryDark"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:background="@drawable/discuss_selector"
+        android:id="@+id/discuss_item_click_area"
+        android:layout_width="250dp"
+        android:layout_height="250dp">
+
+        <ImageView
+            android:contentDescription="@null"
+            android:id="@+id/discuss_item_icon"
+            android:layout_marginTop="35dp"
+            app:layout_constraintLeft_toLeftOf="@id/discuss_item_title"
+            app:layout_constraintRight_toRightOf="@id/discuss_item_title"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/discuss_item_title"
+            android:src="@drawable/conversation"
+            android:layout_width="@dimen/mountain_item_photo_width"
+            android:layout_height="@dimen/mountain_item_photo_width"/>
+
+        <TextView
+            android:id="@+id/discuss_item_title"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@id/discuss_item_icon"
+            app:layout_constraintVertical_chainStyle="spread_inside"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:textSize="@dimen/large_text_size"
+            android:textColor="@color/colorPrimaryDark"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

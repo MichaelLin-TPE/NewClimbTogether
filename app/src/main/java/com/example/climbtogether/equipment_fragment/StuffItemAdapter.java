@@ -8,6 +8,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.climbtogether.R;
@@ -58,6 +59,12 @@ public class StuffItemAdapter extends RecyclerView.Adapter<StuffItemAdapter.View
                 listener.onClick(data.getName(),data.getSid(),data.getSort());
             }
         });
+        holder.clickArea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onClick(data.getName(),data.getSid(),data.getSort());
+            }
+        });
     }
 
     @Override
@@ -71,8 +78,11 @@ public class StuffItemAdapter extends RecyclerView.Adapter<StuffItemAdapter.View
 
         private CheckBox checkBox;
 
+        private ConstraintLayout clickArea;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            clickArea = itemView.findViewById(R.id.stuff_item_click_area);
             tvTitle = itemView.findViewById(R.id.stuff_item_title);
             tvDescription = itemView.findViewById(R.id.stuff_item_description);
             checkBox = itemView.findViewById(R.id.stuff_item_check_box);

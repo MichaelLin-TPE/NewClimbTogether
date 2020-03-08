@@ -16,7 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustResize">
-        <activity android:name=".my_equipment_activity.MyEquipmentActivity"></activity>
+        <activity android:name=".detail_activity.DetailActivity"></activity>
+        <activity android:name=".my_equipment_activity.MyEquipmentActivity" />
         <activity android:name=".share_activity.ShareActivity" />
         <!--
          Set custom default icon. This is used when no icon is set for incoming notification messages.

@@ -1,19 +1,15 @@
 package com.example.climbtogether.share_activity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,6 +38,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -54,12 +51,9 @@ import com.luck.picture.lib.config.PictureMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.listener.OnResultCallbackListener;
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -105,7 +99,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     private ShareAdapter adapter;
 
-    private ArrayList<ReplyDTO> replayArray, replyDialogArray;
+    private ArrayList<ReplyDTO> replayArray;
 
     private ArrayList<ReplyObject> replayArrayList;
 
@@ -175,10 +169,11 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                 data.setSelectPhoto2((String) snapshot.get("selectPhotoUrl2"));
                                 data.setUserPhoto((String) snapshot.get("userPhotoUrl"));
                                 data.setLike((Long) snapshot.get("like"));
+                                data.setReply((Long)snapshot.get("reply"));
                                 shareArray.add(data);
                             }
                             replayArrayList = new ArrayList<>();
-                            searchReplyData();
+                            searchForLikeMember();
                         }
                     }
                 });
@@ -190,48 +185,48 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         likeMemberArray = new ArrayList<>();
         replayArrayList = new ArrayList<>();
         if (adapter != null) {
-            adapter = new ShareAdapter(shareArray, likeMemberArray, user.getEmail(), replayArrayList, this);
-
-            recyclerView.setAdapter(adapter);
+//            adapter = new ShareAdapter(shareArray, likeMemberArray, user.getEmail(), replayArrayList, this);
+//
+//            recyclerView.setAdapter(adapter);
         }
     }
 
-    private void searchReplyData() {
-        replayArray = new ArrayList<>();
-        if (memberCount < shareArray.size()) {
-            firestore.collection(SHARE).document(shareArray.get(memberCount).getContent())
-                    .collection(REPLY)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                Log.i("Michael", "搜尋回覆內容");
-                                ReplyObject data = new ReplyObject();
-                                data.setArticleName(shareArray.get(memberCount).getContent());
-                                for (QueryDocumentSnapshot snapshot : task.getResult()) {
-                                    ReplyDTO reply = new ReplyDTO();
-                                    reply.setContent((String) snapshot.get("content"));
-                                    reply.setUserName((String) snapshot.get("user"));
-                                    reply.setUserPhoto((String) snapshot.get("userPhoto"));
-                                    Log.i("Michael", "留言 : " + snapshot.get("content"));
-                                    replayArray.add(reply);
-                                }
-                                data.setReplyArray(replayArray);
-                                replayArrayList.add(data);
-
-                                memberCount++;
-                                searchReplyData();
-                            }
-                        }
-                    });
-        } else {
-            memberCount = 0;
-            searchForLikeMember();
-        }
-
-
-    }
+//    private void searchReplyData() {
+//        replayArray = new ArrayList<>();
+//        if (memberCount < shareArray.size()) {
+//            firestore.collection(SHARE).document(shareArray.get(memberCount).getContent())
+//                    .collection(REPLY)
+//                    .get()
+//                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                            if (task.isSuccessful() && task.getResult() != null) {
+//                                Log.i("Michael", "搜尋回覆內容");
+//                                ReplyObject data = new ReplyObject();
+//                                data.setArticleName(shareArray.get(memberCount).getContent());
+//                                for (QueryDocumentSnapshot snapshot : task.getResult()) {
+//                                    ReplyDTO reply = new ReplyDTO();
+//                                    reply.setContent((String) snapshot.get("content"));
+//                                    reply.setUserName((String) snapshot.get("user"));
+//                                    reply.setUserPhoto((String) snapshot.get("userPhoto"));
+//                                    Log.i("Michael", "留言 : " + snapshot.get("content"));
+//                                    replayArray.add(reply);
+//                                }
+//                                data.setReplyArray(replayArray);
+//                                replayArrayList.add(data);
+//
+//                                memberCount++;
+//                                searchReplyData();
+//                            }
+//                        }
+//                    });
+//        } else {
+//            memberCount = 0;
+//            searchForLikeMember();
+//        }
+//
+//
+//    }
 
     private void searchForLikeMember() {
         if (user != null && user.getEmail() != null) {
@@ -247,22 +242,18 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                     ArrayList<String> nameList = new ArrayList<>();
                                     ArrayList<Boolean> isCheckArray = new ArrayList<>();
                                     data.setContent(shareArray.get(memberCount).getContent());
-                                    Log.i("Michael", "文章 : " + shareArray.get(memberCount).getContent());
                                     for (QueryDocumentSnapshot snapshot : task.getResult()) {
 
                                         if (user.getEmail().equals(snapshot.getId())) {
-                                            Log.i("Michael","使用者按讚 , 文章 : "+shareArray.get(memberCount).getContent());
                                             isCheckArray.add(true);
                                         } else {
                                             isCheckArray.add(false);
                                         }
-                                        Log.i("Michael", "按讚的有 : " + snapshot.getId());
                                         nameList.add(snapshot.getId());
                                     }
                                     data.setIsCheckArray(isCheckArray);
                                     data.setMemberEmail(nameList);
                                     likeMemberArray.add(data);
-                                    Log.i("Michael", "按讚的長度 : "+isCheckArray.size());
                                     memberCount++;
                                     searchForLikeMember();
                                 } else {
@@ -272,7 +263,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                         });
             } else {
                 memberCount = 0;
-                presenter.onCatchAllData(shareArray, likeMemberArray, replayArrayList);
+                presenter.onCatchAllData(shareArray, likeMemberArray);
             }
         }
 
@@ -388,7 +379,6 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                         e.printStackTrace();
                                     }
                                 }
-                                Log.i("Michael", "準備好上傳的bytes長度 : " + photoBytesArray.size());
                                 DialogViewPagerAdapter adapter = new DialogViewPagerAdapter(ShareActivity.this, bitmapArrayList);
                                 viewPager.setAdapter(adapter);
                             }
@@ -490,12 +480,12 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
     }
 
     @Override
-    public void setRecyclerView(ArrayList<ShareArticleDTO> shareArray, ArrayList<LikeMemberDTO> listMemberArray, ArrayList<ReplyObject> replyArray) {
+    public void setRecyclerView(ArrayList<ShareArticleDTO> shareArray, ArrayList<LikeMemberDTO> listMemberArray) {
 
         presenter.onCloseProgress();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ShareAdapter(shareArray, listMemberArray, user.getEmail(), replyArray, this);
+        adapter = new ShareAdapter(shareArray, listMemberArray, user.getEmail() ,this);
         recyclerView.setAdapter(adapter);
 
         adapter.setonArticleItemClickListener(new ShareAdapter.onArticleItemClickListener() {
@@ -542,10 +532,10 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
             }
 
             @Override
-            public void onReplyClick(ReplyObject data, ShareArticleDTO shareArticleDTO, int position) {
+            public void onReplyClick(ShareArticleDTO shareArticleDTO, int position) {
 
                 itemPosition = position;
-                presenter.onReplyButtonClick(data, shareArticleDTO);
+                presenter.onReplyButtonClick(shareArticleDTO);
 
             }
         });
@@ -553,7 +543,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
     }
 
     @Override
-    public void showReplayDialog(ReplyObject data, ShareArticleDTO shareArticleDTO) {
+    public void showReplayDialog(ShareArticleDTO data) {
         View view = View.inflate(this, R.layout.reply_custom_dialog, null);
         RoundedImageView ivUserPhoto = view.findViewById(R.id.reply_dialog_user_photo);
         TextView tvName = view.findViewById(R.id.reply_dialog_user_displayName);
@@ -563,32 +553,57 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         ImageView ivSend = view.findViewById(R.id.reply_dialog_iv_send);
 
         replayRv.setLayoutManager(new LinearLayoutManager(this));
-        this.replyDialogArray = data.getReplyArray();
-        replyAdapter = new ReplyDialogAdapter(replyDialogArray, this);
-        replayRv.setAdapter(replyAdapter);
 
-        tvName.setText(shareArticleDTO.getDiaplayName());
-        imageLoaderManager.setPhotoUrl(shareArticleDTO.getUserPhoto(), ivUserPhoto);
-        tvContent.setText(shareArticleDTO.getContent());
+        firestore.collection(SHARE)
+                .document(data.getContent())
+                .collection(REPLY)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null){
+                            replayArray = new ArrayList<>();
+                            for (QueryDocumentSnapshot snapshot : task.getResult()){
+                                ReplyDTO replyDTO = new ReplyDTO();
+                                replyDTO.setContent((String)snapshot.get("content"));
+                                replyDTO.setUserName((String)snapshot.get("user"));
+                                replyDTO.setUserPhoto((String)snapshot.get("userPhoto"));
+                                replayArray.add(replyDTO);
+                            }
+                            if (replayArray != null){
+                                replyAdapter = new ReplyDialogAdapter(replayArray, ShareActivity.this);
+                                replayRv.setAdapter(replyAdapter);
+
+                                tvName.setText(data.getDiaplayName());
+                                imageLoaderManager.setPhotoUrl(data.getUserPhoto(), ivUserPhoto);
+                                tvContent.setText(data.getContent());
 
 
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setView(view).create();
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        }
-        dialog.show();
+                                AlertDialog dialog = new AlertDialog.Builder(ShareActivity.this)
+                                        .setView(view).create();
+                                Window window = dialog.getWindow();
+                                if (window != null) {
+                                    window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                                }
+                                dialog.show();
 
 
-        ivSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String content = edContent.getText().toString();
-                presenter.onButtonSendReplyClick(data.getReplyArray(), content, shareArticleDTO);
-                edContent.setText("");
-            }
-        });
+                                ivSend.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        String content = edContent.getText().toString();
+                                        presenter.onButtonSendReplyClick(replayArray, content, data);
+                                        edContent.setText("");
+                                    }
+                                });
+                            }
+
+
+                        }
+                    }
+                });
+
+
 
 
     }
@@ -612,16 +627,25 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                             data.setUserPhoto(userDataManager.getPhotoUrl());
                             data.setContent(content);
                             data.setUserName(userDataManager.getDisplayName());
-                            replyDialogArray.add(data);
+                            replyArray.add(data);
                             replyAdapter.notifyDataSetChanged();
 
-                            replayArrayList.get(itemPosition).setReplyArray(replyDialogArray);
+                            long replyCount = shareArray.get(itemPosition).getReply()+1;
+                            shareArray.get(itemPosition).setReply(replyCount);
                             adapter.notifyDataSetChanged();
-                            Log.i("Michael", "新增留言成功");
+                            modifyDocumentData(shareArticleDTO,replyCount);
                         }
                     }
                 });
 
+    }
+
+    private void modifyDocumentData(ShareArticleDTO shareArticleDTO, long replyCount) {
+        Map<String,Object> map = new HashMap<>();
+        map.put("reply",replyCount);
+        firestore.collection(SHARE)
+                .document(shareArticleDTO.getContent())
+                .set(map,SetOptions.merge());
     }
 
     //先檢查好友
@@ -643,10 +667,8 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                     }
                                 }
                                 if (!isFriend) {
-                                    Log.i("Michael", "不是好友");
                                     searchForInvite(data);
                                 } else {
-                                    Log.i("Michael", "是好友 直接SHOW");
                                     presenter.onShowUserDialog(data, isInvite, isFriend);
                                 }
                             }
@@ -732,7 +754,6 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
-                            Log.i("Michael","傳送好友邀請成功");
                             if (ivAddFriend != null && tvInvite != null){
                                 ivAddFriend.setVisibility(View.GONE);
                                 tvInvite.setVisibility(View.VISIBLE);
@@ -827,10 +848,8 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                     }
                                 }
                                 if (!isInvite) {
-                                    Log.i("Michael", "第一次查詢邀請 失敗");
                                     searchForInviteAgain(data, user.getEmail());
                                 } else {
-                                    Log.i("Michael", "查詢到邀請 SHOW");
                                     presenter.onShowUserDialog(data, isInvite, isFriend);
                                 }
 
@@ -856,7 +875,6 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                     isInvite = true;
                                 }
                             }
-                            Log.i("Michael", "第二次查詢邀請");
                             presenter.onShowUserDialog(data, isInvite, isFriend);
                         }
                     }

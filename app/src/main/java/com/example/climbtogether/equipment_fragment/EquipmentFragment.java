@@ -22,18 +22,22 @@ import com.example.climbtogether.db_modle.EquipmentDTO;
 import com.example.climbtogether.db_modle.EquipmentListDTO;
 import com.example.climbtogether.equipment_fragment.stuff_presenter.StuffPresenter;
 import com.example.climbtogether.equipment_fragment.stuff_presenter.StuffPresenterImpl;
+import com.example.climbtogether.login_activity.LoginActivity;
 import com.example.climbtogether.my_equipment_activity.MyEquipmentActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-public class EquipmentFragment extends Fragment implements EquipmentVu{
+public class EquipmentFragment extends Fragment implements EquipmentVu {
 
     private EquipmentPresenter presenter;
 
@@ -45,7 +49,7 @@ public class EquipmentFragment extends Fragment implements EquipmentVu{
 
     private RecyclerView recyclerView;
 
-    private Button btnAddList,btnGoList;
+    private Button btnAddList, btnGoList;
 
     private FirebaseFirestore firestore;
 
@@ -57,6 +61,10 @@ public class EquipmentFragment extends Fragment implements EquipmentVu{
 
     private static final String EQUIPMENT = "equipment";
 
+    private static final String PREPARED = "prepare";
+
+    private ArrayList<String> prepareArrayList;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -67,6 +75,13 @@ public class EquipmentFragment extends Fragment implements EquipmentVu{
 
 
         return new EquipmentFragment();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        searchPreparedData();
+        user = mAuth.getCurrentUser();
     }
 
     @Override
@@ -100,9 +115,31 @@ public class EquipmentFragment extends Fragment implements EquipmentVu{
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        searchPreparedData();
         presenter.onPrepareData();
     }
+
+    private void searchPreparedData() {
+        if (user != null && user.getEmail() != null) {
+            prepareArrayList = new ArrayList<>();
+            firestore.collection(MY_EQUIPMENT)
+                    .document(user.getEmail())
+                    .collection(PREPARED)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                for (QueryDocumentSnapshot snapshot : task.getResult()) {
+                                    prepareArrayList.add(snapshot.getId());
+                                }
+
+                            }
+                        }
+                    });
+        }
+    }
+
 
     private void initView(View view) {
         recyclerView = view.findViewById(R.id.equipment_recycler_view);
@@ -146,14 +183,14 @@ public class EquipmentFragment extends Fragment implements EquipmentVu{
         stuffPresenter.setElectronicData(electronicArrayList);
         stuffPresenter.setDrogData(drogArrayList);
         stuffPresenter.setOtherData(otherArrayList);
-        adapter = new EquipmentAdapter(stuffPresenter,context);
+        adapter = new EquipmentAdapter(stuffPresenter, context);
 
         recyclerView.setAdapter(adapter);
 
         adapter.setOnItemCheckBoxListener(new StuffItemAdapter.OnItemCheckBoxClickListener() {
             @Override
             public void onClick(String name, int sid, String sort) {
-                presenter.onItemCheckListener(name,sid,sort);
+                presenter.onItemCheckListener(name, sid, sort);
             }
         });
     }
@@ -172,45 +209,76 @@ public class EquipmentFragment extends Fragment implements EquipmentVu{
 
     @Override
     public void showAddListSuccessfulMessage(String message) {
-        Toast.makeText(context,message,Toast.LENGTH_LONG).show();
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void intentToMyEquipmentActivity() {
-        Intent it = new Intent(context, MyEquipmentActivity.class);
-        context.startActivity(it);
+        if (user != null) {
+            Intent it = new Intent(context, MyEquipmentActivity.class);
+            context.startActivity(it);
+        } else {
+            presenter.onNotLoginEvent();
+        }
+
     }
 
     @Override
     public void saveMyEquipmentToFirebase(ArrayList<EquipmentListDTO> myList) {
-        if (user != null && user.getEmail() != null){
-            Log.i("Michael","MyList 長度 : "+myList.size());
-            for (EquipmentListDTO list : myList){
-                Map<String,Object> map = new HashMap<>();
-                map.put("description",list.getDescription());
-                firestore.collection(MY_EQUIPMENT)
-                        .document(user.getEmail())
-                        .collection(EQUIPMENT)
-                        .document(list.getName())
-                        .set(map)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()){
-                                    Log.i("Michael","新增成功");
-                                }
-                            }
-                        });
-            }
-            btnGoList.setEnabled(true);
-            presenter.onClearView();
-            Toast.makeText(context,getString(R.string.add_successful),Toast.LENGTH_LONG).show();
+        if (user != null && user.getEmail() != null) {
+            Log.i("Michael", "MyList 長度 : " + myList.size());
 
+            if (prepareArrayList != null && prepareArrayList.size() != 0){
+                for (int i = 0 ; i < prepareArrayList.size() ; i ++){
+                    for (int j = 0 ; j < myList.size() ; j ++){
+                        if (myList.get(j).getName().equals(prepareArrayList.get(i))){
+                            myList.remove(j);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (myList.size() != 0){
+                for (EquipmentListDTO list : myList) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("description", list.getDescription());
+                    firestore.collection(MY_EQUIPMENT)
+                            .document(user.getEmail())
+                            .collection(EQUIPMENT)
+                            .document(list.getName())
+                            .set(map)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Log.i("Michael", "新增成功");
+                                        btnGoList.setEnabled(true);
+                                        presenter.onClearView();
+                                        Toast.makeText(context, getString(R.string.add_successful), Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
+                }
+            }else {
+                String message = getString(R.string.add_repeat);
+                Toast.makeText(context,message,Toast.LENGTH_LONG).show();
+            }
+
+
+        } else {
+            presenter.onNotLoginEvent();
         }
     }
 
     @Override
     public void setGoToMyEquipmentEnable() {
         btnGoList.setEnabled(false);
+    }
+
+    @Override
+    public void intentToLoginActivity() {
+        Intent it = new Intent(getActivity(), LoginActivity.class);
+        context.startActivity(it);
     }
 }

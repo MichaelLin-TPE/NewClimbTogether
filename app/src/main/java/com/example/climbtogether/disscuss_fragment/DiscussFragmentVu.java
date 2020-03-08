@@ -1,9 +1,10 @@
 package com.example.climbtogether.disscuss_fragment;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 
 public interface DiscussFragmentVu {
-    void searchFirestoreData();
 
     void setViewMaintain(boolean isShow);
 
@@ -18,4 +19,6 @@ public interface DiscussFragmentVu {
     void intentToChatActivity(String listName);
 
     void intentToShareActivity(String listName);
+
+    Context getVuContext();
 }

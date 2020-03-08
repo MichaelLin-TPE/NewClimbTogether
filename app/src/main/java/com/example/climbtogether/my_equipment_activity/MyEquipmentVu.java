@@ -13,5 +13,5 @@ public interface MyEquipmentVu {
 
     void setViewMaintain( boolean isShow);
 
-    void setRecyclerView(ArrayList<EquipmentListDTO> allMyEquipment);
+    void setRecyclerView(ArrayList<EquipmentListDTO> allMyEquipment, ArrayList<EquipmentListDTO> preparedArrayList);
 }

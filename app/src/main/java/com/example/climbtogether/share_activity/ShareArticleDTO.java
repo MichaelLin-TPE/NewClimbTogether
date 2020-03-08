@@ -18,6 +18,16 @@ public class ShareArticleDTO {
 
     private long like;
 
+    private long reply;
+
+    public long getReply() {
+        return reply;
+    }
+
+    public void setReply(long reply) {
+        this.reply = reply;
+    }
+
     public String getSelectPhoto1() {
         return selectPhoto1;
     }

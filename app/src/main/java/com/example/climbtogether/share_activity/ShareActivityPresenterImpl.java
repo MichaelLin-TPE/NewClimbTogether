@@ -48,8 +48,8 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
     }
 
     @Override
-    public void onCatchAllData(ArrayList<ShareArticleDTO> shareArray,ArrayList<LikeMemberDTO> listMemberArray,ArrayList<ReplyObject> replyArray) {
-        mView.setRecyclerView(shareArray,listMemberArray,replyArray);
+    public void onCatchAllData(ArrayList<ShareArticleDTO> shareArray, ArrayList<LikeMemberDTO> listMemberArray) {
+        mView.setRecyclerView(shareArray,listMemberArray);
     }
 
     @Override
@@ -63,8 +63,8 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
     }
 
     @Override
-    public void onReplyButtonClick(ReplyObject data,ShareArticleDTO shareArticleDTO) {
-        mView.showReplayDialog(data,shareArticleDTO);
+    public void onReplyButtonClick(ShareArticleDTO shareArticleDTO) {
+        mView.showReplayDialog(shareArticleDTO);
     }
 
     @Override
