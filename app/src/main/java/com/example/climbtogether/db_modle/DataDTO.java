@@ -30,6 +30,16 @@ public class DataDTO implements Serializable {
 
     private String allTitle;
 
+    private String weatherUrl;
+
+    public String getWeatherUrl() {
+        return weatherUrl;
+    }
+
+    public void setWeatherUrl(String weatherUrl) {
+        this.weatherUrl = weatherUrl;
+    }
+
     public String getAllTitle() {
         return allTitle;
     }
@@ -139,6 +149,7 @@ public class DataDTO implements Serializable {
         time = cursor.getLong(cursor.getColumnIndex("time"));
         userPhoto = cursor.getString(cursor.getColumnIndex("user_photo"));
         allTitle = cursor.getString(cursor.getColumnIndex("all_title"));
+        weatherUrl = cursor.getString(cursor.getColumnIndex("weather_url"));
     }
 
     public ContentValues toContentValues(){

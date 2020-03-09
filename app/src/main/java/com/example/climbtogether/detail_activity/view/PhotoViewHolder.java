@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.climbtogether.R;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 public class PhotoViewHolder extends RecyclerView.ViewHolder {
@@ -14,6 +15,7 @@ public class PhotoViewHolder extends RecyclerView.ViewHolder {
 
     public PhotoViewHolder(@NonNull View itemView) {
         super(itemView);
+        ivPhoto = itemView.findViewById(R.id.detail_photo);
     }
 
     public void setData(byte[] photo) {

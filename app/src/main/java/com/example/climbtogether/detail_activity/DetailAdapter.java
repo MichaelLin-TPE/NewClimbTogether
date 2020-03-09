@@ -9,7 +9,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.climbtogether.R;
 import com.example.climbtogether.detail_activity.mt_presenter.MtPresenter;
+import com.example.climbtogether.detail_activity.view.DetailViewHolder;
 import com.example.climbtogether.detail_activity.view.PhotoViewHolder;
+import com.example.climbtogether.detail_activity.view.WeatherViewHolder;
 import com.example.climbtogether.share_activity.ShareAdapter;
 
 import static com.example.climbtogether.detail_activity.mt_presenter.MtPresenterImpl.INTRODUCE;
@@ -34,9 +36,9 @@ public class DetailAdapter extends RecyclerView.Adapter {
             case PHOTO:
                 return new PhotoViewHolder(LayoutInflater.from(context).inflate(R.layout.detail_item_photo,parent,false));
             case WEATHER:
-                return null;
+                return new WeatherViewHolder(LayoutInflater.from(context).inflate(R.layout.detail_weather_view,parent,false),context);
             case INTRODUCE:
-                return null;
+                return new DetailViewHolder(LayoutInflater.from(context).inflate(R.layout.detail_content_view,parent,false));
                 default:
                     return null;
         }
@@ -46,6 +48,12 @@ public class DetailAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof PhotoViewHolder){
             presenter.onBindPhotoViewHolder((PhotoViewHolder)holder,position);
+        }
+        if (holder instanceof WeatherViewHolder){
+            presenter.onBindWeatherViewHolder((WeatherViewHolder)holder,position);
+        }
+        if (holder instanceof  DetailViewHolder){
+            presenter.onBindDetailViewHolder((DetailViewHolder)holder,position);
         }
     }
 

@@ -99,4 +99,5 @@
     <string name="not_prepare">尚未準備</string>
     <string name="prepared">準備完成</string>
     <string name="add_repeat">已存在你的清單裡唷</string>
+    <string name="seven_days">7日天氣預報</string>
 </resources>

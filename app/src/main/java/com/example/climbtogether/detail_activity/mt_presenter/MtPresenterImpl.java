@@ -1,7 +1,9 @@
 package com.example.climbtogether.detail_activity.mt_presenter;
 
 import com.example.climbtogether.db_modle.DataDTO;
+import com.example.climbtogether.detail_activity.view.DetailViewHolder;
 import com.example.climbtogether.detail_activity.view.PhotoViewHolder;
+import com.example.climbtogether.detail_activity.view.WeatherViewHolder;
 
 public class MtPresenterImpl implements MtPresenter {
 
@@ -38,5 +40,15 @@ public class MtPresenterImpl implements MtPresenter {
     @Override
     public void onBindPhotoViewHolder(PhotoViewHolder holder, int position) {
         holder.setData(data.getPhoto());
+    }
+
+    @Override
+    public void onBindWeatherViewHolder(WeatherViewHolder holder, int position) {
+        holder.setData(data.getWeatherUrl());
+    }
+
+    @Override
+    public void onBindDetailViewHolder(DetailViewHolder holder, int position) {
+        holder.setData(data);
     }
 }
