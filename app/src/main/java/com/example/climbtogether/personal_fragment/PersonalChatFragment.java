@@ -95,6 +95,8 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     private DataBaseApi dataBaseApi;
 
+    private boolean isFirstSearchData;
+
     public static PersonalChatFragment newInstance() {
         PersonalChatFragment fragment = new PersonalChatFragment();
         Bundle args = new Bundle();
@@ -165,7 +167,9 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
     private void searchData() {
         user = mAuth.getCurrentUser();
         if (user != null && user.getEmail() != null){
-            presenter.onShowProgress(true);
+            if (isFirstSearchData){
+                presenter.onShowProgress(true);
+            }
             final ArrayList<String> friendsArrayList = new ArrayList<>();
 
             manager.setFirstCollection(FRIENDSHIP);
@@ -211,7 +215,9 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     @Override
     public void showProgress(boolean isShow) {
-        progressBar.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        if (isFirstSearchData){
+            progressBar.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        }
     }
 
     @Override
@@ -224,7 +230,8 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     @Override
     public void setRecyclerView(ArrayList<PersonalChatDTO> chatDataArrayList) {
-        adapter = new PersonalFragmentAdapter(context,chatDataArrayList);
+        adapter = new PersonalFragmentAdapter(context);
+        adapter.setData(chatDataArrayList);
         recyclerView.addItemDecoration(new DividerItemDecoration(context,DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(adapter);
         adapter.setOnChatItemClickListener(new PersonalFragmentAdapter.OnChatItemClickListener() {
@@ -282,6 +289,19 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
     @Override
     public Context getVuContext() {
         return context;
+    }
+
+    @Override
+    public void continueSearchData() {
+        if (user != null){
+            searchData();
+        }
+    }
+
+    @Override
+    public void updateView(ArrayList<PersonalChatDTO> allChatData) {
+        adapter.setData(allChatData);
+        adapter.notifyDataSetChanged();
     }
 
     private void deleteMessage(String documentPath) {
@@ -467,8 +487,10 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
             Log.i("Michael","有用戶");
             if (dataBaseApi.getAllChatData() != null && dataBaseApi.getAllChatData().size() != 0){
                 Log.i("Michael","Chat DB 有資料");
+                isFirstSearchData = false;
                 presenter.onCatchChatDataSuccessful(dataBaseApi.getAllChatData());
             }else {
+                isFirstSearchData = true;
                 searchData();
             }
 
@@ -476,7 +498,8 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
         }else {
             chatDataArrayList = new ArrayList<>();
             if (adapter != null){
-                adapter = new PersonalFragmentAdapter(context,chatDataArrayList);
+                adapter = new PersonalFragmentAdapter(context);
+                adapter.setData(chatDataArrayList);
                 recyclerView.setAdapter(adapter);
             }
             presenter.onNoUserEvent();
@@ -490,7 +513,8 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
         super.onPause();
         Log.i("Michael","chat onPause");
         if (adapter != null){
-            adapter = new PersonalFragmentAdapter(context,new ArrayList<PersonalChatDTO>());
+            adapter = new PersonalFragmentAdapter(context);
+            adapter.setData(new ArrayList<PersonalChatDTO>());
             recyclerView.setAdapter(adapter);
         }
     }

@@ -22,4 +22,8 @@ public interface PersonalFragmentVu {
     void showDeleteConfirmDialog(String documentPath);
 
     Context getVuContext();
+
+    void continueSearchData();
+
+    void updateView(ArrayList<PersonalChatDTO> allChatData);
 }

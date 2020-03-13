@@ -41,9 +41,12 @@ public class PersonalFragmentAdapter extends RecyclerView.Adapter<PersonalFragme
         this.longClickListener = longClickListener;
     }
 
-    public PersonalFragmentAdapter(Context context, ArrayList<PersonalChatDTO> dataList) {
-        this.context = context;
+    public void setData(ArrayList<PersonalChatDTO> dataList){
         this.dataList = dataList;
+    }
+
+    public PersonalFragmentAdapter(Context context) {
+        this.context = context;
         imageLoaderManager = new ImageLoaderManager(context);
     }
 

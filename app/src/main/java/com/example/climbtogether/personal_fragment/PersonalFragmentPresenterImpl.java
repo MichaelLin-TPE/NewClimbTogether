@@ -54,6 +54,24 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
     }
 
     private void insertDatabase(ArrayList<PersonalChatDTO> chatDataArrayList) {
+
+        if (dataBaseApi.getAllChatData() == null || dataBaseApi.getAllChatData().size() == 0){
+            for (PersonalChatDTO data : chatDataArrayList){
+                PersonalChatDTO chat = new PersonalChatDTO();
+                chat.setDocumentPath(data.getDocumentPath());
+                chat.setPhotoUrl(data.getPhotoUrl());
+                chat.setDisplayName(data.getDisplayName());
+                chat.setFriendEmail(data.getFriendEmail());
+                chat.setMessage(data.getMessage());
+                chat.setTime(data.getTime());
+                dataBaseApi.insertChatData(chat);
+            }
+            return;
+        }
+
+        for (PersonalChatDTO data : dataBaseApi.getAllChatData()){
+            dataBaseApi.deleteChatData(data.getSid());
+        }
         for (PersonalChatDTO data : chatDataArrayList){
             PersonalChatDTO chat = new PersonalChatDTO();
             chat.setDocumentPath(data.getDocumentPath());
@@ -64,6 +82,13 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
             chat.setTime(data.getTime());
             dataBaseApi.insertChatData(chat);
         }
+        mView.updateView(dataBaseApi.getAllChatData());
+
+
+
+
+
+
     }
 
     @Override
@@ -84,6 +109,7 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
     @Override
     public void onCatchChatDataSuccessful(ArrayList<PersonalChatDTO> allChatData) {
         mView.setRecyclerView(allChatData);
+        mView.continueSearchData();
     }
 
 
