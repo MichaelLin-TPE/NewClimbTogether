@@ -1,5 +1,7 @@
 package com.example.climbtogether.db_modle;
 
+import com.example.climbtogether.personal_fragment.PersonalChatDTO;
+
 import java.util.ArrayList;
 
 public interface DataBaseApi {
@@ -7,6 +9,8 @@ public interface DataBaseApi {
     ArrayList<DataDTO> getAllInformation();
 
     ArrayList<DataDTO> getLevelAInformation(String level);
+
+    ArrayList<PersonalChatDTO> getAllChatData();
 
     ArrayList<DataDTO> getInformationOrderByTimeNotFar();
 
@@ -27,4 +31,10 @@ public interface DataBaseApi {
     void delete(int sid);
 
     void insert(EquipmentListDTO data);
+
+    void insertChatData(PersonalChatDTO data);
+
+    void updateChatData(PersonalChatDTO data);
+
+    void deleteChatData(int sid);
 }

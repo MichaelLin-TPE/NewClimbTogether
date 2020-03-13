@@ -18,4 +18,6 @@ public interface PersonalFragmentPresenter {
     void onNoMessageEvent();
 
     void onShowDeleteMessageConfirmDialog(String documentPath);
+
+    void onCatchChatDataSuccessful(ArrayList<PersonalChatDTO> allChatData);
 }

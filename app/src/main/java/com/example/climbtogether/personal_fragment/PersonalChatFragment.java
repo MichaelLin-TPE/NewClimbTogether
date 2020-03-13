@@ -25,6 +25,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.climbtogether.R;
+import com.example.climbtogether.db_modle.DataBaseApi;
+import com.example.climbtogether.db_modle.DataBaseImpl;
 import com.example.climbtogether.login_activity.LoginActivity;
 import com.example.climbtogether.personal_chat_activity.PersonalChatActivity;
 import com.example.climbtogether.personal_chat_activity.PersonalChatData;
@@ -91,8 +93,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     private PersonalFragmentAdapter adapter;
 
-    private int secondCount = 0;
-    private boolean isStillConnect;
+    private DataBaseApi dataBaseApi;
 
     public static PersonalChatFragment newInstance() {
         PersonalChatFragment fragment = new PersonalChatFragment();
@@ -111,6 +112,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
         super.onCreate(savedInstanceState);
         initFirebase();
         initPresenter();
+        dataBaseApi = new DataBaseImpl(context);
         Log.i("Michael","chat onCreate");
     }
 
@@ -188,17 +190,6 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                     }
                 }
             });
-
-//            firestore.collection(FRIENDSHIP)
-//                    .document(user.getEmail())
-//                    .collection(FRIEND)
-//                    .get()
-//                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//
-//                        }
-//                    });
         }else {
             presenter.onNoUserEvent();
         }
@@ -286,6 +277,11 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                     }
                 }).create();
         dialog.show();
+    }
+
+    @Override
+    public Context getVuContext() {
+        return context;
     }
 
     private void deleteMessage(String documentPath) {
@@ -469,7 +465,13 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
         user = mAuth.getCurrentUser();
         if (user != null){
             Log.i("Michael","有用戶");
-            searchData();
+            if (dataBaseApi.getAllChatData() != null && dataBaseApi.getAllChatData().size() != 0){
+                Log.i("Michael","Chat DB 有資料");
+                presenter.onCatchChatDataSuccessful(dataBaseApi.getAllChatData());
+            }else {
+                searchData();
+            }
+
 
         }else {
             chatDataArrayList = new ArrayList<>();

@@ -2,14 +2,20 @@ package com.example.climbtogether.personal_fragment;
 
 import android.util.Log;
 
+import com.example.climbtogether.db_modle.DataBaseApi;
+import com.example.climbtogether.db_modle.DataBaseImpl;
+
 import java.util.ArrayList;
 
 public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter {
 
     private PersonalFragmentVu mView;
 
+    private DataBaseApi dataBaseApi;
+
     public PersonalFragmentPresenterImpl(PersonalFragmentVu mView) {
         this.mView = mView;
+        dataBaseApi = new DataBaseImpl(mView.getVuContext());
     }
 
     @Override
@@ -42,8 +48,22 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
         }else {
             mView.showNoChatDataView(false);
             mView.setRecyclerView(chatDataArrayList);
+            insertDatabase(chatDataArrayList);
         }
 
+    }
+
+    private void insertDatabase(ArrayList<PersonalChatDTO> chatDataArrayList) {
+        for (PersonalChatDTO data : chatDataArrayList){
+            PersonalChatDTO chat = new PersonalChatDTO();
+            chat.setDocumentPath(data.getDocumentPath());
+            chat.setPhotoUrl(data.getPhotoUrl());
+            chat.setDisplayName(data.getDisplayName());
+            chat.setFriendEmail(data.getFriendEmail());
+            chat.setMessage(data.getMessage());
+            chat.setTime(data.getTime());
+            dataBaseApi.insertChatData(chat);
+        }
     }
 
     @Override
@@ -59,6 +79,11 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
     @Override
     public void onShowDeleteMessageConfirmDialog(String documentPath) {
         mView.showDeleteConfirmDialog(documentPath);
+    }
+
+    @Override
+    public void onCatchChatDataSuccessful(ArrayList<PersonalChatDTO> allChatData) {
+        mView.setRecyclerView(allChatData);
     }
 
 

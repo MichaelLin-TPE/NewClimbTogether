@@ -1,5 +1,7 @@
 package com.example.climbtogether.personal_fragment;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 
 public interface PersonalFragmentVu {
@@ -18,4 +20,6 @@ public interface PersonalFragmentVu {
     void showNoChatDataView(boolean isShow);
 
     void showDeleteConfirmDialog(String documentPath);
+
+    Context getVuContext();
 }

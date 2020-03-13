@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.example.climbtogether.personal_fragment.PersonalChatDTO;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -88,6 +90,24 @@ public class DataBaseImpl implements DataBaseApi {
     }
 
     @Override
+    public ArrayList<PersonalChatDTO> getAllChatData() {
+        ArrayList<PersonalChatDTO> data  = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatatbase();
+        Cursor cursor = db.rawQuery("SELECT * FROM personal_chat",null);
+        if (cursor.moveToFirst()){
+            do {
+                PersonalChatDTO chatDTO = new PersonalChatDTO();
+                chatDTO.fromCursor(cursor);
+                data.add(chatDTO);
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return data;
+    }
+
+
+    @Override
     public ArrayList<DataDTO> getLevelAInformation(String levelType) {
         ArrayList<DataDTO> data = new ArrayList<>();
         SQLiteDatabase db = getReadableDatatbase();
@@ -103,6 +123,7 @@ public class DataBaseImpl implements DataBaseApi {
         db.close();
         return data;
     }
+
 
     @Override
     public ArrayList<DataDTO> getInformationOrderByTimeNotFar() {
@@ -242,6 +263,39 @@ public class DataBaseImpl implements DataBaseApi {
         SQLiteDatabase db = getWriteableDatabase();
         try {
             db.insert("equipment_list", null, data.toContentValues());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        db.close();
+    }
+
+    @Override
+    public void insertChatData(PersonalChatDTO data) {
+        SQLiteDatabase db = getWriteableDatabase();
+        try {
+            db.insert("personal_chat", null, data.toContentValues());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        db.close();
+    }
+
+    @Override
+    public void updateChatData(PersonalChatDTO data) {
+        SQLiteDatabase db = getWriteableDatabase();
+        try {
+            db.update("personal_chat", data.toContentValues(), "sid=?", new String[]{"" + data.getSid()});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        db.close();
+    }
+
+    @Override
+    public void deleteChatData(int sid) {
+        SQLiteDatabase db = getWriteableDatabase();
+        try {
+            db.delete("personal_chat", "sid=?", new String[]{"" + sid});
         } catch (Exception e) {
             e.printStackTrace();
         }
