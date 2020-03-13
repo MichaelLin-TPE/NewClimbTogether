@@ -300,8 +300,15 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     @Override
     public void updateView(ArrayList<PersonalChatDTO> allChatData) {
-        adapter.setData(allChatData);
-        adapter.notifyDataSetChanged();
+        if (getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.setData(allChatData);
+                    adapter.notifyDataSetChanged();
+                }
+            });
+        }
     }
 
     private void deleteMessage(String documentPath) {
