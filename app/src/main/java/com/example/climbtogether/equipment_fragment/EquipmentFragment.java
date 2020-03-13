@@ -24,6 +24,7 @@ import com.example.climbtogether.equipment_fragment.stuff_presenter.StuffPresent
 import com.example.climbtogether.equipment_fragment.stuff_presenter.StuffPresenterImpl;
 import com.example.climbtogether.login_activity.LoginActivity;
 import com.example.climbtogether.my_equipment_activity.MyEquipmentActivity;
+import com.example.climbtogether.tool.FireStoreManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -52,6 +53,8 @@ public class EquipmentFragment extends Fragment implements EquipmentVu {
     private Button btnAddList, btnGoList;
 
     private FirebaseFirestore firestore;
+
+    private FireStoreManager manager;
 
     private FirebaseAuth mAuth;
 
@@ -92,6 +95,7 @@ public class EquipmentFragment extends Fragment implements EquipmentVu {
     }
 
     private void initFirebase() {
+        manager = new FireStoreManager();
         firestore = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
@@ -122,21 +126,26 @@ public class EquipmentFragment extends Fragment implements EquipmentVu {
     private void searchPreparedData() {
         if (user != null && user.getEmail() != null) {
             prepareArrayList = new ArrayList<>();
-            firestore.collection(MY_EQUIPMENT)
-                    .document(user.getEmail())
-                    .collection(PREPARED)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                for (QueryDocumentSnapshot snapshot : task.getResult()) {
-                                    prepareArrayList.add(snapshot.getId());
+            manager.setFirstCollection(MY_EQUIPMENT);
+            manager.setFirstDocument(user.getEmail());
+            manager.setSecondCollection(PREPARED);
+            manager.catchTwoCollectionData(new FireStoreManager.OnConnectingFirebaseListener() {
+                @Override
+                public void onSuccess(Task<QuerySnapshot> task) {
+                    if (getActivity() != null){
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (task.isSuccessful() && task.getResult() != null) {
+                                    for (QueryDocumentSnapshot snapshot : task.getResult()) {
+                                        prepareArrayList.add(snapshot.getId());
+                                    }
                                 }
-
                             }
-                        }
-                    });
+                        });
+                    }
+                }
+            });
         }
     }
 

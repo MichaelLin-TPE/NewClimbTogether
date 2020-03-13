@@ -28,6 +28,7 @@ import com.example.climbtogether.R;
 import com.example.climbtogether.login_activity.LoginActivity;
 import com.example.climbtogether.personal_chat_activity.PersonalChatActivity;
 import com.example.climbtogether.personal_chat_activity.PersonalChatData;
+import com.example.climbtogether.tool.FireStoreManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -58,7 +59,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     private FirebaseFirestore firestore;
 
-    private StorageReference storage;
+    private FireStoreManager manager;
 
     private FirebaseUser user;
 
@@ -119,8 +120,8 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     private void initFirebase() {
         mAuth = FirebaseAuth.getInstance();
-        storage = FirebaseStorage.getInstance().getReference();
         user = mAuth.getCurrentUser();
+        manager = new FireStoreManager();
         firestore = FirebaseFirestore.getInstance();
     }
 
@@ -164,22 +165,40 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
         if (user != null && user.getEmail() != null){
             presenter.onShowProgress(true);
             final ArrayList<String> friendsArrayList = new ArrayList<>();
-            firestore.collection(FRIENDSHIP)
-                    .document(user.getEmail())
-                    .collection(FRIEND)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful() && task.getResult() != null){
-                                for (QueryDocumentSnapshot document : task.getResult()){
-                                    friendsArrayList.add(document.getId());
-                                    Log.i("Michael",document.getId());
+
+            manager.setFirstCollection(FRIENDSHIP);
+            manager.setFirstDocument(user.getEmail());
+            manager.setSecondCollection(FRIEND);
+            manager.catchTwoCollectionData(new FireStoreManager.OnConnectingFirebaseListener() {
+                @Override
+                public void onSuccess(Task<QuerySnapshot> task) {
+                    if (getActivity() != null){
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (task.isSuccessful() && task.getResult() != null){
+                                    for (QueryDocumentSnapshot document : task.getResult()){
+                                        friendsArrayList.add(document.getId());
+                                        Log.i("Michael",document.getId());
+                                    }
+                                    presenter.onSearchUserChatData(user.getEmail(),friendsArrayList);
                                 }
-                                presenter.onSearchUserChatData(user.getEmail(),friendsArrayList);
                             }
-                        }
-                    });
+                        });
+                    }
+                }
+            });
+
+//            firestore.collection(FRIENDSHIP)
+//                    .document(user.getEmail())
+//                    .collection(FRIEND)
+//                    .get()
+//                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//
+//                        }
+//                    });
         }else {
             presenter.onNoUserEvent();
         }
@@ -339,19 +358,27 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
 
     private void searchFriendsData(final String friendEmail, final String currentEmail) {
-        firestore.collection("users").document(friendEmail)
-                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful() && task.getResult() != null){
-                    DocumentSnapshot snapshot =  task.getResult();
-                    PersonalChatDTO data = new PersonalChatDTO();
-                    data.setDisplayName((String)snapshot.get("displayName"));
-                    data.setFriendEmail((String)snapshot.get("email"));
-                    data.setPhotoUrl((String)snapshot.get("photoUrl"));
-                    searchChatData(data,friendEmail,currentEmail);
-                }
 
+        manager.setFirstCollection("users");
+        manager.setFirstDocument(friendEmail);
+        manager.catchOneDocumentData(new FireStoreManager.OnFirebaseDocumentListener() {
+            @Override
+            public void onSuccess(Task<DocumentSnapshot> task) {
+                if (getActivity() != null){
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (task.isSuccessful() && task.getResult() != null){
+                                DocumentSnapshot snapshot =  task.getResult();
+                                PersonalChatDTO data = new PersonalChatDTO();
+                                data.setDisplayName((String)snapshot.get("displayName"));
+                                data.setFriendEmail((String)snapshot.get("email"));
+                                data.setPhotoUrl((String)snapshot.get("photoUrl"));
+                                searchChatData(data,friendEmail,currentEmail);
+                            }
+                        }
+                    });
+                }
             }
         });
     }

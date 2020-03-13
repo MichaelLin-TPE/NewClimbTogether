@@ -31,6 +31,7 @@ import com.example.climbtogether.R;
 import com.example.climbtogether.detail_activity.DetailActivity;
 import com.example.climbtogether.login_activity.LoginActivity;
 import com.example.climbtogether.db_modle.DataDTO;
+import com.example.climbtogether.tool.FireStoreManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -72,8 +73,6 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     private FirebaseAuth mAuth;
 
-    private FirebaseFirestore firestore;
-
     private FirebaseUser user;
 
     private String topTime;
@@ -85,6 +84,8 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     private ProgressBar progressBar;
 
     private Spinner spinner;
+
+    private FireStoreManager manager;
 
     public static MountainFragment newInstance() {
         MountainFragment fragment = new MountainFragment();
@@ -105,8 +106,8 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         super.onCreate(savedInstanceState);
         Log.i("Michael","Mt onCreate");
         mAuth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance();
         adapter = new MountainRecyclerViewAdapter(context);
+        manager = new FireStoreManager();
         initPresenter();
 
     }
@@ -161,50 +162,58 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     }
     @Override
     public void searchDataFromDb(String email, final ArrayList<DataDTO> allInformation) {
-        Log.i("Michael","searchDataFromDb");
-        firestoreData = new ArrayList<>();
-        timeArray = new ArrayList<>();
-        firestore.collection(email).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()){
-                            if (task.getResult() != null){
-                                for (QueryDocumentSnapshot document : task.getResult()){
-                                    Log.i("Michael",document.getId() + " =>" + document.getData());
-                                    Map<String,Object> map = document.getData();
-                                    Log.i("Michael","time : "+map.get("topTime"));
-                                    timeArray.add((Long) map.get("topTime"));
-                                    firestoreData.add(document.getId());
-                                }
-                                if (firestoreData.size() != 0 && timeArray.size() != 0){
-                                    Log.i("Michael","有資料的Email做到這 : "+firestoreData.size());
-                                    presenter.onModifyDataFromFirestore(firestoreData,timeArray,allInformation);
-                                }else {
-                                    presenter.initDbData();
-                                }
 
-                            }else {
-                                Log.i("Michael","沒資料的Email做到這 task.getResult == null");
-                                presenter.initDbData();
+        if (getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.i("Michael","searchDataFromDb");
+                    firestoreData = new ArrayList<>();
+                    timeArray = new ArrayList<>();
+                    manager.setFirstCollection(email);
+                    manager.catchOneCollectionData(new FireStoreManager.OnConnectingFirebaseListener() {
+                        @Override
+                        public void onSuccess(Task<QuerySnapshot> task) {
+                            if (getActivity() != null){
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (task.isSuccessful() && task.getResult() != null ){
+                                            for (QueryDocumentSnapshot document : task.getResult()){
+                                                Log.i("Michael",document.getId() + " =>" + document.getData());
+                                                Map<String,Object> map = document.getData();
+                                                Log.i("Michael","time : "+map.get("topTime"));
+                                                timeArray.add((Long) map.get("topTime"));
+                                                firestoreData.add(document.getId());
+                                            }
+                                            if (firestoreData.size() != 0 && timeArray.size() != 0){
+                                                Log.i("Michael","有資料的Email做到這 : "+firestoreData.size());
+                                                presenter.onModifyDataFromFirestore(firestoreData,timeArray,allInformation);
+                                            }else {
+                                                presenter.initDbData();
+                                            }
+                                        }
+                                    }
+                                });
                             }
-                        }else {
-                            Log.i("Michael","沒資料的Email做到這 task.isSuccessFul");
-                            presenter.initDbData();
                         }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.i("Michael","沒資料的Email做到這 onFail");
-            }
-        });
-
+                    });
+                }
+            });
+        }
     }
 
     @Override
     public void readyToProvideData() {
-        presenter.onPrepareData();
+        if (getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    presenter.onPrepareData();
+                }
+            });
+        }
+
     }
 
     @Override
@@ -463,16 +472,37 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
                 map.put("topTime", topTime);
                 map.put("sid", data.getSid());
                 map.put("photoUrl","");
-                firestore.collection(email).document(mountainName)
-                        .set(map)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
+                manager.setFirstCollection(email);
+                manager.setFirstDocument(mountainName);
+                manager.setMap(map);
+                manager.setDocumentData(new FireStoreManager.OnFirebaseSetDocumentListener() {
+                    @Override
+                    public void onSuccessful() {
+                        if (getActivity() != null){
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
                                     Log.i("Michael","資料增加成功");
                                 }
-                            }
-                        });
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+
+                    }
+                });
+//                firestore.collection(email).document(mountainName)
+//                        .set(map)
+//                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<Void> task) {
+//                                if (task.isSuccessful()) {
+//
+//                                }
+//                            }
+//                        });
 
 
             }
@@ -491,17 +521,20 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         if (user != null) {
             String email = user.getEmail();
             if (email != null) {
-                firestore.collection(email).document(dataDTO.getName())
-                        .delete()
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()){
-                                    String isShow = "false";
-                                    presenter.onTopIconChange(sid,isShow,null);
-                                }
-                            }
-                        });
+                manager.setFirstCollection(email);
+                manager.setFirstDocument(dataDTO.getName());
+                manager.deleteDocument(new FireStoreManager.OnFirebaseDeleteListener() {
+                    @Override
+                    public void onSuccessful() {
+                        String isShow = "false";
+                        presenter.onTopIconChange(sid,isShow,null);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.i("Michael","刪除失敗");
+                    }
+                });
             }
         }
     }

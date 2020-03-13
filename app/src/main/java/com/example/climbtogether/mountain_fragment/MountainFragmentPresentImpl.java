@@ -132,13 +132,19 @@ public class MountainFragmentPresentImpl implements MountainFragmentPresenter {
     public void onSearchDbData(String email) {
         mView.showProgressbar(true);
         if (db.getAllInformation().size() != 0) {
-            for (DataDTO dataDTO : db.getAllInformation()){
-                DataDTO data = db.getDataBySid(dataDTO.getSid());
-                data.setTime(0);
-                data.setCheck("false");
-                db.update(data);
-            }
-            mView.searchDataFromDb(email, db.getAllInformation());
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (DataDTO dataDTO : db.getAllInformation()){
+                        DataDTO data = db.getDataBySid(dataDTO.getSid());
+                        data.setTime(0);
+                        data.setCheck("false");
+                        db.update(data);
+                    }
+                    mView.searchDataFromDb(email, db.getAllInformation());
+                }
+            }).start();
+
         } else {
             Log.i("Michael", "db資料為 0");
         }
@@ -149,29 +155,40 @@ public class MountainFragmentPresentImpl implements MountainFragmentPresenter {
         
         
         //在onCreate的時候 就修正完畢所有資料
-        for (int i = 0; i < firestoreData.size(); i++) {
-            for (DataDTO data : allInformation) {
-                if (firestoreData.get(i).equals(data.getName())) {
-                    DataDTO dataDTO = db.getDataBySid(data.getSid());
-                    dataDTO.setCheck("true");
-                    dataDTO.setTime(timeArray.get(i));
-                    db.update(dataDTO);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < firestoreData.size(); i++) {
+                    for (DataDTO data : allInformation) {
+                        if (firestoreData.get(i).equals(data.getName())) {
+                            DataDTO dataDTO = db.getDataBySid(data.getSid());
+                            dataDTO.setCheck("true");
+                            dataDTO.setTime(timeArray.get(i));
+                            db.update(dataDTO);
+                        }
+                    }
                 }
+                mView.readyToProvideData();
             }
-        }
-        mView.readyToProvideData();
+        }).start();
+
     }
 
     @Override
     public void initDbData() {
-        mView.showProgressbar(true);
-        for (DataDTO dataDTO : db.getAllInformation()) {
-            DataDTO data = db.getDataBySid(dataDTO.getSid());
-            data.setCheck("false");
-            data.setTime(0);
-            db.update(data);
-        }
-        mView.readyToProvideData();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mView.showProgressbar(true);
+                for (DataDTO dataDTO : db.getAllInformation()) {
+                    DataDTO data = db.getDataBySid(dataDTO.getSid());
+                    data.setCheck("false");
+                    data.setTime(0);
+                    db.update(data);
+                }
+                mView.readyToProvideData();
+            }
+        }).start();
     }
 
     @Override
