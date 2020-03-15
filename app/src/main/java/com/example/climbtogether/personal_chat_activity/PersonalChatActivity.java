@@ -71,6 +71,8 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     private boolean isStillPosting;
 
+    private UserDataManager userDataManager;
+
     private int countSecond = 0, secondSize = 0;
 
     private MyFirbaseMessagingService service;
@@ -84,6 +86,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_personal_chat);
         service = new MyFirbaseMessagingService();
+        userDataManager = new UserDataManager(this);
         initPresenter();
         initFirebase();
         initBundle();
@@ -182,80 +185,6 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                 presenter.onSendNotificationToFriend(friendEmail, message, displayName);
             }
         });
-    }
-
-    private void searchChatData() {
-
-        chatArrayList = new ArrayList<>();
-        if (user != null) {
-            if (user.getEmail() != null) {
-
-                documentPath = user.getEmail() + "And" + friendEmail;
-
-                firestore.collection(PERSONAL_CHAT).document(documentPath).collection(CHAT_DATA)
-                        .orderBy("time", Query.Direction.ASCENDING)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    if (task.getResult() != null) {
-                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                            PersonalChatData data = new PersonalChatData();
-                                            data.setEmail((String) document.getData().get("email"));
-                                            data.setMessage((String) document.getData().get("message"));
-                                            data.setTime((long) document.getData().get("time"));
-                                            chatArrayList.add(data);
-                                        }
-                                        if (chatArrayList.size() != 0) {
-                                            presenter.onCatchChatData(chatArrayList);
-                                        } else {
-                                            searchAgain();
-                                            Log.i("Michael", "沒資料做這");
-                                        }
-                                    }
-                                }
-                            }
-                        });
-            }
-        }
-
-
-    }
-
-    private void searchAgain() {
-        chatArrayList = new ArrayList<>();
-        if (user != null) {
-            if (user.getEmail() != null) {
-
-                documentPath = friendEmail + "And" + user.getEmail();
-                Log.i("Michael", "聊天檢查路徑 : " + documentPath);
-                firestore.collection(PERSONAL_CHAT).document(documentPath).collection(CHAT_DATA)
-                        .orderBy("time", Query.Direction.ASCENDING)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    if (task.getResult() != null) {
-                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                            PersonalChatData data = new PersonalChatData();
-                                            data.setEmail((String) document.getData().get("email"));
-                                            data.setMessage((String) document.getData().get("message"));
-                                            data.setTime((long) document.getData().get("time"));
-                                            chatArrayList.add(data);
-                                        }
-                                        if (chatArrayList.size() != 0) {
-                                            presenter.onCatchChatData(chatArrayList);
-                                        } else {
-                                            Log.i("Michael", "沒資料做這");
-                                        }
-                                    }
-                                }
-                            }
-                        });
-            }
-        }
     }
 
     private void initFirebase() {
@@ -365,54 +294,12 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
     }
 
     @Override
-    public void createDataToFirestroe(String message, long time) {
-        if (user.getEmail() != null || user != null) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("email", user.getEmail());
-            map.put("message", message);
-            map.put("time", time);
-            firestore.collection(PERSONAL_CHAT).document(testPath).collection(CHAT_DATA)
-                    .document()
-                    .set(map)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Log.i("Michael", "資料新增成功");
-                                if (countSecond >= 22500) {
-                                    countSecond = 0;
-                                    checkDataChange();
-                                } else {
-                                    countSecond = 0;
-                                }
-
-
-                            }
-                        }
-                    });
-            Map<String, Object> chatMap = new HashMap<>();
-            chatMap.put("is_update", true);
-            firestore.collection(IS_UPDATE)
-                    .document(UPDATE)
-                    .set(chatMap)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Log.i("Michael", "傳送需要更新成功");
-                            }
-                        }
-                    });
-        }
-
-    }
-
-    @Override
     public void setRecyclerView(ArrayList<PersonalChatData> chatArrayList) {
 
         if (adapter != null){
             personalPresenter.setData(chatArrayList);
             adapter.notifyDataSetChanged();
+            recyclerView.scrollToPosition(chatArrayList.size()-1);
             return;
         }
 
@@ -468,24 +355,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
     public void setDataToFireStore(String message, long time) {
         if (testPath != null){
             catchDocument(message,time);
-        }else {
-            Map<String,Object> map = new HashMap<>();
-            map.put("user1",user.getEmail());
-            map.put("user2",friendEmail);
-            firestore.collection(CHAT_ROOM)
-                    .document()
-                    .set(map)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                Log.i("Michael","房間建立成功");
-
-                            }
-                        }
-                    });
         }
-
     }
 
     @Override
@@ -497,6 +367,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
     public void setChatDataToFireStore(String jsonStr) {
         Map<String,Object> map = new HashMap<>();
         map.put("json",jsonStr);
+
         firestore.collection(CHAT_DATA)
                 .document(testPath)
                 .set(map)
@@ -506,6 +377,12 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                         if (task.isSuccessful()){
                             Log.i("Michael","上傳成功");
                             sendReadyToUpdate();
+                            if (countSecond >= 22500) {
+                                countSecond = 0;
+                                checkDataChange();
+                            } else {
+                                countSecond = 0;
+                            }
                         }
                     }
                 });
@@ -530,39 +407,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     private void catchDocument(String message, long time) {
         if (testPath != null){
-            presenter.sendMessage(message,time,testPath);
-        }else {
-            firestore.collection(CHAT_ROOM)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                ArrayList<ChatRoomDTO> pathArray = new ArrayList<>();
-
-                                for (QueryDocumentSnapshot snapshot : task.getResult()) {
-                                    ChatRoomDTO data = new ChatRoomDTO();
-                                    data.setDocument(snapshot.getId());
-                                    data.setUser1((String) snapshot.get("user1"));
-                                    data.setUser2((String) snapshot.get("user2"));
-                                    pathArray.add(data);
-                                }
-                                if (pathArray.size() != 0) {
-                                    for (ChatRoomDTO data : pathArray) {
-                                        if (data.getUser1().equals(user.getEmail()) && data.getUser2().equals(friendEmail)) {
-                                            testPath = data.getDocument();
-                                            break;
-                                        }else if (data.getUser1().equals(friendEmail) && data.getUser2().equals(user.getEmail())){
-                                            testPath = data.getDocument();
-                                            break;
-                                        }
-                                    }
-                                    presenter.sendMessage(message,time,testPath);
-                                }
-                            }
-                        }
-                    });
+            presenter.sendMessage(message,time,testPath,userDataManager.getPhotoUrl(),userDataManager.getDisplayName());
         }
-
     }
 }

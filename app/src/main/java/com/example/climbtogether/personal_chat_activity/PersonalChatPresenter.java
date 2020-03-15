@@ -21,5 +21,5 @@ public interface PersonalChatPresenter {
 
     void onCatchChatJson(String jsonStr);
 
-    void sendMessage(String message, long time, String documentPath);
+    void sendMessage(String message, long time, String testPath, String photoUrl, String displayName);
 }

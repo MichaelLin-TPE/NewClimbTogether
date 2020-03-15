@@ -12,6 +12,27 @@ public class PersonalChatData implements Serializable {
     @SerializedName("email")
     private String email;
 
+    @SerializedName("display_name")
+    private String displayName;
+    @SerializedName("photo_url")
+    private String photoUrl;
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
     public String getEmail() {
         return email;
     }

@@ -20,4 +20,6 @@ public interface PersonalFragmentPresenter {
     void onShowDeleteMessageConfirmDialog(String documentPath);
 
     void onCatchChatDataSuccessful(ArrayList<PersonalChatDTO> allChatData);
+
+    void onCatchallData(ArrayList<String> jsonArray,ArrayList<FriendData> friendDataArray);
 }

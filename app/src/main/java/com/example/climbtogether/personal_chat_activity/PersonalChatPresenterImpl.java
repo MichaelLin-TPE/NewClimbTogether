@@ -97,7 +97,7 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
     }
 
     @Override
-    public void sendMessage(String message, long time, String documentPath) {
+    public void sendMessage(String message, long time, String testPath, String photoUrl, String displayName) {
         if (dataArrayList == null){
             PersonalChatData data = new PersonalChatData();
             ArrayList<PersonalChatData> chatArrayList = new ArrayList<>();
@@ -105,6 +105,8 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
             data.setEmail(mView.getEmail());
             data.setMessage(message);
             data.setTime(time);
+            data.setPhotoUrl(photoUrl);
+            data.setDisplayName(displayName);
             chatArrayList.add(data);
             object.setChatData(chatArrayList);
             String jsonStr = gson.toJson(object);
@@ -114,6 +116,8 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
             data.setEmail(mView.getEmail());
             data.setMessage(message);
             data.setTime(time);
+            data.setPhotoUrl(photoUrl);
+            data.setDisplayName(displayName);
             dataArrayList.get(0).getChatData().add(data);
             String jsonStr = gson.toJson(dataArrayList.get(0));
             mView.setChatDataToFireStore(jsonStr);

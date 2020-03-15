@@ -4,6 +4,9 @@ import android.util.Log;
 
 import com.example.climbtogether.db_modle.DataBaseApi;
 import com.example.climbtogether.db_modle.DataBaseImpl;
+import com.example.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
+import com.example.climbtogether.personal_chat_activity.chat_room_object.PersonalChatObject;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -13,9 +16,12 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
 
     private DataBaseApi dataBaseApi;
 
+    private Gson gson;
+
     public PersonalFragmentPresenterImpl(PersonalFragmentVu mView) {
         this.mView = mView;
         dataBaseApi = new DataBaseImpl(mView.getVuContext());
+        gson = new Gson();
     }
 
     @Override
@@ -115,6 +121,38 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
     public void onCatchChatDataSuccessful(ArrayList<PersonalChatDTO> allChatData) {
         mView.setRecyclerView(allChatData);
         mView.continueSearchData();
+    }
+
+    @Override
+    public void onCatchallData(ArrayList<String> jsonArray,ArrayList<FriendData> friendDataArray) {
+
+        if (jsonArray.size() == 0){
+            Log.i("Michael","沒資料");
+            mView.showNoChatDataView(false);
+            return;
+        }
+        Log.i("Michael","開始處理資料");
+        ArrayList<PersonalChatObject> dataArrayList = new ArrayList<>();
+        for (String json : jsonArray){
+            PersonalChatObject data = gson.fromJson(json,PersonalChatObject.class);
+            dataArrayList.add(data);
+        }
+
+        ArrayList<PersonalChatDTO> chatArray = new ArrayList<>();
+        for (int i = 0 ; i < dataArrayList.size() ; i ++){
+            int chatIndex = dataArrayList.get(i).getChatData().size() -1 ;
+            PersonalChatDTO data = new PersonalChatDTO();
+            data.setDisplayName(friendDataArray.get(i).getdisplayName());
+            Log.i("Michael","friendName :" +friendDataArray.get(i).getdisplayName());
+            data.setPhotoUrl(friendDataArray.get(i).getPhotoUrl());
+            data.setFriendEmail(friendDataArray.get(i).getEmail());
+            data.setMessage(dataArrayList.get(i).getChatData().get(chatIndex).getMessage());
+            data.setTime(dataArrayList.get(i).getChatData().get(chatIndex).getTime());
+            chatArray.add(data);
+        }
+        mView.showProgress(false);
+        mView.setRecyclerView(chatArray);
+
     }
 
 

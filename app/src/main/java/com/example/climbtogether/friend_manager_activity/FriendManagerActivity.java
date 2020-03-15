@@ -25,6 +25,7 @@ import com.example.climbtogether.friend_manager_activity.friend_presenter.Friend
 import com.example.climbtogether.friend_manager_activity.friend_presenter.FriendPresenterImpl;
 import com.example.climbtogether.friend_manager_activity.view.FriendViewAdapter;
 import com.example.climbtogether.friend_manager_activity.view.InviteViewAdapter;
+import com.example.climbtogether.login_activity.LoginActivity;
 import com.example.climbtogether.personal_chat_activity.PersonalChatActivity;
 import com.example.climbtogether.tool.ImageLoaderManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -42,6 +43,7 @@ import com.google.firebase.storage.StorageReference;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class FriendManagerActivity extends AppCompatActivity implements FriendManagerVu {
@@ -85,6 +87,8 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
     private static final String CHAT_DATA = "chat_data";
 
     private AlertDialog userDialog;
+
+    private String chatRoomPath;
 
 
     @Override
@@ -302,7 +306,25 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
                             friendPresenter.setData(inviteArrayList,friendArrayList);
                             adapter = new FriendManagerAdapter(friendPresenter,FriendManagerActivity.this);
                             recyclerView.setAdapter(adapter);
+                            createChatRoom(friendEmail,userEmail);
                             checkAllData();
+                        }
+                    }
+                });
+    }
+
+    private void createChatRoom(String friendEmail, String userEmail) {
+        Map<String,Object> map = new HashMap<>();
+        map.put("user1",userEmail);
+        map.put("user2",friendEmail);
+        firestore.collection("chat_room")
+                .document()
+                .set(map)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Log.i("Michael","新增房間成功");
                         }
                     }
                 });
