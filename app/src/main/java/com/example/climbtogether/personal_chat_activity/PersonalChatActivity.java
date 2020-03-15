@@ -1,7 +1,6 @@
 package com.example.climbtogether.personal_chat_activity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,23 +16,22 @@ import android.widget.Toast;
 
 import com.example.climbtogether.MyFirbaseMessagingService;
 import com.example.climbtogether.R;
+import com.example.climbtogether.detail_activity.DetailAdapter;
+import com.example.climbtogether.personal_chat_activity.chat_room_object.ChatRoomDTO;
+import com.example.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
 import com.example.climbtogether.personal_chat_activity.personal_presenter.PersonalPresenter;
 import com.example.climbtogether.personal_chat_activity.personal_presenter.PersonalPresenterImpl;
-import com.example.climbtogether.tool.CommentKeyBoardFix;
 import com.example.climbtogether.tool.UserDataManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,11 +61,13 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     private static final String CHAT_DATA = "chat_data";
 
+    private static final String CHAT_ROOM = "chat_room";
+
     private ArrayList<PersonalChatData> chatArrayList;
 
     private PersonalAdapter adapter;
 
-    private String documentPath;
+    private String documentPath,testPath;
 
     private boolean isStillPosting;
 
@@ -88,8 +88,69 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
         initFirebase();
         initBundle();
         initView();
-        searchChatData();
+        //新方法
+        searchChatPath();
+    }
+    private void searchChatPath() {
+        if (testPath != null && !testPath.isEmpty()){
+            searchNewChatData(testPath);
+        }else {
+            firestore.collection(CHAT_ROOM)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                ArrayList<ChatRoomDTO> pathArray = new ArrayList<>();
 
+                                for (QueryDocumentSnapshot snapshot : task.getResult()) {
+                                    ChatRoomDTO data = new ChatRoomDTO();
+                                    data.setDocument(snapshot.getId());
+                                    data.setUser1((String) snapshot.get("user1"));
+                                    data.setUser2((String) snapshot.get("user2"));
+                                    pathArray.add(data);
+                                }
+                                if (pathArray.size() != 0) {
+                                    for (ChatRoomDTO data : pathArray) {
+                                        if (data.getUser1().equals(user.getEmail()) && data.getUser2().equals(friendEmail)) {
+                                            testPath = data.getDocument();
+                                            searchNewChatData(testPath);
+                                            Log.i("Michael","有房間");
+                                            break;
+                                        }else if (data.getUser1().equals(friendEmail) && data.getUser2().equals(user.getEmail())){
+                                            testPath = data.getDocument();
+                                            searchNewChatData(testPath);
+                                            Log.i("Michael","有房間");
+                                            break;
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    });
+        }
+
+    }
+
+    private void searchNewChatData(String documentPath) {
+        firestore.collection(CHAT_DATA)
+                .document(documentPath)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null){
+                            DocumentSnapshot snapshot = task.getResult();
+                            String jsonStr = (String)snapshot.get("json");
+                            if (jsonStr != null && !jsonStr.isEmpty()){
+                                presenter.onCatchChatJson(jsonStr);
+                            }else {
+                                Log.i("Michael","無聊天資料 待處理");
+                            }
+                        }
+                    }
+                });
     }
 
     private void initView() {
@@ -253,31 +314,21 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                     Log.i("Michael", "資料沒新增 : " + countSecond);
                     if (countSecond != 22500) {
                         if (isStillPosting) {
-                            chatArrayList = new ArrayList<>();
-                            firestore.collection(PERSONAL_CHAT).document(documentPath)
-                                    .collection(CHAT_DATA)
-                                    .orderBy("time", Query.Direction.ASCENDING)
+                            firestore.collection(IS_UPDATE)
+                                    .document(UPDATE)
                                     .get()
-                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                         @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful() && task.getResult() != null) {
-                                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                                    PersonalChatData data = new PersonalChatData();
-                                                    data.setMessage((String) document.getData().get("message"));
-                                                    data.setTime((long) document.getData().get("time"));
-                                                    data.setEmail((String)document.getData().get("email"));
-                                                    chatArrayList.add(data);
-                                                }
-                                                int firstSize = chatArrayList.size();
-                                                if (firstSize == secondSize) {
-                                                    Log.i("Michael", "資料數量相同");
-                                                    secondSize = firstSize;
-                                                } else {
-                                                    Log.i("Michael","資料更新");
-                                                    countSecond = 0;
-                                                    presenter.onDataChangeEvent(chatArrayList);
-                                                    secondSize = firstSize;
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if (task.isSuccessful() && task.getResult() != null){
+                                                DocumentSnapshot snapshot = task.getResult();
+                                                boolean isUpdate = (boolean) snapshot.get("is_personal_update");
+                                                if (isUpdate){
+                                                    Log.i("Michael","更新畫面");
+                                                    setNotUpdate();
+                                                    searchChatPath();
+                                                }else {
+                                                    Log.i("Michael","不更新畫面");
                                                 }
                                             }
                                         }
@@ -297,6 +348,14 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     }
 
+    private void setNotUpdate() {
+        Map<String,Object> map = new HashMap<>();
+        map.put("is_personal_update",false);
+        firestore.collection(IS_UPDATE)
+                .document(UPDATE)
+                .set(map, SetOptions.merge());
+    }
+
 
     @Override
     protected void onPause() {
@@ -312,7 +371,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
             map.put("email", user.getEmail());
             map.put("message", message);
             map.put("time", time);
-            firestore.collection(PERSONAL_CHAT).document(documentPath).collection(CHAT_DATA)
+            firestore.collection(PERSONAL_CHAT).document(testPath).collection(CHAT_DATA)
                     .document()
                     .set(map)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -331,16 +390,16 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                             }
                         }
                     });
-            Map<String ,Object> chatMap = new HashMap<>();
-            chatMap.put("is_update",true);
+            Map<String, Object> chatMap = new HashMap<>();
+            chatMap.put("is_update", true);
             firestore.collection(IS_UPDATE)
                     .document(UPDATE)
                     .set(chatMap)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                Log.i("Michael","傳送需要更新成功");
+                            if (task.isSuccessful()) {
+                                Log.i("Michael", "傳送需要更新成功");
                             }
                         }
                     });
@@ -350,6 +409,13 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     @Override
     public void setRecyclerView(ArrayList<PersonalChatData> chatArrayList) {
+
+        if (adapter != null){
+            personalPresenter.setData(chatArrayList);
+            adapter.notifyDataSetChanged();
+            return;
+        }
+
         if (user != null && user.getEmail() != null) {
             personalPresenter.setCurrentUserEmail(user.getEmail());
             personalPresenter.setFriendData(displayName, friendPhotoUrl);
@@ -396,5 +462,107 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
     @Override
     public String getDisplayName() {
         return new UserDataManager(this).getDisplayName();
+    }
+
+    @Override
+    public void setDataToFireStore(String message, long time) {
+        if (testPath != null){
+            catchDocument(message,time);
+        }else {
+            Map<String,Object> map = new HashMap<>();
+            map.put("user1",user.getEmail());
+            map.put("user2",friendEmail);
+            firestore.collection(CHAT_ROOM)
+                    .document()
+                    .set(map)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                Log.i("Michael","房間建立成功");
+
+                            }
+                        }
+                    });
+        }
+
+    }
+
+    @Override
+    public String getEmail() {
+        return user != null ? user.getEmail() : "";
+    }
+
+    @Override
+    public void setChatDataToFireStore(String jsonStr) {
+        Map<String,Object> map = new HashMap<>();
+        map.put("json",jsonStr);
+        firestore.collection(CHAT_DATA)
+                .document(testPath)
+                .set(map)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Log.i("Michael","上傳成功");
+                            sendReadyToUpdate();
+                        }
+                    }
+                });
+    }
+
+    private void sendReadyToUpdate() {
+        Map<String,Object> map = new HashMap<>();
+        map.put("is_update",true);
+        map.put("is_personal_update",true);
+        firestore.collection(IS_UPDATE)
+                .document(UPDATE)
+                .set(map)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Log.i("Michael","更新成功");
+                        }
+                    }
+                });
+    }
+
+    private void catchDocument(String message, long time) {
+        if (testPath != null){
+            presenter.sendMessage(message,time,testPath);
+        }else {
+            firestore.collection(CHAT_ROOM)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                ArrayList<ChatRoomDTO> pathArray = new ArrayList<>();
+
+                                for (QueryDocumentSnapshot snapshot : task.getResult()) {
+                                    ChatRoomDTO data = new ChatRoomDTO();
+                                    data.setDocument(snapshot.getId());
+                                    data.setUser1((String) snapshot.get("user1"));
+                                    data.setUser2((String) snapshot.get("user2"));
+                                    pathArray.add(data);
+                                }
+                                if (pathArray.size() != 0) {
+                                    for (ChatRoomDTO data : pathArray) {
+                                        if (data.getUser1().equals(user.getEmail()) && data.getUser2().equals(friendEmail)) {
+                                            testPath = data.getDocument();
+                                            break;
+                                        }else if (data.getUser1().equals(friendEmail) && data.getUser2().equals(user.getEmail())){
+                                            testPath = data.getDocument();
+                                            break;
+                                        }
+                                    }
+                                    presenter.sendMessage(message,time,testPath);
+                                }
+                            }
+                        }
+                    });
+        }
+
     }
 }

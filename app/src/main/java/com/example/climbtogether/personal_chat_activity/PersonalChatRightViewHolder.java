@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.climbtogether.R;
-import com.example.climbtogether.chat_activity.ChatData;
+import com.example.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -1,6 +1,6 @@
 package com.example.climbtogether.personal_chat_activity.personal_presenter;
 
-import com.example.climbtogether.personal_chat_activity.PersonalChatData;
+import com.example.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
 import com.example.climbtogether.personal_chat_activity.PersonalChatLeftViewHolder;
 import com.example.climbtogether.personal_chat_activity.PersonalChatRightViewHolder;
 

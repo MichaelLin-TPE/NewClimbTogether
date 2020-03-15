@@ -1,21 +1,16 @@
-package com.example.climbtogether.personal_chat_activity;
+package com.example.climbtogether.personal_chat_activity.chat_room_object;
 
-public class PersonalChatData {
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+public class PersonalChatData implements Serializable {
+    @SerializedName("message")
     private String message;
-
+    @SerializedName("time")
     private long time;
-
+    @SerializedName("email")
     private String email;
-
-    private String documentPath;
-
-    public String getDocumentPath() {
-        return documentPath;
-    }
-
-    public void setDocumentPath(String documentPath) {
-        this.documentPath = documentPath;
-    }
 
     public String getEmail() {
         return email;

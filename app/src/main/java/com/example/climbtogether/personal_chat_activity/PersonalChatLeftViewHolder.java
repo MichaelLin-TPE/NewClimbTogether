@@ -1,8 +1,6 @@
 package com.example.climbtogether.personal_chat_activity;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -11,17 +9,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.climbtogether.R;
-import com.example.climbtogether.chat_activity.ChatData;
 import com.example.climbtogether.chat_activity.ChatLeftViewHolder;
+import com.example.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
 import com.example.climbtogether.tool.ImageLoaderManager;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.makeramen.roundedimageview.RoundedImageView;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,7 +46,7 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
 
 
 
-    public void setData(PersonalChatData personalChatData,String displayName, String friendPhotoUrl) {
+    public void setData(PersonalChatData personalChatData, String displayName, String friendPhotoUrl) {
         if (friendPhotoUrl.isEmpty()){
             ivUserPhoto.setScaleType(ImageView.ScaleType.FIT_CENTER);
         }else {

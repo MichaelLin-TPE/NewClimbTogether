@@ -2,21 +2,27 @@ package com.example.climbtogether.personal_chat_activity;
 
 import android.util.Log;
 
+import com.example.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
+import com.example.climbtogether.personal_chat_activity.chat_room_object.PersonalChatObject;
 import com.example.climbtogether.personal_chat_activity.fcm_object.FcmData;
 import com.example.climbtogether.personal_chat_activity.fcm_object.FcmNotification;
 import com.example.climbtogether.personal_chat_activity.fcm_object.FcmObject;
 import com.example.climbtogether.tool.HttpConnection;
 import com.google.gson.Gson;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 public class PersonalChatPresenterImpl implements PersonalChatPresenter {
 
     private PersonalChatVu mView;
 
+    private Gson gson;
+
+    private ArrayList<PersonalChatObject> dataArrayList;
+
     public PersonalChatPresenterImpl(PersonalChatVu mView){
         this.mView = mView;
+        gson = new Gson();
     }
 
     @Override
@@ -31,7 +37,8 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
 
     @Override
     public void onSendMessageButtonClickListener(String message, long time) {
-        mView.createDataToFirestroe(message,time);
+        //新方法
+        mView.setDataToFireStore(message,time);
     }
 
     @Override
@@ -78,5 +85,40 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
                 Log.i("Michael","錯誤 : "+exception);
             }
         });
+    }
+
+    @Override
+    public void onCatchChatJson(String jsonStr) {
+        dataArrayList = new ArrayList<>();
+        PersonalChatObject data = gson.fromJson(jsonStr,PersonalChatObject.class);
+        dataArrayList.add(data);
+        mView.setRecyclerView(dataArrayList.get(0).getChatData());
+
+    }
+
+    @Override
+    public void sendMessage(String message, long time, String documentPath) {
+        if (dataArrayList == null){
+            PersonalChatData data = new PersonalChatData();
+            ArrayList<PersonalChatData> chatArrayList = new ArrayList<>();
+            PersonalChatObject object = new PersonalChatObject();
+            data.setEmail(mView.getEmail());
+            data.setMessage(message);
+            data.setTime(time);
+            chatArrayList.add(data);
+            object.setChatData(chatArrayList);
+            String jsonStr = gson.toJson(object);
+            mView.setChatDataToFireStore(jsonStr);
+        }else {
+            PersonalChatData data = new PersonalChatData();
+            data.setEmail(mView.getEmail());
+            data.setMessage(message);
+            data.setTime(time);
+            dataArrayList.get(0).getChatData().add(data);
+            String jsonStr = gson.toJson(dataArrayList.get(0));
+            mView.setChatDataToFireStore(jsonStr);
+        }
+
+
     }
 }
