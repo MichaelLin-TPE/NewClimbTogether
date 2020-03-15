@@ -57,8 +57,8 @@ public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ShareArticleDTO data = dataArrayList.get(position);
-        holder.tvName.setText(data.getDiaplayName());
-        holder.tvContentName.setText(data.getDiaplayName());
+        holder.tvName.setText(data.getDisplayName());
+        holder.tvContentName.setText(data.getDisplayName());
         holder.tvContent.setText(data.getContent());
 
         if (data.getEmail().equals(userEmail)){

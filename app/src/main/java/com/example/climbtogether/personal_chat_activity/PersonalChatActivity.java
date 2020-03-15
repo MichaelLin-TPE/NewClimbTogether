@@ -75,6 +75,9 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     private MyFirbaseMessagingService service;
 
+    private static final String IS_UPDATE = "is_chat_update";
+
+    private static final String UPDATE = "update";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -267,7 +270,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                                                     chatArrayList.add(data);
                                                 }
                                                 int firstSize = chatArrayList.size();
-                                                if (firstSize == secondSize || secondSize == 0) {
+                                                if (firstSize == secondSize) {
                                                     Log.i("Michael", "資料數量相同");
                                                     secondSize = firstSize;
                                                 } else {
@@ -325,6 +328,19 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                                 }
 
 
+                            }
+                        }
+                    });
+            Map<String ,Object> chatMap = new HashMap<>();
+            chatMap.put("is_update",true);
+            firestore.collection(IS_UPDATE)
+                    .document(UPDATE)
+                    .set(chatMap)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                Log.i("Michael","傳送需要更新成功");
                             }
                         }
                     });

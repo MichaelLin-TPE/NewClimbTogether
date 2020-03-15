@@ -47,6 +47,8 @@ import com.google.firebase.storage.StorageReference;
 import com.nostra13.universalimageloader.utils.L;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class PersonalChatFragment extends Fragment implements PersonalFragmentVu {
@@ -81,6 +83,10 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     private static final String FRIEND = "friend";
 
+    private static final String IS_UPDATE = "is_chat_update";
+
+    private static final String UPDATE = "update";
+
     private int searchCount = 0,searchCountOnResume = 0;
 
     private ArrayList<PersonalChatDTO> chatDataArrayList;
@@ -95,7 +101,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     private DataBaseApi dataBaseApi;
 
-    private boolean isFirstSearchData;
+    private boolean isFirstSearchData,isConnecting;
 
     public static PersonalChatFragment newInstance() {
         PersonalChatFragment fragment = new PersonalChatFragment();
@@ -294,7 +300,66 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
     @Override
     public void continueSearchData() {
         if (user != null){
-            searchData();
+            isConnecting = true;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    do {
+                        try{
+                            Thread.sleep(2000);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                        if (isConnecting){
+                            firestore.collection(IS_UPDATE)
+                                    .document(UPDATE)
+                                    .get()
+                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                            if (task.isSuccessful() && task.getResult() != null){
+                                                boolean isUpdate = (boolean)task.getResult().get("is_update");
+                                                if (isUpdate){
+                                                    Log.i("Michael","更新資料");
+                                                    setNotUpdate();
+                                                    searchData();
+
+                                                }else {
+                                                    Log.i("Michael","不更新資料");
+                                                }
+                                            }
+                                        }
+                                    });
+                        }else {
+                            break;
+                        }
+                    }while (true);
+
+                }
+            }).start();
+        }
+    }
+
+    private void setNotUpdate() {
+        if (getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Map<String,Object> map = new HashMap<>();
+                    map.put("is_update",false);
+                    firestore.collection(IS_UPDATE)
+                            .document(UPDATE)
+                            .set(map)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+                                        Log.i("Michael","已更改不更新");
+                                    }
+                                }
+                            });
+                }
+            });
         }
     }
 
@@ -500,8 +565,6 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                 isFirstSearchData = true;
                 searchData();
             }
-
-
         }else {
             chatDataArrayList = new ArrayList<>();
             if (adapter != null){
@@ -519,6 +582,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
     public void onPause() {
         super.onPause();
         Log.i("Michael","chat onPause");
+        isConnecting = false;
         if (adapter != null){
             adapter = new PersonalFragmentAdapter(context);
             adapter.setData(new ArrayList<PersonalChatDTO>());

@@ -1,9 +1,11 @@
 package com.example.climbtogether.share_activity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ShareArticleDTO {
-    private String diaplayName;
+public class ShareArticleDTO implements Serializable {
+
+    private String displayName;
 
     private String email;
 
@@ -54,12 +56,12 @@ public class ShareArticleDTO {
         this.replyArray = replyArray;
     }
 
-    public String getDiaplayName() {
-        return diaplayName;
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public void setDiaplayName(String diaplayName) {
-        this.diaplayName = diaplayName;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getEmail() {

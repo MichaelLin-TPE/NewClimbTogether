@@ -1,5 +1,6 @@
 package com.example.climbtogether.share_activity;
 
+import com.example.climbtogether.share_activity.share_json.ShareArticleJson;
 import com.example.climbtogether.tool.UserDataManager;
 
 import java.util.ArrayList;
@@ -11,23 +12,19 @@ public interface ShareActivityPresenter {
 
     void onShareButtonClick(UserDataManager userDataManager, String content, ArrayList<byte[]> photoBytesArray);
 
-    void onCatchSelectPhotoUrl(ArrayList<String> downloadUrlArray,String content);
-
     void onShowSuccessShareArticle();
-
-    void onCatchAllData(ArrayList<ShareArticleDTO> shareArray, ArrayList<LikeMemberDTO> listMemberArray);
 
     void onShowProgress();
 
     void onCloseProgress();
 
-    void onReplyButtonClick(ShareArticleDTO shareArticleDTO);
+    void onReplyButtonClick(ShareArticleJson shareArticleDTO);
 
-    void onButtonSendReplyClick(ArrayList<ReplyDTO> replyArray, String content, ShareArticleDTO shareArticleDTO);
+    void onButtonSendReplyClick(ArrayList<ReplyDTO> replyArray, String content, ShareArticleJson shareArticleDTO);
 
-    void onUserPhotoClickListener(ShareArticleDTO data);
+    void onUserPhotoClickListener(ShareArticleJson data);
 
-    void onShowUserDialog(ShareArticleDTO data, boolean isInvite, boolean isFriend);
+    void onShowUserDialog(ShareArticleJson data, boolean isInvite, boolean isFriend);
 
     void onSetDialogViewChange();
 
@@ -35,7 +32,11 @@ public interface ShareActivityPresenter {
 
     void onAddFriendButtonClickListener(String strangerEmail, String userEmail);
 
-    void onSendMessageClickListener(ShareArticleDTO data);
+    void onSendMessageClickListener(ShareArticleJson data);
 
-    void onIsFriend(ShareArticleDTO data,boolean isFriendSend);
+    void onIsFriend(ShareArticleJson data, boolean isFriendSend);
+
+    void onCatchAllJson(ArrayList<String> jsonStrArray);
+
+    void onCatchallPhotoUrl(UserDataManager userDataManager,String content,ArrayList<String> photoUrlArray);
 }

@@ -1,5 +1,6 @@
 package com.example.climbtogether.share_activity;
 
+import com.example.climbtogether.share_activity.share_json.ShareArticleJson;
 import com.example.climbtogether.tool.UserDataManager;
 
 import java.util.ArrayList;
@@ -11,21 +12,15 @@ public interface ShareActivityVu {
 
     void showErrorMessage(String message);
 
-    void shareArticle(UserDataManager userDataManager, String content, ArrayList<byte[]> photoBytesArray);
-
-    void createArticle(ArrayList<String> downloadUrlArray, String content);
-
-    void setRecyclerView(ArrayList<ShareArticleDTO> shareArray, ArrayList<LikeMemberDTO> listMemberArray);
-
     void showProgress(boolean isShow);
 
-    void showReplayDialog(ShareArticleDTO shareArticleDTO);
+    void showReplayDialog(ShareArticleJson shareArticleDTO);
 
-    void sendReply(String content, ArrayList<ReplyDTO> replyArray, ShareArticleDTO shareArticleDTO);
+    void sendReply(String content, ArrayList<ReplyDTO> replyArray, ShareArticleJson shareArticleDTO);
 
-    void searchForFriendship(ShareArticleDTO data);
+    void searchForFriendship(ShareArticleJson data);
 
-    void showUserDialog(ShareArticleDTO data, boolean isInvite, boolean isFriend);
+    void showUserDialog(ShareArticleJson data, boolean isInvite, boolean isFriend);
 
     void showUserDialog();
 
@@ -33,9 +28,17 @@ public interface ShareActivityVu {
 
     void sendInviteToStranger(String strangerEmail, String userEmail);
 
-    void checkFriendship(ShareArticleDTO data);
+    void checkFriendship(ShareArticleJson data);
 
-    void intentToPersonalChatActivity(ShareArticleDTO data);
+    void intentToPersonalChatActivity(ShareArticleJson data);
 
-    void showNoticeDialog(ShareArticleDTO data);
+    void showNoticeDialog(ShareArticleJson data);
+
+    void setNewRecyclerView(ArrayList<ShareArticleJson> dataArrayList);
+
+    void shareArticleJson(String jsonStr, String content);
+
+    void showProgressMessage(String message);
+
+    void uploadPhoto(UserDataManager userDataManager, String content, ArrayList<byte[]> photoBytesArray);
 }
