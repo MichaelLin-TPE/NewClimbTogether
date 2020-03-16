@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.example.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
 import com.example.climbtogether.personal_chat_activity.chat_room_object.PersonalChatObject;
+import com.example.climbtogether.personal_chat_activity.chat_room_object.UserOneDataDTO;
+import com.example.climbtogether.personal_chat_activity.chat_room_object.UserTwoDataDTO;
 import com.example.climbtogether.personal_chat_activity.fcm_object.FcmData;
 import com.example.climbtogether.personal_chat_activity.fcm_object.FcmNotification;
 import com.example.climbtogether.personal_chat_activity.fcm_object.FcmObject;
@@ -97,17 +99,27 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
     }
 
     @Override
-    public void sendMessage(String message, long time, String testPath, String photoUrl, String displayName) {
+    public void sendMessage(String message, long time, String path, String userPhotoUrl, String userDisplayName, String friendEmail, String friendDisplayName, String friendPhotoUrl) {
         if (dataArrayList == null){
             PersonalChatData data = new PersonalChatData();
             ArrayList<PersonalChatData> chatArrayList = new ArrayList<>();
             PersonalChatObject object = new PersonalChatObject();
+            UserOneDataDTO user1 = new UserOneDataDTO();
+            UserTwoDataDTO user2 = new UserTwoDataDTO();
+            user1.setDisplayNmae(userDisplayName);
+            user1.setEmai(mView.getEmail());
+            user1.setPhotoUrl(userPhotoUrl);
+            user2.setDisplayNmae(friendDisplayName);
+            user2.setEmai(friendEmail);
+            user2.setPhotoUrl(friendPhotoUrl);
             data.setEmail(mView.getEmail());
             data.setMessage(message);
             data.setTime(time);
-            data.setPhotoUrl(photoUrl);
-            data.setDisplayName(displayName);
+            data.setPhotoUrl(friendPhotoUrl);
+            data.setDisplayName(userDisplayName);
             chatArrayList.add(data);
+            object.setUserOneDataDTO(user1);
+            object.setUserTwoDataDTO(user2);
             object.setChatData(chatArrayList);
             String jsonStr = gson.toJson(object);
             mView.setChatDataToFireStore(jsonStr);
@@ -116,8 +128,8 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
             data.setEmail(mView.getEmail());
             data.setMessage(message);
             data.setTime(time);
-            data.setPhotoUrl(photoUrl);
-            data.setDisplayName(displayName);
+            data.setPhotoUrl(friendPhotoUrl);
+            data.setDisplayName(userDisplayName);
             dataArrayList.get(0).getChatData().add(data);
             String jsonStr = gson.toJson(dataArrayList.get(0));
             mView.setChatDataToFireStore(jsonStr);

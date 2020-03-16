@@ -26,4 +26,6 @@ public interface PersonalFragmentVu {
     void continueSearchData();
 
     void updateView(ArrayList<PersonalChatDTO> allChatData);
+
+    String getUserEmail();
 }

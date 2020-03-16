@@ -407,7 +407,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     private void catchDocument(String message, long time) {
         if (testPath != null){
-            presenter.sendMessage(message,time,testPath,userDataManager.getPhotoUrl(),userDataManager.getDisplayName());
+            presenter.sendMessage(message,time,testPath,userDataManager.getPhotoUrl(),userDataManager.getDisplayName(),friendEmail,displayName,friendPhotoUrl);
         }
     }
 }

@@ -204,45 +204,13 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                                     }
                                 }
                                 friendCount = 0;
-                                catchFriendData();
+                                jsonArray = new ArrayList<>();
+                                catchJson();
                             }
                         }
                     });
         } else {
             presenter.onNoUserEvent();
-        }
-    }
-
-    private void catchFriendData() {
-        if (friendCount < friendsArrayList.size() && user.getEmail() != null) {
-            firestore.collection(FRIENDSHIP)
-                    .document(user.getEmail())
-                    .collection(FRIEND)
-                    .document(friendsArrayList.get(friendCount))
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                DocumentSnapshot snapshot = task.getResult();
-                                FriendData data = new FriendData();
-                                data.setdisplayName((String) snapshot.get("displayName"));
-                                data.setEmail(friendsArrayList.get(friendCount));
-                                data.setPhotoUrl((String) snapshot.get("photoUrl"));
-                                friendDataArray.add(data);
-                                friendCount++;
-                                catchFriendData();
-                            } else {
-                                Log.i("Michael", "沒房間");
-                            }
-                        }
-
-                    });
-        } else {
-            friendCount = 0;
-            jsonArray = new ArrayList<>();
-            catchJson();
-
         }
     }
 
@@ -257,8 +225,11 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.isSuccessful() && task.getResult() != null) {
                                 DocumentSnapshot snapshot = task.getResult();
-                                jsonArray.add((String) snapshot.get("json"));
-                                Log.i("Michael", "json : " + snapshot.get("json"));
+                                String jsonStr = (String) snapshot.get("json");
+                                if (jsonStr != null && !jsonStr.isEmpty()){
+                                    jsonArray.add((String) snapshot.get("json"));
+                                    Log.i("Michael", "json : " + snapshot.get("json"));
+                                }
                                 friendCount++;
                                 catchJson();
                             }
@@ -267,7 +238,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
         } else {
             friendCount = 0;
-            presenter.onCatchallData(jsonArray, friendDataArray);
+            presenter.onCatchallData(jsonArray);
         }
     }
 
@@ -442,6 +413,11 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                 }
             });
         }
+    }
+
+    @Override
+    public String getUserEmail() {
+        return user.getEmail();
     }
 
     private void deleteMessage(String documentPath) {

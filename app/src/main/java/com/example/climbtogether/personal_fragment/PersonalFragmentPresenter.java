@@ -21,5 +21,5 @@ public interface PersonalFragmentPresenter {
 
     void onCatchChatDataSuccessful(ArrayList<PersonalChatDTO> allChatData);
 
-    void onCatchallData(ArrayList<String> jsonArray,ArrayList<FriendData> friendDataArray);
+    void onCatchallData(ArrayList<String> jsonArray);
 }
