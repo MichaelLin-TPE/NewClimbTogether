@@ -69,35 +69,41 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
 
         Log.i("Michael","對話長度 : "+dataArrayList.size());
         ArrayList<PersonalChatDTO> chatArray = new ArrayList<>();
-        for (int i = 0 ; i < dataArrayList.size() ; i ++){
-            int chatIndex = dataArrayList.get(i).getChatData().size() -1 ;
-            PersonalChatDTO data = new PersonalChatDTO();
-            if (mView.getUserEmail().equals(dataArrayList.get(i).getUserOneDataDTO().getEmai())){
-                if (!mView.getUserEmail().equals(dataArrayList.get(i).getUserTwoDataDTO().getEmai())){
-                    data.setDisplayName(dataArrayList.get(i).getUserTwoDataDTO().getDisplayNmae());
-                    data.setPhotoUrl(dataArrayList.get(i).getUserTwoDataDTO().getPhotoUrl());
-                    data.setFriendEmail(dataArrayList.get(i).getUserTwoDataDTO().getEmai());
-                    data.setMessage(dataArrayList.get(i).getChatData().get(chatIndex).getMessage());
-                    data.setTime(dataArrayList.get(i).getChatData().get(chatIndex).getTime());
-                    chatArray.add(data);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0 ; i < dataArrayList.size() ; i ++){
+                    int chatIndex = dataArrayList.get(i).getChatData().size() -1 ;
+                    PersonalChatDTO data = new PersonalChatDTO();
+                    if (mView.getUserEmail().equals(dataArrayList.get(i).getUserOneDataDTO().getEmai())){
+                        if (!mView.getUserEmail().equals(dataArrayList.get(i).getUserTwoDataDTO().getEmai())){
+                            data.setDisplayName(dataArrayList.get(i).getUserTwoDataDTO().getDisplayNmae());
+                            data.setPhotoUrl(dataArrayList.get(i).getUserTwoDataDTO().getPhotoUrl());
+                            data.setFriendEmail(dataArrayList.get(i).getUserTwoDataDTO().getEmai());
+                            data.setMessage(dataArrayList.get(i).getChatData().get(chatIndex).getMessage());
+                            data.setTime(dataArrayList.get(i).getChatData().get(chatIndex).getTime());
+                            chatArray.add(data);
+                        }
+                    }else if (mView.getUserEmail().equals(dataArrayList.get(i).getUserTwoDataDTO().getEmai())){
+                        if (!mView.getUserEmail().equals(dataArrayList.get(i).getUserOneDataDTO().getEmai())){
+                            data.setDisplayName(dataArrayList.get(i).getUserOneDataDTO().getDisplayNmae());
+                            data.setPhotoUrl(dataArrayList.get(i).getUserOneDataDTO().getPhotoUrl());
+                            data.setFriendEmail(dataArrayList.get(i).getUserOneDataDTO().getEmai());
+                            data.setMessage(dataArrayList.get(i).getChatData().get(chatIndex).getMessage());
+                            data.setTime(dataArrayList.get(i).getChatData().get(chatIndex).getTime());
+                            chatArray.add(data);
+                        }
+                    }
                 }
-            }else if (mView.getUserEmail().equals(dataArrayList.get(i).getUserTwoDataDTO().getEmai())){
-                if (!mView.getUserEmail().equals(dataArrayList.get(i).getUserOneDataDTO().getEmai())){
-                    data.setDisplayName(dataArrayList.get(i).getUserOneDataDTO().getDisplayNmae());
-                    data.setPhotoUrl(dataArrayList.get(i).getUserOneDataDTO().getPhotoUrl());
-                    data.setFriendEmail(dataArrayList.get(i).getUserOneDataDTO().getEmai());
-                    data.setMessage(dataArrayList.get(i).getChatData().get(chatIndex).getMessage());
-                    data.setTime(dataArrayList.get(i).getChatData().get(chatIndex).getTime());
-                    chatArray.add(data);
+                mView.showProgress(false);
+                if(chatArray.size() != 0){
+                    mView.setRecyclerView(chatArray);
+                }else {
+                    mView.showNoChatDataView(true);
                 }
             }
-        }
-        mView.showProgress(false);
-        if(chatArray.size() != 0){
-            mView.setRecyclerView(chatArray);
-        }else {
-            mView.showNoChatDataView(true);
-        }
+        }).start();
+
 
 
 

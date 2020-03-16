@@ -218,7 +218,14 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     @Override
     public void showProgressbar(boolean isShow) {
-        progressBar.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        if (getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progressBar.setVisibility(isShow ? View.VISIBLE : View.GONE);
+                }
+            });
+        }
     }
 
     @Override

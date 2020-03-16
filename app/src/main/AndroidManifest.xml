@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustResize">
-        <activity android:name=".detail_activity.DetailActivity"></activity>
+        <activity android:name=".detail_activity.DetailActivity"/>
         <activity android:name=".my_equipment_activity.MyEquipmentActivity" />
         <activity android:name=".share_activity.ShareActivity" />
         <!--
@@ -47,7 +47,8 @@
             android:name=".personal_chat_activity.PersonalChatActivity"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
         <activity android:name=".friend_manager_activity.FriendManagerActivity" /> <!-- 這是掌控KeyBoard的關鍵 -->
-        <activity android:name=".chat_activity.ChatActivity" />
+        <activity android:name=".chat_activity.ChatActivity"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden"/>
         <activity android:name=".mountain_collection_activity.MountainCollectionActivity" />
         <activity android:name=".login_activity.LoginActivity" />
         <activity android:name=".member_activity.MemberActivity" />

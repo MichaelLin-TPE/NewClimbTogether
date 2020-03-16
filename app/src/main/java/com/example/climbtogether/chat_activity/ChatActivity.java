@@ -284,6 +284,8 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
                 if (countSecond >= 22500) {
                     checkChatDataChange();
                     countSecond = 0;
+                }else {
+                    countSecond = 0;
                 }
             }
         });
@@ -607,7 +609,7 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
                                 map.put("email", user.getEmail());
                                 map.put("photo_url", "");
                                 map.put("displayName", document.get("displayName"));
-                                firestore.collection(DISCUSSION).document(listName).collection(CHAT_DATA).document()
+                                firestore.collection(DISCUSSION).document("登山即時討論區").collection(CHAT_DATA).document()
                                         .set(map)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override

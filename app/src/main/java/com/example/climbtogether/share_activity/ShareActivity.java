@@ -380,14 +380,6 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     }
 
-    private void modifyDocumentData(ShareArticleJson shareArticleDTO, long replyCount) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("reply", replyCount);
-        firestore.collection(SHARE)
-                .document(shareArticleDTO.getContent())
-                .set(map, SetOptions.merge());
-    }
-
     //先檢查好友
     @Override
     public void searchForFriendship(ShareArticleJson data) {
@@ -441,6 +433,12 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
             @Override
             public void onClick(View v) {
                 presenter.onAddFriendButtonClickListener(data.getEmail(), user.getEmail());
+            }
+        });
+        chatClickArea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onSendMessageClickListener(data);
             }
         });
         this.isFriend = false;

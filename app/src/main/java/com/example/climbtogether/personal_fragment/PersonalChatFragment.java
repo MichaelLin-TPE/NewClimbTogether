@@ -192,31 +192,46 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     @Override
     public void showProgress(boolean isShow) {
+        if (getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progressBar.setVisibility(isShow ? View.VISIBLE : View.GONE);
+                }
+            });
+        }
 
-        progressBar.setVisibility(isShow ? View.VISIBLE : View.GONE);
 
     }
 
     @Override
-    public void setRecyclerView(ArrayList<PersonalChatDTO> chatDataArrayList) {
-        this.chatDataArrayList = chatDataArrayList;
-        adapter = new PersonalFragmentAdapter(context);
-        adapter.setData(chatDataArrayList);
-        recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
-        recyclerView.setAdapter(adapter);
-        adapter.setOnChatItemClickListener(new PersonalFragmentAdapter.OnChatItemClickListener() {
-            @Override
-            public void onClick(String displayName, String friendEmail, String photoUrl) {
-                presenter.onItemClickListener(displayName, friendEmail, photoUrl);
-            }
-        });
-        adapter.setOnChatItemLongClickListener(new PersonalFragmentAdapter.OnChatItemLongClickListener() {
-            @Override
-            public void onClick(String documentPath, int itemPosition1) {
-                itemPosition = itemPosition1;
-                presenter.onShowDeleteMessageConfirmDialog(documentPath);
-            }
-        });
+    public void setRecyclerView(ArrayList<PersonalChatDTO> chatDataArray) {
+        if (getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    chatDataArrayList = chatDataArray;
+                    adapter = new PersonalFragmentAdapter(context);
+                    adapter.setData(chatDataArrayList);
+                    recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
+                    recyclerView.setAdapter(adapter);
+                    adapter.setOnChatItemClickListener(new PersonalFragmentAdapter.OnChatItemClickListener() {
+                        @Override
+                        public void onClick(String displayName, String friendEmail, String photoUrl) {
+                            presenter.onItemClickListener(displayName, friendEmail, photoUrl);
+                        }
+                    });
+                    adapter.setOnChatItemLongClickListener(new PersonalFragmentAdapter.OnChatItemLongClickListener() {
+                        @Override
+                        public void onClick(String documentPath, int itemPosition1) {
+                            itemPosition = itemPosition1;
+                            presenter.onShowDeleteMessageConfirmDialog(documentPath);
+                        }
+                    });
+                }
+            });
+        }
+
     }
 
     @Override
@@ -231,9 +246,16 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     @Override
     public void showNoChatDataView(boolean isShow) {
-        ivLogo.setVisibility(isShow ? View.VISIBLE : View.GONE);
-        tvNotice.setVisibility(isShow ? View.VISIBLE : View.GONE);
-        tvNotice.setText(isShow ? getString(R.string.no_chat_data) : "");
+        if (getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ivLogo.setVisibility(isShow ? View.VISIBLE : View.GONE);
+                    tvNotice.setVisibility(isShow ? View.VISIBLE : View.GONE);
+                    tvNotice.setText(isShow ? getString(R.string.no_chat_data) : "");
+                }
+            });
+        }
     }
 
     @Override
