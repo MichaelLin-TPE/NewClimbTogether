@@ -11,8 +11,6 @@ public interface PersonalFragmentVu {
 
     void showProgress(boolean isShow);
 
-    void searchForChatData(String currentEmail, ArrayList<String> friendsArrayList);
-
     void setRecyclerView(ArrayList<PersonalChatDTO> chatDataArrayList);
 
     void intentToPersonalChatActivity(String displayName, String friendEmail, String photoUrl);
@@ -22,10 +20,6 @@ public interface PersonalFragmentVu {
     void showDeleteConfirmDialog(String documentPath);
 
     Context getVuContext();
-
-    void continueSearchData();
-
-    void updateView(ArrayList<PersonalChatDTO> allChatData);
 
     String getUserEmail();
 }

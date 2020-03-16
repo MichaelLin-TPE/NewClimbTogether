@@ -7,19 +7,12 @@ public interface PersonalFragmentPresenter {
 
     void onLoginClickListener();
 
-    void onSearchUserChatData(String email, ArrayList<String> friendsArrayList);
 
     void onShowProgress(boolean isShow);
 
-    void onCatchAllDataSucessful(ArrayList<PersonalChatDTO> chatDataArrayList);
-
     void onItemClickListener(String displayName, String friendEmail, String photoUrl);
 
-    void onNoMessageEvent();
-
     void onShowDeleteMessageConfirmDialog(String documentPath);
-
-    void onCatchChatDataSuccessful(ArrayList<PersonalChatDTO> allChatData);
 
     void onCatchallData(ArrayList<String> jsonArray);
 }
