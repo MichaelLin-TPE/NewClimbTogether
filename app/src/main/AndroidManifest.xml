@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.climbtogether">
+    package="com.hiking.climbtogether">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -16,9 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustResize">
-        <activity android:name=".detail_activity.DetailActivity"/>
-        <activity android:name=".my_equipment_activity.MyEquipmentActivity" />
-        <activity android:name=".share_activity.ShareActivity" />
+        <activity android:name="com.hiking.climbtogether.detail_activity.DetailActivity"/>
+        <activity android:name="com.hiking.climbtogether.my_equipment_activity.MyEquipmentActivity" />
+        <activity android:name="com.hiking.climbtogether.share_activity.ShareActivity" />
         <!--
          Set custom default icon. This is used when no icon is set for incoming notification messages.
              See README(https://goo.gl/l4GJaQ) for more.
@@ -44,16 +44,16 @@
             android:value="false" />
 
         <activity
-            android:name=".personal_chat_activity.PersonalChatActivity"
+            android:name="com.hiking.climbtogether.personal_chat_activity.PersonalChatActivity"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
-        <activity android:name=".friend_manager_activity.FriendManagerActivity" /> <!-- 這是掌控KeyBoard的關鍵 -->
-        <activity android:name=".chat_activity.ChatActivity"
+        <activity android:name="com.hiking.climbtogether.friend_manager_activity.FriendManagerActivity" /> <!-- 這是掌控KeyBoard的關鍵 -->
+        <activity android:name="com.hiking.climbtogether.chat_activity.ChatActivity"
             android:windowSoftInputMode="adjustPan|stateAlwaysHidden"/>
-        <activity android:name=".mountain_collection_activity.MountainCollectionActivity" />
-        <activity android:name=".login_activity.LoginActivity" />
-        <activity android:name=".member_activity.MemberActivity" />
-        <activity android:name=".home_activity.HomePageActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name="com.hiking.climbtogether.mountain_collection_activity.MountainCollectionActivity" />
+        <activity android:name="com.hiking.climbtogether.login_activity.LoginActivity" />
+        <activity android:name="com.hiking.climbtogether.member_activity.MemberActivity" />
+        <activity android:name="com.hiking.climbtogether.home_activity.HomePageActivity" />
+        <activity android:name="com.hiking.climbtogether.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
@@ -65,7 +65,7 @@
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" /> <!-- optional (needed if default theme has no action bar) -->
         <service
-            android:name=".MyFirbaseMessagingService"
+            android:name="com.hiking.climbtogether.MyFirbaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
