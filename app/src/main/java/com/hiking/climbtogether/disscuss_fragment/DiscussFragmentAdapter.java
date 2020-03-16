@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hiking.climbtogether.R;
@@ -45,8 +46,10 @@ public class DiscussFragmentAdapter extends RecyclerView.Adapter<DiscussFragment
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
 
         if (position == 0){
+            holder.clickArea.setBackground(ContextCompat.getDrawable(context,R.drawable.discuss_selector2));
             holder.ivIcon.setImageResource(R.drawable.conversation);
         }else {
+            holder.clickArea.setBackground(ContextCompat.getDrawable(context,R.drawable.discuss_selector));
             holder.ivIcon.setImageResource(R.drawable.notebook);
         }
 

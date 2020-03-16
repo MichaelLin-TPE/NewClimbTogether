@@ -36,9 +36,9 @@ public class MemberActivityPresenterImpl implements MemberActivityPresenter {
     }
 
     @Override
-    public void onChangeView(boolean isShow) {
+    public void onChangeView(boolean isShow, String displayName) {
         mView.downloadUserPhoto();
-        mView.changeView(isShow);
+        mView.changeView(isShow,displayName);
     }
 
     @Override

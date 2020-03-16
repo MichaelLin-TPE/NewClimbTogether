@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,13 +79,17 @@ public class DiscussFragment extends Fragment implements DiscussFragmentVu {
     @Override
     public void onStart() {
         super.onStart();
+        Log.i("Michael","DiscussFragment onStart");
         checkLoginStatus();
     }
+
+
 
     @Override
     public void onResume() {
         super.onResume();
         presenter.onClearView();
+        Log.i("Michael","DiscussFragment onStart");
         if (user != null){
             presenter.onPrepareData();
         }else {

@@ -7,9 +7,6 @@
         android:left="10dp"
         android:right="10dp"
         android:bottom="10dp"/>
-
-    <!--邊框-->
-    <stroke android:width="2dip" android:color="#49AA49" />
     <!--漸層顏色-->
     <gradient android:angle="-90" android:startColor="#D8D6D6" android:endColor="#D8D6D6"  />
 </shape>

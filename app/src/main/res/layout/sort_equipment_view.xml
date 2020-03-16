@@ -12,15 +12,16 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:orientation="vertical"
+        android:gravity="center"
         android:background="@color/item_green"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="35dp">
 
         <TextView
             android:id="@+id/sort_tv_title"
             tools:text="尚未準備"
             android:layout_marginStart="5dp"
-            android:textSize="@dimen/big_text_size"
+            android:textSize="@dimen/member_item_text_title_size"
             android:textColor="@color/colorPrimaryDark"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>

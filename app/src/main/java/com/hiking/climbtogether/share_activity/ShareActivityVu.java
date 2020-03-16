@@ -36,7 +36,7 @@ public interface ShareActivityVu {
 
     void setNewRecyclerView(ArrayList<ShareArticleJson> dataArrayList);
 
-    void shareArticleJson(String jsonStr, String content);
+    void shareArticleJson(String jsonStr, String content, long currentTime);
 
     void showProgressMessage(String message);
 

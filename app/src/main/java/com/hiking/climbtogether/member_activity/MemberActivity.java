@@ -89,6 +89,8 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
     private UserDataManager userDataManager;
 
+    private String displayName;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -124,7 +126,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
     private void updateUI(FirebaseUser currentUser) {
         if (currentUser != null) {
-            presenter.onChangeView(false);
+            presenter.onChangeView(false,displayName);
             if (currentUser != null && currentUser.getEmail() != null){
                 firestore.collection("users")
                         .document(currentUser.getEmail())
@@ -135,6 +137,8 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
                                 if (task.isSuccessful() && task.getResult() != null){
                                     DocumentSnapshot snapshot = task.getResult();
                                     userDataManager.saveUserData((String)snapshot.get("email"),(String)snapshot.get("displayName"),(String)snapshot.get("photoUrl"));
+                                    displayName = (String)snapshot.get("displayName");
+                                    presenter.onChangeView(false,displayName);
                                 }
                             }
                         });
@@ -157,7 +161,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
             }
 
         } else {
-            presenter.onChangeView(true);
+            presenter.onChangeView(true, displayName);
         }
     }
 
@@ -171,13 +175,12 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     }
 
     @Override
-    public void changeView(boolean isShow) {
+    public void changeView(boolean isShow, String displayName) {
         tvNotice.setVisibility(isShow ? View.VISIBLE : View.GONE);
         btnLogin.setVisibility(isShow ? View.VISIBLE : View.GONE);
         ivUserIcon.setVisibility(isShow ? View.GONE : View.VISIBLE);
         tvEmail.setVisibility(isShow ? View.GONE : View.VISIBLE);
-        tvEmail.setText(isShow ? "" : String.format(Locale.getDefault(), "目前登入 : %s", currentUser.getEmail()));
-
+        tvEmail.setText(isShow ? "" : String.format(Locale.getDefault(), "目前登入 : %s", displayName));
         if (signOut != null) {
             signOut.setVisible(!isShow);
         }
@@ -216,7 +219,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
             signInClient.revokeAccess().addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    presenter.onChangeView(true);
+                    presenter.onChangeView(true, displayName);
 
                 }
             });
@@ -357,48 +360,6 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
                 Exception error = result.getError();
             }
         }
-
-//        if (requestCode == IMAGE_REQUEST_CODE) {
-//            Bitmap bitmap;
-//            try {
-//                Log.i("Michael", "壓縮照片");
-//                if (data != null) {
-//                    Uri uri = data.getData();
-//                    ContentResolver or = this.getContentResolver();
-//                    if (uri != null) {
-//                        bitmap = BitmapFactory.decodeStream(or.openInputStream(uri));
-//                        Log.i("Michael", "取得的照片 : " + bitmap);
-//                        //壓縮照片
-//                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                        int quality = 10;
-//                        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos);
-//                        byte[] bytes = baos.toByteArray();
-//                        bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-//                        Log.i("Michael", "壓縮後的圖片大小 : " + (bitmap.getByteCount() / 1024 / 1024) + " , 寬度 : " + bitmap.getWidth()
-//                                + " , 高度為 : " + bitmap.getHeight() + " , bytes 長度 : "
-//                                + (bytes.length / 1024) + " kb " + "quality = " + quality);
-//                        //Uri 轉 Bitmap
-////                            uri = Uri.parse(MediaStore.Images.Media.insertImage(getContentResolver(),bitmap,null,null));
-//                        String message = getString(R.string.please_wait);
-//
-//                        presenter.onShowProgressToast(message);
-//
-//                        uploadPhotoToStorage(bytes);
-//
-//
-//                    } else {
-//                        Log.i("Michael", "photo uri = null");
-//                    }
-//                } else {
-//                    Log.i("Michael", " data = null");
-//                }
-//
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                Log.i("Michael", "壓縮照片錯誤");
-//            }
-//        }
     }
 
     private void uploadPhotoToStorage(final byte[] bytes) {

@@ -29,6 +29,7 @@ public class DiscussFragmentPresenterImpl implements DiscussFragmentPresenter {
 
     @Override
     public void onClearView() {
+        mView.setViewMaintain(false);
         mView.clearView();
     }
 

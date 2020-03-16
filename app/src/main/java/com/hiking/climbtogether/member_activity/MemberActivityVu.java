@@ -9,7 +9,7 @@ public interface MemberActivityVu {
 
     void setRecyclerView(ArrayList<String> btnList);
 
-    void changeView(boolean isShow);
+    void changeView(boolean isShow, String displayName);
 
     void intentToLoginActivity();
 

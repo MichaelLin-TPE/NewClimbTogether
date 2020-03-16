@@ -149,8 +149,8 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
         json.setClick_member(new ArrayList<ShareClickLikeObject>());
         json.setDisplayName(userDataManager.getDisplayName());
         String jsonStr = gson.toJson(json);
-
-        mView.shareArticleJson(jsonStr,json.getContent());
+        long currentTime =  System.currentTimeMillis();
+        mView.shareArticleJson(jsonStr,json.getContent(),currentTime);
 
 
         Log.i("Michael","json 格式 : "+jsonStr);

@@ -26,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.Query;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.personal_chat_activity.PersonalChatActivity;
 import com.hiking.climbtogether.share_activity.share_json.ShareArticleJson;
@@ -141,6 +142,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
     private void searchData() {
         presenter.onShowProgress();
         firestore.collection(SHARE)
+                .orderBy("time", Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -568,9 +570,10 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
     }
 
     @Override
-    public void shareArticleJson(String jsonStr, String content) {
+    public void shareArticleJson(String jsonStr, String content, long currentTime) {
         Map<String,Object> map = new HashMap<>();
         map.put("json",jsonStr);
+        map.put("time",currentTime);
         firestore.collection(SHARE)
                 .document(content)
                 .set(map)

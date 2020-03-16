@@ -2,9 +2,11 @@ package com.hiking.climbtogether.my_equipment_activity.view;
 
 import android.content.Context;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +22,8 @@ public class PreparedViewHolder extends RecyclerView.ViewHolder {
 
     private RecyclerView recyclerView;
 
+    private LinearLayout linearLayout;
+
     private SortPreparedAdapter.OnSortPreparedItemClickListener listener;
 
     public void setOnSortItemClickListener(SortPreparedAdapter.OnSortPreparedItemClickListener listener){
@@ -33,11 +37,13 @@ public class PreparedViewHolder extends RecyclerView.ViewHolder {
         this.context = context;
         tvTitle = itemView.findViewById(R.id.sort_tv_title);
         recyclerView = itemView.findViewById(R.id.sort_recycler_view);
+        linearLayout = itemView.findViewById(R.id.sort_linear);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.addItemDecoration(new DividerItemDecoration(context,DividerItemDecoration.VERTICAL));
     }
 
     public void setData(ArrayList<EquipmentListDTO> preparedArrayList) {
+        linearLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.speech_bubble_user));
         tvTitle.setText(context.getString(R.string.prepared));
         SortAdapter adapter = new SortAdapter(context,preparedArrayList);
         recyclerView.setAdapter(adapter);
