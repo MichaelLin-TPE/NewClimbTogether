@@ -47,10 +47,10 @@ public class DiscussFragmentAdapter extends RecyclerView.Adapter<DiscussFragment
 
         if (position == 0){
             holder.clickArea.setBackground(ContextCompat.getDrawable(context,R.drawable.discuss_selector2));
-            holder.ivIcon.setImageResource(R.drawable.conversation);
+            holder.ivIcon.setImageResource(R.drawable.chat);
         }else {
             holder.clickArea.setBackground(ContextCompat.getDrawable(context,R.drawable.discuss_selector));
-            holder.ivIcon.setImageResource(R.drawable.notebook);
+            holder.ivIcon.setImageResource(R.drawable.hiking);
         }
 
         holder.tvTitle.setText(listArrayList.get(position));

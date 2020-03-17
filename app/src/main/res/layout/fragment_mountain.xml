@@ -134,7 +134,7 @@
         android:id="@+id/mountain_fragment_spinner"
         app:layout_constraintTop_toBottomOf="@id/mountain_fragment_notice"
         app:layout_constraintRight_toLeftOf="@id/mountain_fragment_drop_down_icon"
-        android:spinnerMode="dropdown"
+        android:spinnerMode="dialog"
         android:gravity="center"
         android:background="@null"
         android:layout_width="wrap_content"

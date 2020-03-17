@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
     <!--設定圓角，當設置的圓角半徑很大，就可變成弧形邊了-->
+    <corners android:radius="15dip" />
     <!--邊框-->
 <!--    <stroke android:width="2dip" android:color="#49AA49" />-->
     <!--漸層顏色-->

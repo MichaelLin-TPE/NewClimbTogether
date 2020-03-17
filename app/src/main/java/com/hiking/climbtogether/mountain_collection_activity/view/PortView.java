@@ -77,7 +77,7 @@ public class PortView extends ConstraintLayout {
         tvTime.setText(String.format(Locale.getDefault(), "日期 : %s", sdf.format(new Date(data.getTime()))));
         tvTitle.setText(data.getName());
         tvHeight.setText(data.getHeight());
-        clickArea.setBackground(isChangeColor ? ContextCompat.getDrawable(context, R.color.item_green) : ContextCompat.getDrawable(context,R.color.item_yellow));
+        clickArea.setBackground(isChangeColor ? ContextCompat.getDrawable(context, R.drawable.mountain_collection_green) : ContextCompat.getDrawable(context,R.drawable.mountain_collection_blue));
         clickArea.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

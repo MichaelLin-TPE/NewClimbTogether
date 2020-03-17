@@ -102,4 +102,8 @@
     <string name="seven_days">7日天氣預報</string>
     <string name="permission">權限通知</string>
     <string name="is_open_notification">是否開啟通知權限呢?</string>
+    <string name="share_to_who">你的裝備清單想分享給誰呢?</string>
+    <string name="no_friend">你目前沒有任何朋友唷...快去加別人好友吧...</string>
+    <string name="share_successful">分享成功!</string>
+    <string name="delete_notice">此為刪除整筆裝備清單(刪除後將不存在),確認是否要刪除整筆?</string>
 </resources>

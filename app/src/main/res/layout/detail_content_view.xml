@@ -20,7 +20,6 @@
 
     <TextView
         app:layout_constraintTop_toTopOf="@id/detail_content_icon"
-        app:layout_constraintBottom_toBottomOf="@id/detail_content_icon"
         app:layout_constraintLeft_toRightOf="@id/detail_content_icon"
         app:layout_constraintRight_toRightOf="parent"
         android:id="@+id/detail_content"

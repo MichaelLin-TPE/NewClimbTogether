@@ -60,12 +60,12 @@ public class SortPresenterImpl implements SortPresenter {
 
     @Override
     public void onBindViewHolder(NotPrepareViewHolder holder, int position) {
-        holder.setData(notPrepareArrayList);
+        holder.setData(notPrepareArrayList,false);
     }
 
     @Override
     public void onBindPrepareViewHolder(PreparedViewHolder holder, int position) {
-        holder.setData(preparedArrayList);
+        holder.setData(preparedArrayList,true);
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,6 +24,8 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.ViewHolder> {
 
     private OnSortItemClickListener listener;
 
+    private boolean isCheck;
+
     public void setOnSortItemClickListener(OnSortItemClickListener listener){
         this.listener = listener;
     }
@@ -40,10 +43,17 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         EquipmentListDTO data = dataArrayList.get(position);
         holder.tvTitle.setText(data.getName());
         holder.tvDescription.setText(data.getDescription());
-
+        holder.checkBox.setChecked(isCheck);
+        holder.checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onClick(data.getName(),data.getDescription(),position);
+            }
+        });
         holder.clickArea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,11 +68,17 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.ViewHolder> {
         return dataArrayList == null ? 0 : dataArrayList.size();
     }
 
+    public void setCheck(boolean isCheck) {
+        this.isCheck = isCheck;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView tvTitle,tvDescription;
         private ConstraintLayout clickArea;
+        private CheckBox checkBox;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            checkBox = itemView.findViewById(R.id.my_equipment_check_box);
             clickArea = itemView.findViewById(R.id.my_equipment_click_area);
             tvDescription = itemView.findViewById(R.id.my_equipment_item_description);
             tvTitle = itemView.findViewById(R.id.my_equipment_item_title);

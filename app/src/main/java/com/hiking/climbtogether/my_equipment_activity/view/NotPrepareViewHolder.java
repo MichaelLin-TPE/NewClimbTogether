@@ -35,9 +35,9 @@ public class NotPrepareViewHolder extends RecyclerView.ViewHolder {
         recyclerView.addItemDecoration(new DividerItemDecoration(context,DividerItemDecoration.VERTICAL));
     }
 
-    public void setData(ArrayList<EquipmentListDTO> preparedArrayList) {
+    public void setData(ArrayList<EquipmentListDTO> preparedArrayList, boolean isCheck) {
         SortAdapter adapter = new SortAdapter(context,preparedArrayList);
-
+        adapter.setCheck(isCheck);
         tvTitle.setText(context.getString(R.string.not_prepare));
         recyclerView.setAdapter(adapter);
         adapter.setOnSortItemClickListener(new SortAdapter.OnSortItemClickListener() {

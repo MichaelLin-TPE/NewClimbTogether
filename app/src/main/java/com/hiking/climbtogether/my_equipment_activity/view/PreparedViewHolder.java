@@ -42,10 +42,11 @@ public class PreparedViewHolder extends RecyclerView.ViewHolder {
         recyclerView.addItemDecoration(new DividerItemDecoration(context,DividerItemDecoration.VERTICAL));
     }
 
-    public void setData(ArrayList<EquipmentListDTO> preparedArrayList) {
-        linearLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.speech_bubble_user));
+    public void setData(ArrayList<EquipmentListDTO> preparedArrayList, boolean isCheck) {
+        linearLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.item_blue));
         tvTitle.setText(context.getString(R.string.prepared));
         SortAdapter adapter = new SortAdapter(context,preparedArrayList);
+        adapter.setCheck(isCheck);
         recyclerView.setAdapter(adapter);
         adapter.setOnSortItemClickListener(new SortAdapter.OnSortItemClickListener() {
             @Override

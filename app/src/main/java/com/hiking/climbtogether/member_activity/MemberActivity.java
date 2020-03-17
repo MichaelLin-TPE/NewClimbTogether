@@ -125,40 +125,38 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     }
 
     private void updateUI(FirebaseUser currentUser) {
-        if (currentUser != null) {
-            presenter.onChangeView(false,displayName);
-            if (currentUser != null && currentUser.getEmail() != null){
-                firestore.collection("users")
-                        .document(currentUser.getEmail())
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful() && task.getResult() != null){
-                                    DocumentSnapshot snapshot = task.getResult();
-                                    userDataManager.saveUserData((String)snapshot.get("email"),(String)snapshot.get("displayName"),(String)snapshot.get("photoUrl"));
-                                    displayName = (String)snapshot.get("displayName");
-                                    presenter.onChangeView(false,displayName);
-                                }
+        if (currentUser != null && currentUser.getEmail() != null) {
+            presenter.onChangeView(false, "");
+            firestore.collection("users")
+                    .document(currentUser.getEmail())
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                DocumentSnapshot snapshot = task.getResult();
+                                userDataManager.saveUserData((String) snapshot.get("email"), (String) snapshot.get("displayName"), (String) snapshot.get("photoUrl"));
+                                displayName = (String) snapshot.get("displayName");
+                                presenter.onChangeView(false, displayName);
                             }
-                        });
+                        }
+                    });
 
-                //申請推播TOKEN
-                FirebaseInstanceId.getInstance().getInstanceId()
-                        .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                                if (task.isSuccessful() && task.getResult() != null){
-                                    String token = task.getResult().getToken();
+            //申請推播TOKEN
+            FirebaseInstanceId.getInstance().getInstanceId()
+                    .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                String token = task.getResult().getToken();
 
-                                    Log.i("Michael","new Token : "+token);
-                                    userDataManager.saveNotificationToken(token);
-                                    updateUserToken(token);
-                                }
-
+                                Log.i("Michael", "new Token : " + token);
+                                userDataManager.saveNotificationToken(token);
+                                updateUserToken(token);
                             }
-                        });
-            }
+
+                        }
+                    });
 
         } else {
             presenter.onChangeView(true, displayName);
@@ -166,9 +164,9 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     }
 
     private void updateUserToken(String token) {
-        if (currentUser != null && currentUser.getEmail() != null){
-            Map<String,Object> map = new HashMap<>();
-            map.put("token",token);
+        if (currentUser != null && currentUser.getEmail() != null) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("token", token);
             firestore.collection("users").document(currentUser.getEmail())
                     .set(map, SetOptions.merge());
         }
@@ -229,12 +227,12 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     }
 
     private void removeUserToken() {
-        if (currentUser != null && currentUser.getEmail() != null){
-            Map<String,Object> map = new HashMap<>();
-            map.put("token","remove");
+        if (currentUser != null && currentUser.getEmail() != null) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("token", "remove");
             firestore.collection("users")
                     .document(currentUser.getEmail())
-                    .set(map,SetOptions.merge());
+                    .set(map, SetOptions.merge());
         }
 
     }
@@ -271,30 +269,29 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     }
 
 
-
     @Override
     public void showToast(String message) {
-        Toast.makeText(this,message,Toast.LENGTH_LONG).show();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void downloadUserPhoto() {
-        if (currentUser != null){
-            StorageReference river = storage.child(currentUser.getEmail()+"/userPhoto/"+currentUser.getEmail()+".jpg");
+        if (currentUser != null) {
+            StorageReference river = storage.child(currentUser.getEmail() + "/userPhoto/" + currentUser.getEmail() + ".jpg");
             river.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
                     String url = uri.toString();
                     ivUserIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                    imageLoaderManager.setPhotoUrl(url,ivUserIcon);
+                    imageLoaderManager.setPhotoUrl(url, ivUserIcon);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     //do nothing
                     e.printStackTrace();
-                    Log.i("Michael","沒照片");
-                    Log.i("Michael",e.toString());
+                    Log.i("Michael", "沒照片");
+                    Log.i("Michael", e.toString());
                     ivUserIcon.setScaleType(ImageView.ScaleType.FIT_CENTER);
                     ivUserIcon.setImageResource(R.drawable.empty_photo);
                 }
@@ -336,11 +333,11 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
             if (resultCode == RESULT_OK && result != null) {
 
                 Uri resultUri = result.getUri();
-                try{
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),resultUri);
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), resultUri);
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     int quality = 80;
-                    bitmap.compress(Bitmap.CompressFormat.JPEG,quality,baos);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos);
                     byte[] bytes = baos.toByteArray();
 
                     String message = getString(R.string.please_wait);
@@ -349,11 +346,9 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
                     uploadPhotoToStorage(bytes);
 
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
 
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
@@ -363,8 +358,8 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     }
 
     private void uploadPhotoToStorage(final byte[] bytes) {
-        if (currentUser != null){
-            final StorageReference river = storage.child(currentUser.getEmail()+"/userPhoto/"+currentUser.getEmail()+".jpg");
+        if (currentUser != null) {
+            final StorageReference river = storage.child(currentUser.getEmail() + "/userPhoto/" + currentUser.getEmail() + ".jpg");
             UploadTask task = river.putBytes(bytes);
             task.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -372,7 +367,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
                     String message = getString(R.string.upload_success);
                     presenter.onShowProgressToast(message);
                     ivUserIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                     ivUserIcon.setImageBitmap(bitmap);
 
                     river.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -398,12 +393,12 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     }
 
     private void updateUserData(String photoUrl) {
-        if (currentUser != null && currentUser.getEmail() != null){
-            Map<String,Object> map = new HashMap<>();
-            map.put("photoUrl",photoUrl);
+        if (currentUser != null && currentUser.getEmail() != null) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("photoUrl", photoUrl);
             UserDataManager userDataManager = new UserDataManager(this);
-            if (!userDataManager.getToken().isEmpty()){
-                map.put("token",userDataManager.getToken());
+            if (!userDataManager.getToken().isEmpty()) {
+                map.put("token", userDataManager.getToken());
             }
             firestore.collection("users").document(currentUser.getEmail())
                     .set(map, SetOptions.merge());
@@ -412,9 +407,9 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
                     .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful() && task.getResult() != null){
+                            if (task.isSuccessful() && task.getResult() != null) {
                                 DocumentSnapshot snapshot = task.getResult();
-                                userDataManager.saveUserData((String)snapshot.get("email"),(String) snapshot.get("displayName"),photoUrl);
+                                userDataManager.saveUserData((String) snapshot.get("email"), (String) snapshot.get("displayName"), photoUrl);
                             }
                         }
                     });

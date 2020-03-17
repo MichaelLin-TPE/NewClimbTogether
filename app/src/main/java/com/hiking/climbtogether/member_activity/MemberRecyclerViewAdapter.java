@@ -70,16 +70,6 @@ public class MemberRecyclerViewAdapter extends RecyclerView.Adapter<MemberRecycl
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-
-
-        holder.tvTitle.setText(btnList.get(position));
-        holder.ivIcon.setImageDrawable(ContextCompat.getDrawable(context,iconArray.get(position)));
-        holder.clickArea.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listItemClickListener.onClick(position);
-            }
-        });
         if (position == 4){
             if (user != null){
                 if (user.getEmail() != null){
@@ -90,7 +80,20 @@ public class MemberRecyclerViewAdapter extends RecyclerView.Adapter<MemberRecycl
                 holder.tvInvite.setVisibility(View.GONE);
                 Log.i("Michael","user null");
             }
+        }else {
+            holder.ivIconNext.setVisibility(View.VISIBLE);
+            holder.tvInvite.setVisibility(View.GONE);
         }
+
+        holder.tvTitle.setText(btnList.get(position));
+        holder.ivIcon.setImageDrawable(ContextCompat.getDrawable(context,iconArray.get(position)));
+        holder.clickArea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listItemClickListener.onClick(position);
+            }
+        });
+
     }
 
     private void searchDataFromFirebase(String email, final TextView tvInvite, final ImageView ivIconNext) {

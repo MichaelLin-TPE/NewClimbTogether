@@ -49,4 +49,5 @@
     <dimen name="equipment_icon_size">20dp</dimen>
     <dimen name="detail_photo_height">200dp</dimen>
     <dimen name="detail_content_icon_size">50dp</dimen>
+    <dimen name="friend_photo_size">50dp</dimen>
 </resources>

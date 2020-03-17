@@ -10,4 +10,20 @@ public interface MyEquipmentPresenter {
     void onCatchDataSuccessful(ArrayList<EquipmentListDTO> dataArrayList, ArrayList<EquipmentListDTO> preparedArrayList);
 
     void onViewMaintain();
+
+    void onShareButtonClick();
+
+    void onSearchFriendData();
+
+    void onCatchFriendDataSuccessful(ArrayList<FriendData> dataArrayList);
+
+    void onHasNoFriendEvent();
+
+    void onFriendItemClickListener(String email);
+
+    void onShareSuccessful();
+
+    void onDeleteButtonClick();
+
+    void onDeleteAllListConfirmClick();
 }

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:padding="10dp"
+    android:background="@drawable/button_shape_not_press"
+    android:layout_height="wrap_content"
+    android:minHeight="100dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/friend_dialog_notice"
+        android:text="@string/share_to_who"
+        android:textSize="@dimen/big_text_size"
+        android:textColor="@color/colorPrimaryDark"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:id="@+id/friend_logo"
+        android:contentDescription="@null"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:src="@drawable/hiking_logo"
+        android:visibility="gone"
+        android:layout_width="@dimen/weather_big_icon"
+        android:layout_height="@dimen/weather_big_icon"/>
+
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/friend_logo"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="8dp"
+        android:id="@+id/friend_notice"
+        android:text="@string/no_friend"
+        android:visibility="gone"
+        android:textSize="@dimen/normal_text_size"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@id/friend_dialog_notice"
+        android:id="@+id/friend_dialog_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
