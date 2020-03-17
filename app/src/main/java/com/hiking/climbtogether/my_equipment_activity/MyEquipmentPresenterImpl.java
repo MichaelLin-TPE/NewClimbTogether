@@ -76,5 +76,10 @@ public class MyEquipmentPresenterImpl implements MyEquipmentPresenter {
         mView.showToast(message);
     }
 
+    @Override
+    public void onDeleteLongClick(String name, int itemPosition, String type) {
+        mView.showConfirmDialog(name,itemPosition,type);
+    }
+
 
 }

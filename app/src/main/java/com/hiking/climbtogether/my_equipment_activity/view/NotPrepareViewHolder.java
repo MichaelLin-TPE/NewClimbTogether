@@ -45,6 +45,11 @@ public class NotPrepareViewHolder extends RecyclerView.ViewHolder {
             public void onClick(String name,String description, int itemPosition) {
                 listener.onClick(name,description,itemPosition);
             }
+
+            @Override
+            public void onDeleteLongClick(String name, int itemPosition) {
+                listener.onDeleteLongClick(name,itemPosition);
+            }
         });
     }
 }

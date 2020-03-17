@@ -38,4 +38,6 @@ public interface MyEquipmentVu {
     void clearView();
 
     String getDeleteDataSuccess();
+
+    void showConfirmDialog(String name, int itemPosition, String type);
 }

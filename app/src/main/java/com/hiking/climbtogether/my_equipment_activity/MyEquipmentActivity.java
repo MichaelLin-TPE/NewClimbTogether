@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -246,6 +245,11 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
                 adapter.notifyDataSetChanged();
                 modifyFirebaseData(name, description);
             }
+
+            @Override
+            public void onDeleteLongClick(String name, int itemPosition) {
+                presenter.onDeleteLongClick(name,itemPosition,"equipment");
+            }
         });
 
         adapter.setOnSortPreparedItemClickListener(new SortPreparedAdapter.OnSortPreparedItemClickListener() {
@@ -268,7 +272,61 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
                 adapter.notifyDataSetChanged();
                 modifyFirebaseDataPrepared(name, description);
             }
+
+            @Override
+            public void onDeleteLongClick(String name, int itemPosition) {
+
+                presenter.onDeleteLongClick(name,itemPosition,"prepared");
+
+            }
         });
+    }
+
+    @Override
+    public void showConfirmDialog(String name, int itemPosition, String type) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.warning))
+                .setMessage(getString(R.string.confirm_to_delete_single_data))
+                .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (type.equals("prepared")){
+                            preparedArrayList.remove(itemPosition);
+                            sortPresenter.setPreparedData(preparedArrayList);
+                            adapter.notifyDataSetChanged();
+                            deleteDataFromFirebase(name,type);
+                        }else {
+                            notPrepareArrayList.remove(itemPosition);
+                            sortPresenter.setNotPrepareData(notPrepareArrayList);
+                            adapter.notifyDataSetChanged();
+                            deleteDataFromFirebase(name,"notPrepare");
+                        }
+
+                    }
+                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    private void deleteDataFromFirebase(String name, String type) {
+        if (type.equals("prepared") && user != null && user.getEmail() != null){
+            firestore.collection("my_equipment")
+                    .document(user.getEmail())
+                    .collection("prepare")
+                    .document(name)
+                    .delete();
+        }else {
+            if (user != null && user.getEmail() != null){
+                firestore.collection("my_equipment")
+                        .document(user.getEmail())
+                        .collection("equipment")
+                        .document(name).delete();
+            }
+        }
     }
 
     @Override
@@ -445,6 +503,8 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
     public String getDeleteDataSuccess() {
         return getString(R.string.delete_success);
     }
+
+
 
     private void deletePrepareData() {
         if (preparedArrayList.size() != 0 && user != null && user.getEmail() != null){

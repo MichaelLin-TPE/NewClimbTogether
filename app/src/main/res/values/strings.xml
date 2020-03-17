@@ -106,4 +106,5 @@
     <string name="no_friend">你目前沒有任何朋友唷...快去加別人好友吧...</string>
     <string name="share_successful">分享成功!</string>
     <string name="delete_notice">此為刪除整筆裝備清單(刪除後將不存在),確認是否要刪除整筆?</string>
+    <string name="confirm_to_delete_single_data">確定要刪除此筆資料嗎?</string>
 </resources>

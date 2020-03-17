@@ -26,4 +26,6 @@ public interface MyEquipmentPresenter {
     void onDeleteButtonClick();
 
     void onDeleteAllListConfirmClick();
+
+    void onDeleteLongClick(String name, int itemPosition, String type);
 }

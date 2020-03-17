@@ -60,6 +60,15 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.ViewHolder> {
                 listener.onClick(data.getName(),data.getDescription(),position);
             }
         });
+        holder.clickArea.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                listener.onDeleteLongClick(data.getName(),position);
+
+                return false;
+            }
+        });
 
     }
 
@@ -87,5 +96,7 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.ViewHolder> {
 
     public interface OnSortItemClickListener{
         void onClick(String name,String description,int itemPosition);
+
+        void onDeleteLongClick(String name,int itemPosition);
     }
 }
