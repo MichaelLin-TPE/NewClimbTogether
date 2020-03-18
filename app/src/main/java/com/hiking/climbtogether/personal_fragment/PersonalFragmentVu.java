@@ -13,7 +13,7 @@ public interface PersonalFragmentVu {
 
     void setRecyclerView(ArrayList<PersonalChatDTO> chatDataArrayList);
 
-    void intentToPersonalChatActivity(String displayName, String friendEmail, String photoUrl);
+    void intentToPersonalChatActivity(String displayName, String friendEmail, String photoUrl, String path);
 
     void showNoChatDataView(boolean isShow);
 

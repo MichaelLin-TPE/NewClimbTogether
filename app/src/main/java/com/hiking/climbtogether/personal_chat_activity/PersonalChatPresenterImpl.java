@@ -91,6 +91,7 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
 
     @Override
     public void onCatchChatJson(String jsonStr) {
+        Log.i("Michael","抓到 json : "+jsonStr);
         dataArrayList = new ArrayList<>();
         PersonalChatObject data = gson.fromJson(jsonStr,PersonalChatObject.class);
         dataArrayList.add(data);

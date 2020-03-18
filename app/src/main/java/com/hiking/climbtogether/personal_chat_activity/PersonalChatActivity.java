@@ -1,6 +1,7 @@
 package com.hiking.climbtogether.personal_chat_activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,6 +15,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.hiking.climbtogether.MyFirbaseMessagingService;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.personal_chat_activity.chat_room_object.ChatRoomDTO;
@@ -55,29 +59,27 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     private PersonalPresenter personalPresenter;
 
-    private static final String PERSONAL_CHAT = "personal_chat";
-
     private static final String CHAT_DATA = "chat_data";
 
     private static final String CHAT_ROOM = "chat_room";
 
-    private ArrayList<PersonalChatData> chatArrayList;
-
     private PersonalAdapter adapter;
 
-    private String documentPath,testPath;
+    private String testPath;
 
     private boolean isStillPosting;
 
     private UserDataManager userDataManager;
 
-    private int countSecond = 0, secondSize = 0;
+    private int countSecond = 0;
 
     private MyFirbaseMessagingService service;
 
     private static final String IS_UPDATE = "is_chat_update";
 
     private static final String UPDATE = "update";
+
+    private String lastMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +93,26 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
         initView();
         //新方法
         searchChatPath();
+        if (testPath != null){
+            DocumentReference reference = firestore.collection(CHAT_DATA)
+                    .document(testPath);
+            reference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
+                    if (e != null) {
+                        System.err.println("Listen failed: " + e);
+                        return;
+                    }
+                    if (snapshot != null && snapshot.exists()){
+                        Log.i("Michael","該更新了");
+                        String jsonStr = (String) snapshot.get("json");
+                        presenter.onCatchChatJson(jsonStr);
+                    }
+                }
+            });
+        }
+
+
     }
     private void searchChatPath() {
         if (testPath != null && !testPath.isEmpty()){
@@ -198,6 +220,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
             displayName = bundle.getString("displayName", "");
             friendEmail = bundle.getString("mail", "");
             friendPhotoUrl = bundle.getString("photoUrl", "");
+            testPath = bundle.getString("path","");
             Log.i("Michael", "綽號 : " + displayName + " , EMAIL : " + friendEmail + " , photoUrl : " + friendPhotoUrl);
         }
     }
@@ -221,67 +244,9 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
     @Override
     protected void onResume() {
         super.onResume();
-        checkDataChange();
 
     }
 
-    private void checkDataChange() {
-        //這裡監控 回家做
-        isStillPosting = true;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                do {
-                    try {
-                        Thread.sleep(1500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    countSecond += 1500;
-                    Log.i("Michael", "資料沒新增 : " + countSecond);
-                    if (countSecond != 22500) {
-                        if (isStillPosting) {
-                            firestore.collection(IS_UPDATE)
-                                    .document(UPDATE)
-                                    .get()
-                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                            if (task.isSuccessful() && task.getResult() != null){
-                                                DocumentSnapshot snapshot = task.getResult();
-                                                boolean isUpdate = (boolean) snapshot.get("is_personal_update");
-                                                if (isUpdate){
-                                                    Log.i("Michael","更新畫面");
-                                                    setNotUpdate();
-                                                    searchChatPath();
-                                                }else {
-                                                    Log.i("Michael","不更新畫面");
-                                                }
-                                            }
-                                        }
-                                    });
-                        } else {
-                            Log.i("Michael", "結束迴圈");
-                            break;
-                        }
-                    } else {
-                        Log.i("Michael", "結束迴圈");
-                        break;
-                    }
-
-                } while (true);
-            }
-        }).start();
-
-    }
-
-    private void setNotUpdate() {
-        Map<String,Object> map = new HashMap<>();
-        map.put("is_personal_update",false);
-        firestore.collection(IS_UPDATE)
-                .document(UPDATE)
-                .set(map, SetOptions.merge());
-    }
 
 
     @Override
@@ -374,34 +339,11 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
                             Log.i("Michael","上傳成功");
-                            sendReadyToUpdate();
-                            if (countSecond >= 22500) {
-                                countSecond = 0;
-                                checkDataChange();
-                            } else {
-                                countSecond = 0;
-                            }
                         }
                     }
                 });
     }
 
-    private void sendReadyToUpdate() {
-        Map<String,Object> map = new HashMap<>();
-        map.put("is_update",true);
-        map.put("is_personal_update",true);
-        firestore.collection(IS_UPDATE)
-                .document(UPDATE)
-                .set(map)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            Log.i("Michael","更新成功");
-                        }
-                    }
-                });
-    }
 
     private void catchDocument(String message, long time) {
         if (testPath != null){

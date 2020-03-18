@@ -42,8 +42,8 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
 
 
     @Override
-    public void onItemClickListener(String displayName, String friendEmail, String photoUrl) {
-        mView.intentToPersonalChatActivity(displayName,friendEmail,photoUrl);
+    public void onItemClickListener(String displayName, String friendEmail, String photoUrl, String path) {
+        mView.intentToPersonalChatActivity(displayName,friendEmail,photoUrl,path);
     }
 
     @Override

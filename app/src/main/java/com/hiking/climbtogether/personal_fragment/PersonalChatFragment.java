@@ -210,8 +210,8 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                     recyclerView.setAdapter(adapter);
                     adapter.setOnChatItemClickListener(new PersonalFragmentAdapter.OnChatItemClickListener() {
                         @Override
-                        public void onClick(String displayName, String friendEmail, String photoUrl) {
-                            presenter.onItemClickListener(displayName, friendEmail, photoUrl);
+                        public void onClick(String displayName, String friendEmail, String photoUrl, int position) {
+                            presenter.onItemClickListener(displayName, friendEmail, photoUrl,documentIdArray.get(position));
                         }
                     });
                     adapter.setOnChatItemLongClickListener(new PersonalFragmentAdapter.OnChatItemLongClickListener() {
@@ -229,11 +229,12 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     @Override
     public void intentToPersonalChatActivity(String displayName, String friendEmail, String
-            photoUrl) {
+            photoUrl, String path) {
         Intent it = new Intent(context, PersonalChatActivity.class);
         it.putExtra("displayName", displayName);
         it.putExtra("mail", friendEmail);
         it.putExtra("photoUrl", photoUrl);
+        it.putExtra("path",path);
         context.startActivity(it);
     }
 

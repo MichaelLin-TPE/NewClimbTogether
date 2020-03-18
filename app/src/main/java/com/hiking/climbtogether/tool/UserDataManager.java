@@ -50,4 +50,10 @@ public class UserDataManager {
     public String getPhotoUrl(){
         return sharedPreferences.getString("photoUrl","");
     }
+
+    public void clearAllData() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+    }
 }

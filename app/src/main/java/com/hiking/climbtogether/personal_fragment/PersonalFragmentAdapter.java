@@ -86,7 +86,7 @@ public class PersonalFragmentAdapter extends RecyclerView.Adapter<PersonalFragme
         holder.clickArea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onClick(data.getDisplayName(),data.getFriendEmail(),data.getPhotoUrl());
+                listener.onClick(data.getDisplayName(),data.getFriendEmail(),data.getPhotoUrl(),position);
             }
         });
         holder.clickArea.setOnLongClickListener(new View.OnLongClickListener() {
@@ -121,7 +121,7 @@ public class PersonalFragmentAdapter extends RecyclerView.Adapter<PersonalFragme
         }
     }
     public interface OnChatItemClickListener{
-        void onClick(String displayName,String friendEmail,String photoUrl);
+        void onClick(String displayName, String friendEmail, String photoUrl, int position);
     }
     public interface OnChatItemLongClickListener{
         void onClick(String documentPath,int itemPosition);

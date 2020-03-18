@@ -1,6 +1,7 @@
 package com.hiking.climbtogether.chat_activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -21,6 +22,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.SetOptions;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.chat_activity.chat_view_presenter.ViewPresenter;
@@ -123,6 +127,27 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
         user = mAuth.getCurrentUser();
 
         checkChatData();
+
+        DocumentReference docRef = firestore.collection(DISCUSSION)
+                .document("登山即時討論區");
+        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null){
+                    System.err.println("Listen failed : "+e);
+                    return;
+                }
+                if (snapshot != null && snapshot.exists()){
+                    String jsonStr = (String) snapshot.get("json");
+                    presenter.onCatchNewChatData(jsonStr);
+                    Log.i("Michael","每次更新 : "+jsonStr);
+                }else {
+                    Log.i("Michael","沒資料");
+
+                }
+            }
+        });
+
         //在家測試
     }
 
@@ -152,7 +177,7 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     @Override
     protected void onResume() {
         super.onResume();
-        checkChatDataChange();
+//        checkChatDataChange();
     }
 
     @Override
@@ -174,13 +199,13 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
             public void run() {
                 do {
                     try {
-                        Thread.sleep(1500);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    countSecond += 1500;
+                    countSecond += 1000;
                     Log.i("Michael", "資料沒新增 : " + countSecond);
-                    if (countSecond < 80500) {
+                    if (countSecond < 80000) {
                         if (isStillPosting) {
                             checkChatData();
                         } else {
@@ -461,8 +486,6 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
 
     @Override
     public void setRecyclerView(ArrayList<ChatData> chatDataArrayList) {
-
-
 
         if (adapter != null){
             int messageIndex = chatDataArrayList.size() -1;

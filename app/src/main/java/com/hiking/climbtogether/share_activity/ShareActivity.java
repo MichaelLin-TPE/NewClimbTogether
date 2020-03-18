@@ -104,8 +104,6 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     private static final String INVITE = "invite";
 
-    private String shareContent;
-
     private int photoCount = 0;
 
     private boolean isFriend, isInvite;
@@ -599,11 +597,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         this.content = content;
         this.photoBytesArray = photoBytesArray;
         downloadUrlArray = new ArrayList<>();
-
         uploadPhotoToStorage();
-
-
-
 
     }
 

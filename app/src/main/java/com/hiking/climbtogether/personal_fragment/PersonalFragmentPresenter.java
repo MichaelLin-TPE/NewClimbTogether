@@ -10,7 +10,7 @@ public interface PersonalFragmentPresenter {
 
     void onShowProgress(boolean isShow);
 
-    void onItemClickListener(String displayName, String friendEmail, String photoUrl);
+    void onItemClickListener(String displayName, String friendEmail, String photoUrl, String path);
 
     void onShowDeleteMessageConfirmDialog(String documentPath);
 

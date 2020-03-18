@@ -244,6 +244,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
                 .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        userDataManager.clearAllData();
                         presenter.onConfirmSignOutClickListener();
                     }
                 }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
