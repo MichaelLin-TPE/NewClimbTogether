@@ -1,17 +1,13 @@
 package com.hiking.climbtogether.chat_activity;
 
+import com.hiking.climbtogether.tool.UserDataManager;
+
 import java.util.ArrayList;
 
 public interface ChatActivityPresenter {
-    void onBtnSendClickListener(String message, long currentTime);
-
-    void onSearchChatData(String email);
-
-    void onCatchChatDataSuccessful(ArrayList<ChatData> chatDataArrayList);
+    void onBtnSendClickListener(String message, long currentTime, UserDataManager userDataManager);
 
     void onChangeData(String email);
-
-    void onShowRecyclerViewChangeData(ArrayList<ChatData> chatDataArrayList);
 
     void onUserPhotoClickListener(String mail);
 
@@ -28,4 +24,8 @@ public interface ChatActivityPresenter {
     void onChatButtonClickListener(String displayName, String mail, String photoUrl);
 
     void onSearUserData();
+
+    void onCatchNewChatData(String jsonStr);
+
+    void onCatchNoChatData();
 }

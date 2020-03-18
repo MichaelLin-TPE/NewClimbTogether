@@ -34,6 +34,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.hiking.climbtogether.tool.UserDataManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,12 +65,15 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVu 
 
     private ProgressBar progressBar;
 
+    private UserDataManager userDataManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         //初始化Firebase
+        userDataManager = new UserDataManager(this);
         mAuth = FirebaseAuth.getInstance();
         initGoogleOptions();
         initPresenter();
@@ -163,6 +167,7 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVu 
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            saveUserData(email);
                             presenter.onLoginSuccessful();
                         } else {
                             if (task.getException() != null) {
@@ -174,6 +179,26 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVu 
                     }
                 });
 
+    }
+
+    private void saveUserData(String email) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                firestore.collection("users")
+                        .document(email)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful() && task.getResult() != null){
+                                    DocumentSnapshot snapshot = task.getResult();
+                                    userDataManager.saveUserData(email,(String)snapshot.get("displayName"),(String)snapshot.get("photoUrl"));
+                                }
+                            }
+                        });
+            }
+        }).start();
     }
 
     @Override

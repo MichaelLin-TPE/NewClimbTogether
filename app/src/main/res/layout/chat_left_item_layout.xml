@@ -13,6 +13,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:riv_oval="true"
+        android:scaleType="centerCrop"
         android:layout_width="@dimen/weather_big_icon"
         android:layout_height="@dimen/weather_big_icon"/>
     <TextView

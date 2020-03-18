@@ -1,12 +1,17 @@
 package com.hiking.climbtogether.chat_activity;
 
-public class ChatData {
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+public class ChatData implements Serializable {
+    @SerializedName("message")
     private String message;
-
+    @SerializedName("email")
     private String email;
-
+    @SerializedName("photo_url")
     private String photoUrl;
-
+    @SerializedName("display_name")
     private String disPlayName;
 
     public String getDisPlayName() {

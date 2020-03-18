@@ -1,5 +1,9 @@
 package com.hiking.climbtogether.chat_activity;
 
+import com.google.gson.Gson;
+import com.hiking.climbtogether.ChatObject;
+import com.hiking.climbtogether.tool.UserDataManager;
+
 import java.util.ArrayList;
 
 public class ChatActivityPresenterImpl implements ChatActivityPresenter {
@@ -8,38 +12,58 @@ public class ChatActivityPresenterImpl implements ChatActivityPresenter {
 
     private String friendEmail;
 
+    private Gson gson;
+
+    private ArrayList<ChatData> dataArrayList;
+
     public ChatActivityPresenterImpl(ChatActivityVu mView){
         this.mView = mView;
+        gson = new Gson();
     }
 
     @Override
-    public void onBtnSendClickListener(String message, long currentTime) {
+    public void onBtnSendClickListener(String message, long currentTime, UserDataManager userDataManager) {
         if (message == null || message.isEmpty()){
             String errorMessage = "請輸入對話";
             mView.showErrorMessage(errorMessage);
             return;
         }
-        mView.createChatDataToFirestore(message,currentTime);
+        if (dataArrayList == null || dataArrayList.size() == 0){
+            ChatObject object = new ChatObject();
+            ChatData data = new ChatData();
+            data.setDisPlayName(userDataManager.getDisplayName());
+            data.setEmail(userDataManager.getEmail());
+            data.setMessage(message);
+            data.setPhotoUrl(userDataManager.getPhotoUrl());
+            data.setTime(currentTime);
+            ArrayList<ChatData> dataArrayList = new ArrayList<>();
+            dataArrayList.add(data);
+            object.setChatData(dataArrayList);
+            String jsonStr = gson.toJson(object);
+
+            mView.createNewChatDataToFirebase(jsonStr);
+        }else {
+            ChatObject object = new ChatObject();
+            ChatData data = new ChatData();
+            data.setDisPlayName(userDataManager.getDisplayName());
+            data.setEmail(userDataManager.getEmail());
+            data.setMessage(message);
+            data.setPhotoUrl(userDataManager.getPhotoUrl());
+            data.setTime(currentTime);
+            dataArrayList.add(data);
+            object.setChatData(dataArrayList);
+            String jsonStr = gson.toJson(object);
+            mView.createNewChatDataToFirebase(jsonStr);
+
+        }
+
     }
 
-    @Override
-    public void onSearchChatData(String email) {
-        mView.searchChatDataFromFirestore(email);
-    }
 
-    @Override
-    public void onCatchChatDataSuccessful(ArrayList<ChatData> chatDataArrayList) {
-        mView.setRecyclerView(chatDataArrayList);
-    }
 
     @Override
     public void onChangeData(String email) {
         mView.catchDataFormFirestore(email);
-    }
-
-    @Override
-    public void onShowRecyclerViewChangeData(ArrayList<ChatData> chatDataArrayList) {
-        mView.reShowRecyclerView(chatDataArrayList);
     }
 
     @Override
@@ -85,5 +109,17 @@ public class ChatActivityPresenterImpl implements ChatActivityPresenter {
     @Override
     public void onSearUserData() {
         mView.searchInfoFromFirebase(friendEmail);
+    }
+
+    @Override
+    public void onCatchNewChatData(String jsonStr) {
+        ChatObject data = gson.fromJson(jsonStr,ChatObject.class);
+        this.dataArrayList = data.getChatData();
+        mView.setRecyclerView(data.getChatData());
+    }
+
+    @Override
+    public void onCatchNoChatData() {
+
     }
 }

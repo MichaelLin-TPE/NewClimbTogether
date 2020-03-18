@@ -83,7 +83,7 @@ public class ChatLeftViewHolder extends RecyclerView.ViewHolder {
         }
         tvTime.setText(String.format(Locale.getDefault(),"%s %s",new SimpleDateFormat("HH:mm", Locale.TAIWAN).format(new Date(chatData.getTime())),hour));
 
-        downloadUserPhoto(chatData.getEmail());
+        imageLoader.displayImage(chatData.getPhotoUrl(),ivUserPhoto,options);
 
         ivUserPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,28 +92,6 @@ public class ChatLeftViewHolder extends RecyclerView.ViewHolder {
             }
         });
     }
-
-    private void downloadUserPhoto(String email) {
-        StorageReference river = storage.child(email+"/userPhoto/"+email+".jpg");
-        river.getDownloadUrl()
-                .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        String url = uri.toString();
-                        ivUserPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        imageLoader.displayImage(url,ivUserPhoto,options);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                e.printStackTrace();
-                ivUserPhoto.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                ivUserPhoto.setImageResource(R.drawable.empty_photo);
-            }
-        });
-
-    }
-
 
     public interface OnUserPhotoClickListener{
         void onClick(String mail);

@@ -3,13 +3,10 @@ package com.hiking.climbtogether.chat_activity;
 import java.util.ArrayList;
 
 public interface ChatActivityVu {
-    void searchChatDataFromFirestore(String email);
 
     void showProgressbar(boolean isShow);
 
     void setRecyclerView(ArrayList<ChatData> chatDataArrayList);
-
-    void createChatDataToFirestore(String message, long currentTime);
 
     void showErrorMessage(String errorMessage);
 
@@ -34,4 +31,6 @@ public interface ChatActivityVu {
     void intentToPersonalChatActivity(String displayName, String mail, String photoUrl);
 
     void showUserDialog();
+
+    void createNewChatDataToFirebase(String jsonStr);
 }

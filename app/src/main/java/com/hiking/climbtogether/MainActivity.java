@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
 
         initPresenter();
         initActionBar();
+
         Button btnTest = findViewById(R.id.main_test_btn);
         btnTest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
 
     private void verifyStoragePermissions(MainActivity mainActivity) {
         try {
-
             int permission = ActivityCompat.checkSelfPermission(mainActivity,
                     "android.permission.WRITE_EXTERNAL_STORAGE");
             if (permission != PackageManager.PERMISSION_GRANTED) {
@@ -157,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
                             }
                         }).create();
                 dialog.show();
-
             }
 
 
@@ -194,20 +193,24 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
 
     private void saveCurrentUserData() {
 
-
         if (user != null && user.getEmail() != null){
-            firestore.collection("users")
-                    .document(user.getEmail())
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful() && task.getResult() != null){
-                                DocumentSnapshot snapshot = task.getResult();
-                                userDataManager.saveUserData((String)snapshot.get("email"),(String)snapshot.get("displayName"),(String)snapshot.get("photoUrl"));
-                            }
-                        }
-                    });
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    firestore.collection("users")
+                            .document(user.getEmail())
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful() && task.getResult() != null){
+                                        DocumentSnapshot snapshot = task.getResult();
+                                        userDataManager.saveUserData((String)snapshot.get("email"),(String)snapshot.get("displayName"),(String)snapshot.get("photoUrl"));
+                                    }
+                                }
+                            });
+                }
+            }).start();
         }
     }
 
