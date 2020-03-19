@@ -30,4 +30,6 @@ public interface MountainFragmentPresenter {
     void onSpinnerSelectListener(int position);
 
     void onMountainItemClick(DataDTO data);
+
+    void onShowSpinnerDialog(ArrayList<String> spinnerData);
 }

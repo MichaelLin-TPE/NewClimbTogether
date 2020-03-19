@@ -42,4 +42,10 @@ public interface MountainCollectionVu {
     void modifyFirestoreData(DataDTO data, long pickTime);
 
     void changeRecyclerView(int position);
+
+    void showSpinnerDialog(ArrayList<String> listArray);
+
+    void intentToDetailActivity(DataDTO dataDTO);
+
+    void intentToShareActivity();
 }

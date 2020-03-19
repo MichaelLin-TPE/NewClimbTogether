@@ -17,7 +17,12 @@ public class FriendManagerPresenterImpl implements FriendManagerPresenter {
 
     @Override
     public void onCatchDataSuccessful(ArrayList<FriendInviteDTO> inviteArrayList, ArrayList<FriendDTO> friendArrayList) {
-        mView.setRecyclerView(inviteArrayList,friendArrayList);
+        if (inviteArrayList.size() != 0 || friendArrayList.size() != 0){
+            mView.showNoFriendInfo(false);
+            mView.setRecyclerView(inviteArrayList,friendArrayList);
+        }else {
+            mView.showNoFriendInfo(true);
+        }
     }
 
     @Override

@@ -3,9 +3,10 @@ package com.hiking.climbtogether.home_fragment.weather_view;
 import java.util.ArrayList;
 
 public interface WeatherSpinnerPresenter {
-    void onShowSpinner(ArrayList<String> nationParkNameArray);
 
     void onShowRecyclerView();
 
-    void onSpinnerItemSelectListener(int itemPosition);
+    void onSpinnerItemSelectListener(String name, int position);
+
+    void onShowCustomDialog(ArrayList<String> nationParkNameArray);
 }

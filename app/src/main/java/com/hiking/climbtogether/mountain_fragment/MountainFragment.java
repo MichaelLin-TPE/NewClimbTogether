@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.detail_activity.DetailActivity;
+import com.hiking.climbtogether.home_fragment.weather_view.WeatherDialogAdapter;
 import com.hiking.climbtogether.login_activity.LoginActivity;
 import com.hiking.climbtogether.db_modle.DataDTO;
 import com.hiking.climbtogether.tool.FireStoreManager;
@@ -79,7 +80,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     private ProgressBar progressBar;
 
-    private Spinner spinner;
+    private TextView spinner;
 
     private FireStoreManager manager;
 
@@ -226,18 +227,11 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     @Override
     public void setSpinner(ArrayList<String> spinnerData) {
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context,R.layout.spinner_custom_layout,spinnerData);
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        spinner.setAdapter(arrayAdapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spinner.setText(spinnerData.get(0));
+        spinner.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
-                presenter.onSpinnerSelectListener(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+            public void onClick(View v) {
+                presenter.onShowSpinnerDialog(spinnerData);
             }
         });
     }
@@ -411,6 +405,30 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         it.putExtra("data",data);
         context.startActivity(it);
 
+    }
+
+    @Override
+    public void showSpinnerDialog(ArrayList<String> spinnerData) {
+        ArrayList<Integer> imageArray = new ArrayList<>();
+        imageArray.add(R.drawable.native_icon);
+        imageArray.add(R.drawable.close);
+        imageArray.add(R.drawable.far);
+        View view = View.inflate(getActivity(),R.layout.weather_spinner_dialog,null);
+        RecyclerView recyclerView = view.findViewById(R.id.weather_dialog_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        WeatherDialogAdapter adapter = new WeatherDialogAdapter(getActivity(),spinnerData,imageArray);
+        recyclerView.setAdapter(adapter);
+        AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                .setView(view).create();
+        dialog.show();
+        adapter.setOnWeatherDialogItemClickListener(new WeatherDialogAdapter.OnWeatherDialogItemClickListener() {
+            @Override
+            public void onClick(String name, int position) {
+                spinner.setText(name);
+                presenter.onSpinnerSelectListener(position);
+                dialog.dismiss();
+            }
+        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

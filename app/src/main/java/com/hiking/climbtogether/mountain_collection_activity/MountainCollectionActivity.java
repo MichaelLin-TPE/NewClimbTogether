@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
@@ -29,11 +30,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hiking.climbtogether.R;
+import com.hiking.climbtogether.detail_activity.DetailActivity;
+import com.hiking.climbtogether.home_fragment.weather_view.WeatherDialogAdapter;
 import com.hiking.climbtogether.login_activity.LoginActivity;
 import com.hiking.climbtogether.mountain_collection_activity.view.PortView;
 import com.hiking.climbtogether.mountain_collection_activity.view_presenter.MtPresenter;
 import com.hiking.climbtogether.mountain_collection_activity.view_presenter.MtPresenterImpl;
 import com.hiking.climbtogether.db_modle.DataDTO;
+import com.hiking.climbtogether.share_activity.ShareActivity;
 import com.hiking.climbtogether.tool.SpaceItemDecoration;
 import com.hiking.climbtogether.tool.UserDataManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -90,7 +94,7 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
 
     private MountainCollectionAdapter adapter;
 
-    private Spinner spinner;
+    private TextView spinner;
 
     private static final int IMAGE_REQUEST_CODE = 2;
 
@@ -113,46 +117,16 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mountain_collection);
         initFirebase();
+        user = mAuth.getCurrentUser();
         initPresenter();
         initView();
         initSpinner();
+        checkLoginStatus();
     }
 
     private void initSpinner() {
         spinner = findViewById(R.id.favorite_mt_spinner);
         presenter.onPrepareSpinnerData();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.i("Michael","collection onStart");
-        user = mAuth.getCurrentUser();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i("Michael","collection onResume");
-        checkLoginStatus();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (user != null){
-            if (adapter != null){
-                mtPresenter.setData(new ArrayList<DataDTO>());
-                adapter.notifyDataSetChanged();
-            }
-        }
-        Log.i("Michael","collection onPause");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.i("Michael","collection onStop");
     }
 
     private void checkLoginStatus() {
@@ -310,20 +284,14 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
 
     @Override
     public void setSpinner(ArrayList<String> listArray) {
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this,R.layout.spinner_custom_layout,listArray);
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        spinner.setAdapter(arrayAdapter);
+
         userDataManager = new UserDataManager(this);
-        spinner.setSelection(userDataManager.getCollectionViewStyle());
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        presenter.onSpinnerItemSelectedListener(userDataManager.getCollectionViewStyle());
+        spinner.setText(listArray.get(userDataManager.getCollectionViewStyle()));
+        spinner.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                presenter.onSpinnerItemSelectedListener(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+            public void onClick(View v) {
+                presenter.onShowSpinnerDialog(listArray);
             }
         });
     }
@@ -547,6 +515,42 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
         if (adapter != null){
             adapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void showSpinnerDialog(ArrayList<String> listArray) {
+        ArrayList<Integer> imageArray = new ArrayList<>();
+        imageArray.add(R.drawable.port);
+        imageArray.add(R.drawable.land);
+        View view = View.inflate(this,R.layout.weather_spinner_dialog,null);
+        RecyclerView recyclerView = view.findViewById(R.id.weather_dialog_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        WeatherDialogAdapter adapter = new WeatherDialogAdapter(this,listArray,imageArray);
+        recyclerView.setAdapter(adapter);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view).create();
+        dialog.show();
+        adapter.setOnWeatherDialogItemClickListener(new WeatherDialogAdapter.OnWeatherDialogItemClickListener() {
+            @Override
+            public void onClick(String name, int position) {
+                presenter.onSpinnerItemSelectedListener(position);
+                spinner.setText(name);
+                dialog.dismiss();
+            }
+        });
+    }
+
+    @Override
+    public void intentToDetailActivity(DataDTO dataDTO) {
+        Intent it = new Intent(this, DetailActivity.class);
+        it.putExtra("data",dataDTO);
+        startActivity(it);
+    }
+
+    @Override
+    public void intentToShareActivity() {
+        Intent it = new Intent(this, ShareActivity.class);
+        startActivity(it);
     }
 
 

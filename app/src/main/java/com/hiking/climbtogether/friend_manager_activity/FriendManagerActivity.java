@@ -81,13 +81,16 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
 
     private String friendPhotoUrl;
 
-    private static final String PERSONAL_CHAT = "personal_chat";
-
-    private static final String CHAT_DATA = "chat_data";
-
     private AlertDialog userDialog;
 
     private String chatRoomPath;
+
+    private TextView tvInfo;
+
+    private ImageView ivLogo;
+
+    private ArrayList<ChatRoomDTO> chatPathArray;
+
 
 
     @Override
@@ -97,8 +100,29 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
         imageLoaderManager = new ImageLoaderManager(this);
         initPresenter();
         initFirebase();
+        searchForChatRoom();
         initView();
         checkAllData();
+    }
+
+    private void searchForChatRoom() {
+        firestore.collection("chat_room")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful() && task.getResult() != null){
+                            chatPathArray = new ArrayList<>();
+                            for (QueryDocumentSnapshot snapshot : task.getResult()){
+                                ChatRoomDTO data = new ChatRoomDTO();
+                                data.setChatPath(snapshot.getId());
+                                data.setUser1((String)snapshot.get("user1"));
+                                data.setUser2((String)snapshot.get("user2"));
+                                chatPathArray.add(data);
+                            }
+                        }
+                    }
+                });
     }
 
     /**
@@ -107,26 +131,26 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
      */
 
     private void checkAllData() {
-        if (user != null){
-            if (user.getEmail() != null){
+        if (user != null) {
+            if (user.getEmail() != null) {
                 firestore.collection(INVITE_FRIEND).document(user.getEmail()).collection(INVITE)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()){
+                                if (task.isSuccessful()) {
                                     inviteArrayList = new ArrayList<>();
-                                    if (task.getResult() != null){
-                                        for (QueryDocumentSnapshot document : task.getResult()){
+                                    if (task.getResult() != null) {
+                                        for (QueryDocumentSnapshot document : task.getResult()) {
                                             FriendInviteDTO friendInviteDTO = new FriendInviteDTO();
-                                            friendInviteDTO.setAnswer((String)document.getData().get("answer"));
+                                            friendInviteDTO.setAnswer((String) document.getData().get("answer"));
                                             friendInviteDTO.setEmail(document.getId());
                                             inviteArrayList.add(friendInviteDTO);
                                         }
-                                        if (inviteArrayList.size() != 0){
-                                            Log.i("Michael","有邀情");
-                                        }else {
-                                            Log.i("Michael","沒邀請");
+                                        if (inviteArrayList.size() != 0) {
+                                            Log.i("Michael", "有邀情");
+                                        } else {
+                                            Log.i("Michael", "沒邀請");
                                         }
 
                                         searchForFriend(user.getEmail());
@@ -144,22 +168,22 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()){
-                            if (task.getResult() != null){
+                        if (task.isSuccessful()) {
+                            if (task.getResult() != null) {
                                 friendArrayList = new ArrayList<>();
-                                for (QueryDocumentSnapshot document : task.getResult()){
+                                for (QueryDocumentSnapshot document : task.getResult()) {
                                     FriendDTO friendDTO = new FriendDTO();
-                                    friendDTO.setDisplayName((String)document.getData().get("displayName"));
-                                    friendDTO.setEmail((String)document.getData().get("email"));
+                                    friendDTO.setDisplayName((String) document.getData().get("displayName"));
+                                    friendDTO.setEmail((String) document.getData().get("email"));
                                     friendArrayList.add(friendDTO);
                                 }
-                                if (friendArrayList.size() != 0){
-                                    Log.i("Michael","有朋友");
-                                }else {
-                                    Log.i("Michael","沒朋友");
+                                if (friendArrayList.size() != 0) {
+                                    Log.i("Michael", "有朋友");
+                                } else {
+                                    Log.i("Michael", "沒朋友");
                                 }
 
-                                presenter.onCatchDataSuccessful(inviteArrayList,friendArrayList);
+                                presenter.onCatchDataSuccessful(inviteArrayList, friendArrayList);
 
                             }
                         }
@@ -175,6 +199,8 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
     }
 
     private void initView() {
+        tvInfo = findViewById(R.id.friend_manager_text_info);
+        ivLogo = findViewById(R.id.friend_manager_logo);
         toolbar = findViewById(R.id.friend_manager_toolbar);
         recyclerView = findViewById(R.id.friend_manager_recycler_view);
         setSupportActionBar(toolbar);
@@ -199,33 +225,39 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
     @Override
     public void setRecyclerView(ArrayList<FriendInviteDTO> inviteArrayList, ArrayList<FriendDTO> friendArrayList) {
 
-        friendPresenter.setData(inviteArrayList,friendArrayList);
+        friendPresenter.setData(inviteArrayList, friendArrayList);
 
-        adapter = new FriendManagerAdapter(friendPresenter,this);
+        adapter = new FriendManagerAdapter(friendPresenter, this);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         recyclerView.setAdapter(adapter);
 
         adapter.setOnfriendItemClickListener(new FriendViewAdapter.OnfriendItemClickListener() {
             @Override
             public void onClick(FriendDTO data, int itemPosition) {
-                presenter.onFriendItemClickListener(data,itemPosition);
+                presenter.onFriendItemClickListener(data, itemPosition);
             }
         });
 
         adapter.setOnCheckInviteListener(new InviteViewAdapter.OnCheckInviteIconClickListener() {
             @Override
             public void onClickYes(boolean isAdd, FriendInviteDTO data, int itemPosition) {
-                deleteInviteData(data, itemPosition);
+                inviteArrayList.remove(itemPosition);
+                friendPresenter.setData(inviteArrayList, friendArrayList);
+                adapter.notifyDataSetChanged();
+                deleteInviteData(data);
                 createFriendData(data);
             }
 
             @Override
             public void onClickNo(boolean isAdd, FriendInviteDTO data, int itemPosition) {
-                deleteInviteData(data, itemPosition);
+                inviteArrayList.remove(itemPosition);
+                friendPresenter.setData(inviteArrayList, friendArrayList);
+                adapter.notifyDataSetChanged();
+                deleteInviteData(data);
             }
         });
 
@@ -236,25 +268,25 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            if (task.getResult() != null) {
-                                DocumentSnapshot document = task.getResult();
-                                Map<String, Object> map = document.getData();
-                                if (user != null) {
-                                    if (user.getEmail() != null) {
-                                        if (map != null) {
-                                            becomeToFriend(user.getEmail(),data.getEmail(),map);
-                                        }
-                                    }
-                                }
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            DocumentSnapshot document = task.getResult();
 
-                            }
+                            //處理畫面
+                            FriendDTO data = new FriendDTO();
+                            data.setDisplayName((String) document.get("displayName"));
+                            data.setEmail((String) document.get("email"));
+                            friendArrayList.add(data);
+                            friendPresenter.setData(inviteArrayList, friendArrayList);
+                            adapter.notifyDataSetChanged();
+
+                            //繼續做連線端的事情
+                            becomeToFriend(user.getEmail(), data.getEmail(), document.getData());
                         }
                     }
                 });
     }
 
-    private void becomeToFriend(final String userEmail, final String friendEmail, Map<String,Object> map) {
+    private void becomeToFriend(final String userEmail, final String friendEmail, Map<String, Object> map) {
         firestore.collection(FRIENDSHIP).document(userEmail)
                 .collection(FRIEND).document(friendEmail)
                 .set(map)
@@ -262,7 +294,7 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            createUserData(userEmail,friendEmail);
+                            createUserData(userEmail, friendEmail);
                         }
                     }
                 });
@@ -273,19 +305,13 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            if (task.getResult() != null) {
-                                DocumentSnapshot document = task.getResult();
-                                Map<String, Object> map = document.getData();
-                                if (user != null) {
-                                    if (user.getEmail() != null) {
-                                        if (map != null) {
-                                            becomeToNewFriend(userEmail,friendEmail,map);
-                                        }
-                                    }
-                                }
+                        if (task.isSuccessful() && task.getResult() != null) {
 
-                            }
+                            DocumentSnapshot document = task.getResult();
+                            Map<String, Object> map = document.getData();
+
+                            becomeToNewFriend(userEmail, friendEmail, map);
+
                         }
                     }
                 });
@@ -300,36 +326,32 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             Log.i("Michael", "新增成功");
-                            inviteArrayList = new ArrayList<>();
-                            friendArrayList = new ArrayList<>();
-                            friendPresenter.setData(inviteArrayList,friendArrayList);
-                            adapter = new FriendManagerAdapter(friendPresenter,FriendManagerActivity.this);
-                            recyclerView.setAdapter(adapter);
-                            createChatRoom(friendEmail,userEmail);
-                            checkAllData();
+                            createChatRoom(friendEmail, userEmail);
                         }
                     }
                 });
     }
 
     private void createChatRoom(String friendEmail, String userEmail) {
-        Map<String,Object> map = new HashMap<>();
-        map.put("user1",userEmail);
-        map.put("user2",friendEmail);
+        Map<String, Object> map = new HashMap<>();
+        map.put("user1", userEmail);
+        map.put("user2", friendEmail);
         firestore.collection("chat_room")
                 .document()
                 .set(map)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            Log.i("Michael","新增房間成功");
+                        if (task.isSuccessful()) {
+                            Log.i("Michael", "新增房間成功");
+                            searchForChatRoom();
                         }
                     }
                 });
+
     }
 
-    private void deleteInviteData(FriendInviteDTO data, final int itemPosition) {
+    private void deleteInviteData(FriendInviteDTO data) {
         if (user != null) {
             if (user.getEmail() != null) {
                 firestore.collection(INVITE_FRIEND).document(user.getEmail()).collection(INVITE).document(data.getEmail())
@@ -339,8 +361,6 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
                                     Log.i("Michael", "已刪除");
-                                    inviteArrayList.remove(itemPosition);
-                                    adapter.notifyDataSetChanged();
                                 }
                             }
                         });
@@ -351,24 +371,23 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
     }
 
 
-
     @Override
     public void showUserDialog(final FriendDTO data, final int itemPosition) {
-        final View view = View.inflate(this,R.layout.friend_managemnet_dialog_custom_view,null);
+        final View view = View.inflate(this, R.layout.friend_managemnet_dialog_custom_view, null);
         final RoundedImageView ivUserPhoto = view.findViewById(R.id.friend_dialog_photo);
         final TextView tvName = view.findViewById(R.id.friend_dialog_display_name);
         final TextView tvEmail = view.findViewById(R.id.friend_dialog_email);
         LinearLayout chatClickArea = view.findViewById(R.id.friend_dialog_chat_clickArea);
         LinearLayout deleteClickArea = view.findViewById(R.id.friend_dialog_delete_clickArea);
 
-        StorageReference river = storage.child(data.getEmail()+"/userPhoto/"+data.getEmail()+".jpg");
+        StorageReference river = storage.child(data.getEmail() + "/userPhoto/" + data.getEmail() + ".jpg");
         river.getDownloadUrl()
                 .addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
                         friendPhotoUrl = uri.toString();
                         ivUserPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        imageLoaderManager.setPhotoUrl(friendPhotoUrl,ivUserPhoto);
+                        imageLoaderManager.setPhotoUrl(friendPhotoUrl, ivUserPhoto);
                         tvEmail.setText(data.getEmail());
                         tvName.setText(data.getDisplayName());
                         showView(view);
@@ -388,23 +407,37 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
         chatClickArea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                presenter.onChatButtonClickListener(data.getEmail(),data.getDisplayName(),friendPhotoUrl);
+
+                presenter.onChatButtonClickListener(data.getEmail(), data.getDisplayName(), friendPhotoUrl);
+                userDialog.dismiss();
             }
         });
         deleteClickArea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                presenter.onDeleteButtonClickListener(data.getEmail(),itemPosition);
+                presenter.onDeleteButtonClickListener(data.getEmail(), itemPosition);
+                userDialog.dismiss();
             }
         });
     }
 
     @Override
     public void intentToPersonalChatActivity(String email, String displayName, String friendPhotoUrl) {
+
+        for (ChatRoomDTO data : chatPathArray){
+            if (data.getUser1().equals(user.getEmail()) && data.getUser2().equals(email)){
+                chatRoomPath = data.getChatPath();
+                break;
+            }else if (data.getUser1().equals(email)&&data.getUser2().equals(user.getEmail())){
+                chatRoomPath = data.getChatPath();
+                break;
+            }
+        }
         Intent it = new Intent(this, PersonalChatActivity.class);
-        it.putExtra("displayName",displayName);
-        it.putExtra("mail",email);
-        it.putExtra("photoUrl",friendPhotoUrl);
+        it.putExtra("displayName", displayName);
+        it.putExtra("mail", email);
+        it.putExtra("photoUrl", friendPhotoUrl);
+        it.putExtra("path",chatRoomPath);
         startActivity(it);
         finish();
     }
@@ -417,16 +450,19 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
                 .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                          if (userDialog != null){
-                              userDialog.dismiss();
-                          }
-                          presenter.onConfirmToDelectFriendClick(friendEmail,itemPosition);
+
+                        presenter.onConfirmToDelectFriendClick(friendEmail, itemPosition);
+                        if (userDialog != null) {
+                            userDialog.dismiss();
+                        }
 
                     }
                 }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
+                        if (userDialog != null) {
+                            userDialog.dismiss();
+                        }
                     }
                 }).create();
         dialog.show();
@@ -434,7 +470,7 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
 
     @Override
     public void deleteFriendData(final String friendEmail) {
-        if (user != null && user.getEmail() != null){
+        if (user != null && user.getEmail() != null) {
             firestore.collection(FRIENDSHIP)
                     .document(friendEmail)
                     .collection(FRIEND)
@@ -443,8 +479,8 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                deleteUserFriend(user.getEmail(),friendEmail);
+                            if (task.isSuccessful()) {
+                                deleteUserFriend(user.getEmail(), friendEmail);
                             }
                         }
                     });
@@ -455,10 +491,16 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
     @Override
     public void changeRecyclerView(int itemPosition) {
         friendArrayList.remove(itemPosition);
-        friendPresenter.setData(inviteArrayList,friendArrayList);
-        if (adapter != null){
+        friendPresenter.setData(inviteArrayList, friendArrayList);
+        if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void showNoFriendInfo(boolean isShow) {
+        tvInfo.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        ivLogo.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
 
     private void deleteUserFriend(final String userEmail, final String friendEmail) {
@@ -470,51 +512,63 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            deleteChatData(userEmail,friendEmail);
+                        if (task.isSuccessful()) {
+                            deleteChatData(userEmail, friendEmail);
                         }
                     }
                 });
     }
 
     private void deleteChatData(final String userEmail, final String friendEmail) {
-
-
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final String path = userEmail + "And" + friendEmail;
-                final ArrayList<String> documentId = new ArrayList<>();
-                firestore.collection(PERSONAL_CHAT).document(path)
-                        .collection(CHAT_DATA)
+                firestore.collection("chat_room")
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful() && task.getResult() != null){
-                                    for (QueryDocumentSnapshot snapshot : task.getResult()){
-                                        documentId.add(snapshot.getId());
-                                        Log.i("Michael",snapshot.getId());
-                                    }
-                                    if (documentId.size() != 0){
-                                        for (String id : documentId){
-                                            firestore.collection(PERSONAL_CHAT).document(path)
-                                                    .collection(CHAT_DATA)
-                                                    .document(id)
-                                                    .delete()
-                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                            if (task.isSuccessful()){
-                                                                Log.i("Michael","刪除成功");
-                                                            }
-                                                        }
-                                                    });
+                                if (task.isSuccessful() && task.getResult() != null) {
+                                    for (QueryDocumentSnapshot snapshot : task.getResult()) {
+                                        String user1 = (String) snapshot.get("user1");
+                                        String user2 = (String) snapshot.get("user2");
+                                        if (user1 != null && user2 != null) {
+                                            if (user1.equals(userEmail) && user2.equals(friendEmail)) {
+                                                chatRoomPath = snapshot.getId();
+                                                break;
+                                            } else if (user1.equals(friendEmail) && user2.equals(userEmail)) {
+                                                chatRoomPath = snapshot.getId();
+                                                break;
+                                            }
+                                        } else {
+                                            Log.i("Michael", "沒資料");
                                         }
-                                        deletePath(path);
-                                    }else {
-                                        searchAgain(userEmail,friendEmail);
                                     }
+                                    if (chatRoomPath != null) {
+                                        firestore.collection("chat_data")
+                                                .document(chatRoomPath)
+                                                .delete()
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            Log.i("Michael", "聊天刪除成功");
+                                                        }
+                                                    }
+                                                });
+                                        firestore.collection("chat_room")
+                                                .document(chatRoomPath)
+                                                .delete()
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()){
+                                                            Log.i("Michael","路徑刪除成功");
+                                                        }
+                                                    }
+                                                });
+                                    }
+
                                 }
                             }
                         });
@@ -523,54 +577,6 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
 
     }
 
-    private void deletePath(String path) {
-        firestore.collection(PERSONAL_CHAT).document(path)
-                .delete()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            Log.i("Michael","路徑刪除");
-                        }
-                    }
-                });
-    }
-
-    private void searchAgain(String userEmail, String friendEmail) {
-        final String path = friendEmail + "And" + userEmail;
-        final ArrayList<String> documentId = new ArrayList<>();
-        firestore.collection(PERSONAL_CHAT).document(path)
-                .collection(CHAT_DATA)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful() && task.getResult() != null){
-                            for (QueryDocumentSnapshot snapshot : task.getResult()){
-                                documentId.add(snapshot.getId());
-                                Log.i("Michael",snapshot.getId());
-                            }
-                            if (documentId.size() != 0){
-                                for (String id : documentId){
-                                    firestore.collection(PERSONAL_CHAT).document(path)
-                                            .collection(CHAT_DATA)
-                                            .document(id)
-                                            .delete()
-                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()){
-                                                        Log.i("Michael","刪除成功");
-                                                    }
-                                                }
-                                            });
-                                }
-                                deletePath(path);
-                            }
-                        }
-                    }
-                });
-    }
 
     private void showView(View view) {
         userDialog = new AlertDialog.Builder(this)
@@ -579,6 +585,9 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
         if (window != null) {
             window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         }
-        userDialog.show();
+        if (!userDialog.isShowing()){
+            userDialog.show();
+        }
+
     }
 }

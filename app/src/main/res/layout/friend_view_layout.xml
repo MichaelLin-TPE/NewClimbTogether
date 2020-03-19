@@ -9,7 +9,9 @@
         android:id="@+id/friend_title"
         app:layout_constraintTop_toTopOf="parent"
         android:text="@string/friend"
-        android:background="@color/grey"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/big_text_size"
+        android:background="@color/item_blue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

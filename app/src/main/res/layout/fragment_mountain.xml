@@ -123,23 +123,24 @@
         android:layout_height="25dp"/>
 
     <ImageView
+        android:contentDescription="@null"
         app:layout_constraintTop_toTopOf="@id/mountain_fragment_spinner"
         app:layout_constraintRight_toLeftOf="@id/mountain_fragment_spinner"
         android:src="@drawable/icn_vod_sort"
         android:layout_width="25dp"
         android:layout_height="25dp"/>
 
-    <Spinner
+    <TextView
         android:layout_marginTop="10dp"
         android:id="@+id/mountain_fragment_spinner"
         app:layout_constraintTop_toBottomOf="@id/mountain_fragment_notice"
         app:layout_constraintRight_toLeftOf="@id/mountain_fragment_drop_down_icon"
-        android:spinnerMode="dialog"
         android:gravity="center"
         android:background="@null"
         android:layout_width="wrap_content"
         android:layout_height="25dp"/>
     <ImageView
+        android:contentDescription="@null"
         android:id="@+id/mountain_fragment_drop_down_icon"
         android:src="@drawable/icn_vod_dropdown"
         app:layout_constraintRight_toRightOf="parent"

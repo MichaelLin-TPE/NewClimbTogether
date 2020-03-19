@@ -52,7 +52,7 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
     }
 
     @Override
-    public void onCatchallData(ArrayList<String> jsonArray) {
+    public void onCatchallData(ArrayList<String> jsonArray, ArrayList<String> documentIdArray) {
 
         if (jsonArray.size() == 0){
             Log.i("Michael","沒資料");
@@ -81,6 +81,7 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
                             data.setFriendEmail(dataArrayList.get(i).getUserTwoDataDTO().getEmai());
                             data.setMessage(dataArrayList.get(i).getChatData().get(chatIndex).getMessage());
                             data.setTime(dataArrayList.get(i).getChatData().get(chatIndex).getTime());
+                            data.setDocumentPath(documentIdArray.get(i));
                             chatArray.add(data);
                         }
                     }else if (mView.getUserEmail().equals(dataArrayList.get(i).getUserTwoDataDTO().getEmai())){
@@ -90,6 +91,7 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
                             data.setFriendEmail(dataArrayList.get(i).getUserOneDataDTO().getEmai());
                             data.setMessage(dataArrayList.get(i).getChatData().get(chatIndex).getMessage());
                             data.setTime(dataArrayList.get(i).getChatData().get(chatIndex).getTime());
+                            data.setDocumentPath(documentIdArray.get(i));
                             chatArray.add(data);
                         }
                     }

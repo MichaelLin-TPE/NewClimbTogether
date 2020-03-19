@@ -1,12 +1,13 @@
 package com.hiking.climbtogether.home_fragment.weather_view;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Handler;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 
 public class WeatherSpinnerView extends ConstraintLayout implements WeatherSpinnerVu {
 
-    private Spinner spinner;
+    private TextView tvSpinner;
 
     private RecyclerView recyclerView;
 
@@ -54,7 +55,7 @@ public class WeatherSpinnerView extends ConstraintLayout implements WeatherSpinn
 
     private void initView(View view) {
         progressBar = view.findViewById(R.id.weather_progressbar);
-        spinner = view.findViewById(R.id.weather_spinner);
+        tvSpinner = view.findViewById(R.id.weather_spinner);
         recyclerView = view.findViewById(R.id.weather_recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -63,21 +64,20 @@ public class WeatherSpinnerView extends ConstraintLayout implements WeatherSpinn
 
     public void setData(ArrayList<String> nationParkNameArray) {
 
-        spinnerPresenter.onShowSpinner(nationParkNameArray);
+        tvSpinner.setText(nationParkNameArray.get(0));
 
-        //先採用舊的方法取得天氣
+        spinnerPresenter.onShowRecyclerView();
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+
+        //改成客製化Dialog
+        tvSpinner.setOnClickListener(new OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int itemPosition, long l) {
-                spinnerPresenter.onSpinnerItemSelectListener(itemPosition);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
+            public void onClick(View v) {
+                spinnerPresenter.onShowCustomDialog(nationParkNameArray);
             }
         });
+
 
     }
 
@@ -87,14 +87,6 @@ public class WeatherSpinnerView extends ConstraintLayout implements WeatherSpinn
     }
 
 
-    @Override
-    public void showSpinner(ArrayList<String> nationParkNameArray) {
-        ArrayAdapter<String> stringArray = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, nationParkNameArray);
-        stringArray.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        spinner.setAdapter(stringArray);
-
-        spinnerPresenter.onShowRecyclerView();
-    }
 
     @Override
     public Context getVuContext() {
@@ -122,5 +114,33 @@ public class WeatherSpinnerView extends ConstraintLayout implements WeatherSpinn
             }
         });
 
+    }
+
+    @Override
+    public void showDialog(ArrayList<String> nationParkNameArray) {
+        ArrayList<Integer> imageArray = new ArrayList<>();
+        imageArray.add(R.drawable.yu_icon);
+        imageArray.add(R.drawable.snow_icon);
+        imageArray.add(R.drawable.ru_icon);
+        imageArray.add(R.drawable.sun_icon);
+
+        View view = View.inflate(getContext(),R.layout.weather_spinner_dialog,null);
+        RecyclerView recyclerView = view.findViewById(R.id.weather_dialog_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        WeatherDialogAdapter adapter = new WeatherDialogAdapter(getContext(),nationParkNameArray,imageArray);
+
+        recyclerView.setAdapter(adapter);
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setView(view).create();
+        dialog.show();
+        adapter.setOnWeatherDialogItemClickListener(new WeatherDialogAdapter.OnWeatherDialogItemClickListener() {
+            @Override
+            public void onClick(String name, int position) {
+                tvSpinner.setText(name);
+                spinnerPresenter.onSpinnerItemSelectListener(name,position);
+                dialog.dismiss();
+            }
+        });
     }
 }

@@ -239,6 +239,7 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVu 
                     user.put("displayName", displayName);
                     user.put("currentTime", currentTime);
                     user.put("photoUrl","");
+                    user.put("token","");
                     if (firebaseUser != null) {
                         user.put("uid", firebaseUser.getUid());
                     }

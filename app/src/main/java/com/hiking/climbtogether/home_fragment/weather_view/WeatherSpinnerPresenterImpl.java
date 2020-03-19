@@ -20,11 +20,6 @@ public class WeatherSpinnerPresenterImpl implements WeatherSpinnerPresenter {
     }
 
     @Override
-    public void onShowSpinner(ArrayList<String> nationParkNameArray) {
-        mView.showSpinner(nationParkNameArray);
-    }
-
-    @Override
     public void onShowRecyclerView() {
         weatherUrl = new ArrayList<>();
         /**
@@ -59,8 +54,8 @@ public class WeatherSpinnerPresenterImpl implements WeatherSpinnerPresenter {
     }
 
     @Override
-    public void onSpinnerItemSelectListener(int itemPosition) {
-        weatherManager.getDataFromHTML(weatherUrl.get(itemPosition), new NationalParkWeatherAndNewsManager.OnWeatherListener() {
+    public void onSpinnerItemSelectListener(String name, int position) {
+        weatherManager.getDataFromHTML(weatherUrl.get(position), new NationalParkWeatherAndNewsManager.OnWeatherListener() {
             @Override
             public void onSuccess(ArrayList<String> timeArray, ArrayList<String> tempArray, ArrayList<String> rainArray, ArrayList<String> imgUrlArray) {
                 Log.i("Michael", "日期 : " + timeArray.get(0)+"資料長度 : "+timeArray.size());
@@ -72,5 +67,10 @@ public class WeatherSpinnerPresenterImpl implements WeatherSpinnerPresenter {
 
             }
         });
+    }
+
+    @Override
+    public void onShowCustomDialog(ArrayList<String> nationParkNameArray) {
+        mView.showDialog(nationParkNameArray);
     }
 }

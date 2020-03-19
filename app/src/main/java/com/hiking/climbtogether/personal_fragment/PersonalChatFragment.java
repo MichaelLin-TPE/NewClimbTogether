@@ -160,7 +160,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                                         documentIdArray.add(path);
                                     }
                                 }
-                                presenter.onCatchallData(jsonArray);
+                                presenter.onCatchallData(jsonArray,documentIdArray);
                             }
                         }
                     });
@@ -210,8 +210,8 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                     recyclerView.setAdapter(adapter);
                     adapter.setOnChatItemClickListener(new PersonalFragmentAdapter.OnChatItemClickListener() {
                         @Override
-                        public void onClick(String displayName, String friendEmail, String photoUrl, int position) {
-                            presenter.onItemClickListener(displayName, friendEmail, photoUrl,documentIdArray.get(position));
+                        public void onClick(String displayName, String friendEmail, String photoUrl, int position, String documentPath) {
+                            presenter.onItemClickListener(displayName, friendEmail, photoUrl,documentPath);
                         }
                     });
                     adapter.setOnChatItemLongClickListener(new PersonalFragmentAdapter.OnChatItemLongClickListener() {

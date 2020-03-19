@@ -227,4 +227,9 @@ public class MountainFragmentPresentImpl implements MountainFragmentPresenter {
 
         mView.intentToMtDetailActivity(data);
     }
+
+    @Override
+    public void onShowSpinnerDialog(ArrayList<String> spinnerData) {
+        mView.showSpinnerDialog(spinnerData);
+    }
 }

@@ -30,4 +30,6 @@ public interface MountainCollectionPresenter {
     void onShowProgressToast(String message);
 
     void onDatePickerDialogClickListener(DataDTO dataDTO, long pickTime);
+
+    void onShowSpinnerDialog(ArrayList<String> listArray);
 }

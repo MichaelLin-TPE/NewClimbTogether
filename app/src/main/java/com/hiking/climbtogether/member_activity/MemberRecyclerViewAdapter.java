@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.nostra13.universalimageloader.utils.L;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -35,6 +36,8 @@ public class MemberRecyclerViewAdapter extends RecyclerView.Adapter<MemberRecycl
     private OnMemberListItemClickListener listItemClickListener;
 
     private FirebaseUser user;
+
+    private int inviteCount;
 
     private FirebaseFirestore firestore;
 
@@ -71,14 +74,13 @@ public class MemberRecyclerViewAdapter extends RecyclerView.Adapter<MemberRecycl
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         if (position == 4){
-            if (user != null){
-                if (user.getEmail() != null){
-                    searchDataFromFirebase(user.getEmail(),holder.tvInvite,holder.ivIconNext);
-                }
-            }else{
-                holder.ivIconNext.setVisibility(View.VISIBLE);
+            if (inviteCount != 0){
+                holder.tvInvite.setVisibility(View.VISIBLE);
+                holder.ivIconNext.setVisibility(View.GONE);
+                holder.tvInvite.setText(String.format(Locale.getDefault(),"%d",inviteCount));
+            }else {
                 holder.tvInvite.setVisibility(View.GONE);
-                Log.i("Michael","user null");
+                holder.ivIconNext.setVisibility(View.VISIBLE);
             }
         }else {
             holder.ivIconNext.setVisibility(View.VISIBLE);
@@ -96,39 +98,14 @@ public class MemberRecyclerViewAdapter extends RecyclerView.Adapter<MemberRecycl
 
     }
 
-    private void searchDataFromFirebase(String email, final TextView tvInvite, final ImageView ivIconNext) {
-        Log.i("Michael","查詢邀請");
-        final ArrayList<String> nameList = new ArrayList<>();
-        firestore.collection(INVITE_FRIEND).document(email).collection(INVITE).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()){
-                            if (task.getResult() != null){
-                                for (QueryDocumentSnapshot document : task.getResult()){
-                                    nameList.add(document.getId());
-                                }
-                                if (nameList.size() != 0){
-                                    Log.i("Michael","有邀請");
-                                    tvInvite.setVisibility(View.VISIBLE);
-                                    ivIconNext.setVisibility(View.GONE);
-                                    tvInvite.setText(String.format(Locale.getDefault(),"%d",nameList.size()));
-                                }else {
-                                    Log.i("Michael","沒邀請");
-                                    tvInvite.setVisibility(View.GONE);
-                                    ivIconNext.setVisibility(View.VISIBLE);
-                                }
-
-
-                            }
-                        }
-                    }
-                });
-    }
 
     @Override
     public int getItemCount() {
         return btnList.size();
+    }
+
+    public void setInviteCount(int inviteCount) {
+        this.inviteCount = inviteCount;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{

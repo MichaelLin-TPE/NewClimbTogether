@@ -5,18 +5,22 @@
     android:padding="5dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <Spinner
+    <TextView
         android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:gravity="center"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/big_text_size"
         android:id="@+id/weather_spinner"
         android:background="@drawable/circle_shapte"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:spinnerMode="dialog"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_width="match_parent"
         android:layout_height="@dimen/spinner_height"/>
 
     <ImageView
+        android:contentDescription="@null"
         app:layout_constraintTop_toTopOf="@id/weather_spinner"
         app:layout_constraintBottom_toBottomOf="@id/weather_spinner"
         app:layout_constraintRight_toRightOf="parent"

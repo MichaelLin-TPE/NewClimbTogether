@@ -28,12 +28,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <Spinner
+    <TextView
         android:id="@+id/favorite_mt_spinner"
+        android:layout_marginStart="10dp"
+        tools:text="XXXX"
         app:layout_constraintTop_toTopOf="@id/favorite_mt_choose_mode"
         app:layout_constraintBottom_toBottomOf="@id/favorite_mt_choose_mode"
         app:layout_constraintLeft_toRightOf="@id/favorite_mt_choose_mode"
-        android:spinnerMode="dialog"
         android:background="@null"
         android:layout_width="wrap_content"
         android:layout_height="0dp"/>

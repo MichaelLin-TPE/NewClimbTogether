@@ -14,5 +14,5 @@ public interface PersonalFragmentPresenter {
 
     void onShowDeleteMessageConfirmDialog(String documentPath);
 
-    void onCatchallData(ArrayList<String> jsonArray);
+    void onCatchallData(ArrayList<String> jsonArray, ArrayList<String> documentIdArray);
 }

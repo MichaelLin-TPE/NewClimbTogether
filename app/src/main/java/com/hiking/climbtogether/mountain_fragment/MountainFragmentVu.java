@@ -38,4 +38,6 @@ public interface MountainFragmentVu {
     void changeRecyclerViewSor(ArrayList<DataDTO> allInformation);
 
     void intentToMtDetailActivity(DataDTO data);
+
+    void showSpinnerDialog(ArrayList<String> spinnerData);
 }

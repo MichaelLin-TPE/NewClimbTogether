@@ -126,8 +126,10 @@ public class MountainCollectionPresenterImpl implements MountainCollectionPresen
                 mView.selectPhoto(dataDTO.getName());
                 break;
             case WATCH_INFORMATION:
+                mView.intentToDetailActivity(dataDTO);
                 break;
             case SHARE_EXPERIENCE:
+                mView.intentToShareActivity();
                 break;
             case MODIFY_TIME:
                 mView.showDatePickerDialog(dataDTO);
@@ -157,6 +159,11 @@ public class MountainCollectionPresenterImpl implements MountainCollectionPresen
         data.setTime(pickTime);
         db.update(data);
         mView.modifyFirestoreData(data,pickTime);
+    }
+
+    @Override
+    public void onShowSpinnerDialog(ArrayList<String> listArray) {
+        mView.showSpinnerDialog(listArray);
     }
 
 }

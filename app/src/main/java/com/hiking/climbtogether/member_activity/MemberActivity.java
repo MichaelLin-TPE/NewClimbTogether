@@ -25,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.friend_manager_activity.FriendManagerActivity;
 import com.hiking.climbtogether.login_activity.LoginActivity;
@@ -89,14 +91,13 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
     private UserDataManager userDataManager;
 
+    private static final String INVITE_FRIEND = "invite_friend";
+
+    private static final String INVITE = "invite";
+
     private String displayName;
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
-    }
+    private int inviteCount;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -182,8 +183,6 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         if (signOut != null) {
             signOut.setVisible(!isShow);
         }
-        adapter.setCurrent(isShow ? null : currentUser);
-        adapter.notifyDataSetChanged();
 
 
     }
@@ -192,6 +191,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     protected void onResume() {
         super.onResume();
         currentUser = mAuth.getCurrentUser();
+        searchDataFromFirebase();
         updateUI(currentUser);
 
 
@@ -265,8 +265,14 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
     @Override
     public void intentToMtCollectionActivity() {
-        Intent it = new Intent(this, MountainCollectionActivity.class);
-        startActivity(it);
+        if (currentUser != null){
+            Intent it = new Intent(this, MountainCollectionActivity.class);
+            startActivity(it);
+        }else {
+            Intent it = new Intent(this, LoginActivity.class);
+            startActivity(it);
+        }
+
     }
 
 
@@ -308,9 +314,16 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
     @Override
     public void intentToMyEquipmentActivity() {
-        Intent it = new Intent(this, MyEquipmentActivity.class);
-        startActivity(it);
-        finish();
+        if (currentUser != null){
+            Intent it = new Intent(this, MyEquipmentActivity.class);
+            startActivity(it);
+            finish();
+        }else {
+            Intent it = new Intent(this, LoginActivity.class);
+            startActivity(it);
+            finish();
+        }
+
     }
 
     @Override
@@ -421,15 +434,53 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_member);
+        initFirebase();
+        initPresenter();
+        initView();
+        searchDataFromFirebase();
+        updateUI(currentUser);
+
+    }
+    private void searchDataFromFirebase() {
+        Log.i("Michael","查詢邀請");
+        currentUser = mAuth.getCurrentUser();
+        final ArrayList<String> nameList = new ArrayList<>();
+        if (currentUser != null && currentUser.getEmail() != null){
+            firestore.collection(INVITE_FRIEND).document(currentUser.getEmail()).collection(INVITE).get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()){
+                                if (task.getResult() != null){
+                                    for (QueryDocumentSnapshot document : task.getResult()){
+                                        nameList.add(document.getId());
+                                    }
+                                    if (nameList.size() != 0){
+                                        Log.i("Michael","有邀請");
+                                        inviteCount = nameList.size();
+                                    }else {
+                                        Log.i("Michael","沒邀請");
+                                        inviteCount = 0;
+                                    }
+                                    presenter.onShowRecycler();
+
+                                }
+                            }
+                        }
+                    });
+        }else {
+            presenter.onShowRecycler();
+        }
+
+    }
+
+    private void initFirebase() {
         //初始化Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance().getReference();
         firestore = FirebaseFirestore.getInstance();
         imageLoaderManager = new ImageLoaderManager(this);
         userDataManager = new UserDataManager(this);
-        initPresenter();
-        initView();
-        presenter.onShowRecycler();
     }
 
 
@@ -488,7 +539,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         iconArray.add(R.drawable.backpack);
 
         adapter = new MemberRecyclerViewAdapter(iconArray, btnList, this);
-        currentUser = mAuth.getCurrentUser();
+        adapter.setInviteCount(inviteCount);
         adapter.setCurrent(currentUser);
         recyclerView.setAdapter(adapter);
 

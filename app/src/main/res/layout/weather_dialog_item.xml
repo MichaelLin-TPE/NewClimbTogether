@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/weather_item_click_area"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/weather_item_icon"
+        android:contentDescription="@null"
+        android:src="@drawable/yu_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:scaleType="centerCrop"
+        android:layout_width="@dimen/smaller_icon_size"
+        android:layout_height="@dimen/smaller_icon_size"/>
+
+    <TextView
+        android:id="@+id/weather_item_title"
+        android:textSize="@dimen/big_text_size"
+        android:textColor="@color/colorPrimaryDark"
+        app:layout_constraintTop_toTopOf="@id/weather_item_icon"
+        app:layout_constraintBottom_toBottomOf="@id/weather_item_icon"
+        app:layout_constraintLeft_toRightOf="@id/weather_item_icon"
+        tools:text="玉山國家公園"
+        android:layout_marginStart="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

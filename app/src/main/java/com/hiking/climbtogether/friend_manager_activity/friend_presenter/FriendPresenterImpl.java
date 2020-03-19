@@ -24,7 +24,7 @@ public class FriendPresenterImpl implements FriendPresenter {
     private ArrayList<FriendDTO> friendArrayList;
 
 
-    public void setOnfriendItemClickListener (FriendViewAdapter.OnfriendItemClickListener listener ,FriendViewHolder holder){
+    public void setOnfriendItemClickListener(FriendViewAdapter.OnfriendItemClickListener listener, FriendViewHolder holder) {
         holder.setOnfriendItemClickListener(listener);
     }
 
@@ -36,17 +36,15 @@ public class FriendPresenterImpl implements FriendPresenter {
     @Override
     public int getItemViewType(int position) {
 
-        if (isInvite){
-            if (position == 0){
-                Log.i("Michael","做好友邀請");
-                return FRIEND_INVITE;
-            }
+        if (isInvite && position == 0) {
+            Log.i("Michael", "做好友邀請");
+            return FRIEND_INVITE;
         }
-        if (isFriendShow){
-            if (position == 0){
-                Log.i("Michael","做好友管理");
+        if (isFriendShow) {
+            if (position == 0) {
+                Log.i("Michael", "做好友管理");
                 return FRIEND_MANAGEMENT;
-            }else if (position == 1){
+            } else if (position == 1) {
                 return FRIEND_MANAGEMENT;
             }
 
@@ -57,13 +55,13 @@ public class FriendPresenterImpl implements FriendPresenter {
     @Override
     public int getItemCount() {
         int itemCount = 0;
-        if (isInvite){
-            itemCount ++;
+        if (isInvite) {
+            itemCount++;
         }
-        if (isFriendShow){
-            itemCount ++;
+        if (isFriendShow) {
+            itemCount++;
         }
-        Log.i("Michael","item 數量 : "+itemCount);
+        Log.i("Michael", "item 數量 : " + itemCount);
         return itemCount;
     }
 
@@ -76,7 +74,7 @@ public class FriendPresenterImpl implements FriendPresenter {
 
         isFriendShow = friendArrayList.size() != 0;
 
-        Log.i("Michael","邀請 : "+isInvite + " , 好友 : "+isFriendShow);
+        Log.i("Michael", "邀請 : " + isInvite + " , 好友 : " + isFriendShow);
 
     }
 

@@ -9,7 +9,9 @@
         android:id="@+id/invite_title"
         app:layout_constraintTop_toTopOf="parent"
         android:text="@string/friend_invite"
-        android:background="@color/grey"
+        android:textSize="@dimen/big_text_size"
+        android:textColor="@color/colorPrimaryDark"
+        android:background="@color/item_green"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

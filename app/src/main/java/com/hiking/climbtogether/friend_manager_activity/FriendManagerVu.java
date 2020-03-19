@@ -16,4 +16,6 @@ public interface FriendManagerVu {
     void deleteFriendData(String friendEmail);
 
     void changeRecyclerView(int itemPosition);
+
+    void showNoFriendInfo(boolean isShow);
 }
