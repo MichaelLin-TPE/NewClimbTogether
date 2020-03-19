@@ -1,5 +1,8 @@
 package com.hiking.climbtogether;
 
 public interface MainActivityVu {
-    void intentToHomePageActivity();
+
+    void applyToken();
+
+    void saveCurrentUserData();
 }

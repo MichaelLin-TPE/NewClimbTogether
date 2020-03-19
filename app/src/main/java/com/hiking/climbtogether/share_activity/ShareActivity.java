@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.google.firebase.firestore.Query;
 import com.hiking.climbtogether.R;
+import com.hiking.climbtogether.friend_manager_activity.ChatRoomDTO;
 import com.hiking.climbtogether.personal_chat_activity.PersonalChatActivity;
 import com.hiking.climbtogether.share_activity.share_json.ShareArticleJson;
 import com.hiking.climbtogether.share_activity.share_json.ShareClickLikeObject;
@@ -121,7 +122,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     private ArrayList<ShareArticleJson> dataArrayList;
     private Gson gson;
-
+    private ArrayList<ChatRoomDTO> chatRoomArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,10 +132,30 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         imageLoaderManager = new ImageLoaderManager(this);
         gson = new Gson();
         initFirebase();
+        searchChatRoom();
         initPresenter();
         initView();
-
         searchData();
+    }
+
+    private void searchChatRoom() {
+        firestore.collection("chat_room")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        chatRoomArrayList = new ArrayList<>();
+                        if (task.isSuccessful() && task.getResult() != null){
+                            for (QueryDocumentSnapshot snapshot : task.getResult()){
+                                ChatRoomDTO data = new ChatRoomDTO();
+                                data.setUser1((String)snapshot.get("user1"));
+                                data.setUser2((String)snapshot.get("user2"));
+                                data.setChatPath(snapshot.getId());
+                                chatRoomArrayList.add(data);
+                            }
+                        }
+                    }
+                });
     }
 
     private void searchData() {
@@ -528,10 +549,21 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     @Override
     public void intentToPersonalChatActivity(ShareArticleJson data) {
+        String path = "";
+        for (ChatRoomDTO chat : chatRoomArrayList){
+            if (chat.getUser2().equals(data.getEmail())&& chat.getUser1().equals(user.getEmail())){
+                path = chat.getChatPath();
+                break;
+            }else if (chat.getUser2().equals(user.getEmail())&& chat.getUser1().equals(data.getEmail())){
+                path = chat.getChatPath();
+                break;
+            }
+        }
         Intent it = new Intent(this, PersonalChatActivity.class);
         it.putExtra("displayName", data.getDisplayName());
         it.putExtra("mail", data.getEmail());
         it.putExtra("photoUrl", data.getUserPhoto());
+        it.putExtra("path",path);
         startActivity(it);
     }
 

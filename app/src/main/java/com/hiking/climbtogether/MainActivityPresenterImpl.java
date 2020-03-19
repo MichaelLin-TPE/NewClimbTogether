@@ -9,7 +9,12 @@ public class MainActivityPresenterImpl implements MainActivityPresenter {
     }
 
     @Override
-    public void onBtnTestClickListener() {
-        mView.intentToHomePageActivity();
+    public void onApplyToken() {
+        mView.applyToken();
+    }
+
+    @Override
+    public void onSaveCurrentUserData() {
+        mView.saveCurrentUserData();
     }
 }

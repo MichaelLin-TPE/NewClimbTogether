@@ -1,5 +1,8 @@
 package com.hiking.climbtogether;
 
 public interface MainActivityPresenter {
-    void onBtnTestClickListener();
+
+    void onApplyToken();
+
+    void onSaveCurrentUserData();
 }

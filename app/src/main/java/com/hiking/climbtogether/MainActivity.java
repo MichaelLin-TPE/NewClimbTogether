@@ -32,6 +32,7 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.luck.picture.lib.listener.OnResultCallbackListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +40,6 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity implements MainActivityVu {
 
     private MainActivityPresenter mainPresenter;
-
-    private Toolbar toolbar;
 
     private UserDataManager userDataManager;
 
@@ -65,103 +64,105 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
-
         initPresenter();
-        initActionBar();
-
-        Button btnTest = findViewById(R.id.main_test_btn);
-        btnTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mainPresenter.onBtnTestClickListener();
-            }
-        });
-
         userDataManager = new UserDataManager(this);
 
-        //申請推播TOKEN
-        FirebaseInstanceId.getInstance().getInstanceId()
-                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        if (task.isSuccessful() && task.getResult() != null){
-                            String token = task.getResult().getToken();
-
-                            Log.i("Michael","new Token : "+token);
-                            userDataManager.saveNotificationToken(token);
-                            updateUserToken(token);
-                        }
-
-                    }
-                });
-        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            String channelId = getString(R.string.default_notification_channel_id);
-            String channelName = "default_notification_channel_name";
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(new NotificationChannel(channelId,channelName,NotificationManager.IMPORTANCE_LOW));
-        }
-
-
-        saveCurrentUserData();
+        mainPresenter.onApplyToken();
 
         //先判斷動態權限
-
-        verifyStoragePermissions(this);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                verifyStoragePermissions(MainActivity.this);
+            }
+        }).start();
 
 
     }
 
     private void verifyStoragePermissions(MainActivity mainActivity) {
         try {
-            int permission = ActivityCompat.checkSelfPermission(mainActivity,
+            permission = ActivityCompat.checkSelfPermission(mainActivity,
                     "android.permission.WRITE_EXTERNAL_STORAGE");
             if (permission != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(mainActivity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+
+            }else {
+                try {
+                    Thread.sleep(2000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Intent it = new Intent(MainActivity.this,HomePageActivity.class);
+                startActivity(it);
+                finish();
             }
-            //開啟通知權限
-            NotificationManagerCompat manager = NotificationManagerCompat.from(MainActivity.this);
-            boolean isEnable = manager.areNotificationsEnabled();
-            if (!isEnable){
-
-                AlertDialog dialog = new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.permission))
-                        .setMessage(getString(R.string.is_open_notification))
-                        .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    //这种方案适用于 API 26, 即8.0（含8.0）以上可以用
-                                    Intent intent = new Intent();
-                                    intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-                                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
-                                    intent.putExtra(Settings.EXTRA_CHANNEL_ID, getApplicationInfo().uid);
-                                    startActivity(intent);
-                                } else {
-                                    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                                        toSystemConfig();
-                                    } else {
-                                        try {
-                                            toApplicationInfo();
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                            toSystemConfig();
-                                        }
-                                    }
-                                }
-                            }
-                        }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        }).create();
-                dialog.show();
-            }
-
-
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case REQUEST_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //開啟通知權限
+                    NotificationManagerCompat manager = NotificationManagerCompat.from(MainActivity.this);
+                    boolean isEnable = manager.areNotificationsEnabled();
+                    if (!isEnable) {
+
+                        AlertDialog dialog = new AlertDialog.Builder(this)
+                                .setTitle(getString(R.string.permission))
+                                .setMessage(getString(R.string.is_open_notification))
+                                .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                            //这种方案适用于 API 26, 即8.0（含8.0）以上可以用
+                                            Intent intent = new Intent();
+                                            intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                                            intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                                            intent.putExtra(Settings.EXTRA_CHANNEL_ID, getApplicationInfo().uid);
+                                            startActivity(intent);
+                                        } else {
+                                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                                                toSystemConfig();
+                                            } else {
+                                                try {
+                                                    toApplicationInfo();
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                    toSystemConfig();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                }).create();
+                        dialog.show();
+                    }else {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        Intent it = new Intent(MainActivity.this,HomePageActivity.class);
+                        startActivity(it);
+                        finish();
+                    }
+                } else {
+                    ActivityCompat.requestPermissions(MainActivity.this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+                }
+                break;
+            default:
+                break;
         }
     }
 
@@ -182,56 +183,64 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
         }
     }
 
-    private void updateUserToken(String token) {
-        if (user != null && user.getEmail() != null){
-            Map<String,Object> map = new HashMap<>();
-            map.put("token",token);
-            firestore.collection("users").document(user.getEmail())
-                    .set(map, SetOptions.merge());
+    @Override
+    public void saveCurrentUserData() {
+        if (user != null && user.getEmail() != null) {
+            firestore.collection("users")
+                    .document(user.getEmail())
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                DocumentSnapshot snapshot = task.getResult();
+                                userDataManager.saveUserData((String) snapshot.get("email"), (String) snapshot.get("displayName"), (String) snapshot.get("photoUrl"));
+                            }
+                        }
+                    });
+
         }
     }
 
-    private void saveCurrentUserData() {
-
-        if (user != null && user.getEmail() != null){
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    firestore.collection("users")
-                            .document(user.getEmail())
-                            .get()
-                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if (task.isSuccessful() && task.getResult() != null){
-                                        DocumentSnapshot snapshot = task.getResult();
-                                        userDataManager.saveUserData((String)snapshot.get("email"),(String)snapshot.get("displayName"),(String)snapshot.get("photoUrl"));
-                                    }
-                                }
-                            });
-                }
-            }).start();
-        }
-    }
-
-    private void initActionBar() {
-        toolbar = findViewById(R.id.first_page_toolbar);
-        setSupportActionBar(toolbar);
-
-    }
 
     private void initPresenter() {
         mainPresenter = new MainActivityPresenterImpl(this);
     }
 
     @Override
-    public void intentToHomePageActivity() {
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
-        }else {
-            Intent it = new Intent(this, HomePageActivity.class);
-            startActivity(it);
-        }
+    public void applyToken() {
+        //申請推播TOKEN
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            String token = task.getResult().getToken();
 
+                            Log.i("Michael", "new Token : " + token);
+                            userDataManager.saveNotificationToken(token);
+                            updateUserToken(token);
+                            mainPresenter.onSaveCurrentUserData();
+                        }
+
+                    }
+                });
+        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = getString(R.string.default_notification_channel_id);
+            String channelName = "default_notification_channel_name";
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW));
+        }
     }
+
+    private void updateUserToken(String token) {
+        if (user != null && user.getEmail() != null) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("token", token);
+            firestore.collection("users").document(user.getEmail())
+                    .set(map, SetOptions.merge());
+        }
+    }
+
 }

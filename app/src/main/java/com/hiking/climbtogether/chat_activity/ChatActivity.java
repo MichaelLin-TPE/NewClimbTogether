@@ -29,6 +29,7 @@ import com.google.firebase.firestore.SetOptions;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.chat_activity.chat_view_presenter.ViewPresenter;
 import com.hiking.climbtogether.chat_activity.chat_view_presenter.ViewPresenterImpl;
+import com.hiking.climbtogether.friend_manager_activity.ChatRoomDTO;
 import com.hiking.climbtogether.personal_chat_activity.PersonalChatActivity;
 import com.hiking.climbtogether.tool.ImageLoaderManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -114,6 +115,8 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
 
     private UserDataManager userDataManager;
 
+    private ArrayList<ChatRoomDTO> chatRoomArrayList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,6 +125,7 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
         userDataManager = new UserDataManager(this);
         initPresenter();
         initFirebase();
+        searchChatRoom();
         initBundle();
         initView();
         user = mAuth.getCurrentUser();
@@ -151,6 +155,26 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
         //在家測試
     }
 
+    private void searchChatRoom() {
+        firestore.collection("chat_room")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        chatRoomArrayList = new ArrayList<>();
+                        if (task.isSuccessful() && task.getResult() != null){
+                            for (QueryDocumentSnapshot snapshot : task.getResult()){
+                                ChatRoomDTO data = new ChatRoomDTO();
+                                data.setUser1((String)snapshot.get("user1"));
+                                data.setUser2((String)snapshot.get("user2"));
+                                data.setChatPath(snapshot.getId());
+                                chatRoomArrayList.add(data);
+                            }
+                        }
+                    }
+                });
+    }
+
     private void checkChatData() {
         firestore.collection(DISCUSSION)
                 .document("登山即時討論區")
@@ -177,7 +201,6 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     @Override
     protected void onResume() {
         super.onResume();
-//        checkChatDataChange();
     }
 
     @Override
@@ -186,52 +209,6 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
         isStillPosting = false;
         countSecond = 0;
     }
-
-    /**
-     * countSecond 是拿來如果使用者惡意一直停留在這個畫面的話,就不會20秒後就不會繼續讀取 Firebase
-     * 但是當有人在講話資料新增秒數將重新計算,減少流量
-     */
-
-    private void checkChatDataChange() {
-        isStillPosting = true;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                do {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    countSecond += 1000;
-                    Log.i("Michael", "資料沒新增 : " + countSecond);
-                    if (countSecond < 80000) {
-                        if (isStillPosting) {
-                            checkChatData();
-                        } else {
-                            Log.i("Michael", "結束迴圈");
-                            break;
-                        }
-                    } else {
-                        Log.i("Michael", "結束迴圈");
-                        break;
-                    }
-
-                } while (true);
-            }
-        }).start();
-
-
-    }
-
-    private void notUpdateView() {
-        Map<String,Object> map = new HashMap<>();
-        map.put("is_discuss_update",false);
-        firestore.collection("is_chat_update")
-                .document("update")
-                .set(map,SetOptions.merge());
-    }
-
     private void initFirebase() {
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
@@ -390,10 +367,21 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
 
     @Override
     public void intentToPersonalChatActivity(String displayName, String mail, String photoUrl) {
+        String path = "";
+        for (ChatRoomDTO data : chatRoomArrayList){
+            if (data.getUser1().equals(mail) && data.getUser2().equals(user.getEmail())){
+                path = data.getChatPath();
+                break;
+            }else if (data.getUser1().equals(user.getEmail()) && data.getUser2().equals(mail)){
+                path = data.getChatPath();
+                break;
+            }
+        }
         Intent it = new Intent(this, PersonalChatActivity.class);
         it.putExtra("displayName", displayName);
         it.putExtra("mail", mail);
         it.putExtra("photoUrl", photoUrl);
+        it.putExtra("path",path);
         startActivity(it);
     }
 
@@ -551,10 +539,6 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
-                            if (countSecond >= 80500){
-                                countSecond = 0;
-                                checkChatDataChange();
-                            }
                             Log.i("Michael","該更新資料了");
                             updateView();
                         }
