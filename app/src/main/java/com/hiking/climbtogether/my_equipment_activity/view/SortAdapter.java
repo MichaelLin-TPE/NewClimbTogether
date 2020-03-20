@@ -1,6 +1,7 @@
 package com.hiking.climbtogether.my_equipment_activity.view;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,16 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.ViewHolder> {
 
     private boolean isCheck;
 
+    private static final int PREPARED = 0;
+
+    private static final int NOT_PREPARE = 1;
+
+    private int type;
+
+    public void setMode(int type){
+        this.type = type;
+    }
+
     public void setOnSortItemClickListener(OnSortItemClickListener listener){
         this.listener = listener;
     }
@@ -45,6 +56,17 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         EquipmentListDTO data = dataArrayList.get(position);
+
+        if(type == PREPARED){
+            holder.tvTitle.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
+            holder.tvDescription.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG);
+        }else {
+            holder.tvTitle.getPaint().setFlags(0);
+            holder.tvDescription.getPaint().setFlags(0);
+        }
+
+
+
         holder.tvTitle.setText(data.getName());
         holder.tvDescription.setText(data.getDescription());
         holder.checkBox.setChecked(isCheck);

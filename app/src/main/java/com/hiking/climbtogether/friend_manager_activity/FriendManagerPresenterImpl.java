@@ -45,4 +45,9 @@ public class FriendManagerPresenterImpl implements FriendManagerPresenter {
         mView.changeRecyclerView(itemPosition);
         mView.deleteFriendData(friendEmail);
     }
+
+    @Override
+    public void onSearchButtonClick() {
+        mView.intentToSearchFriendPage();
+    }
 }

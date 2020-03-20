@@ -1,6 +1,7 @@
 package com.hiking.climbtogether.my_equipment_activity.view;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,6 +25,9 @@ public class PreparedViewHolder extends RecyclerView.ViewHolder {
 
     private LinearLayout linearLayout;
 
+    private static final int PREPARED = 0;
+
+
     private SortPreparedAdapter.OnSortPreparedItemClickListener listener;
 
     public void setOnSortItemClickListener(SortPreparedAdapter.OnSortPreparedItemClickListener listener){
@@ -46,6 +50,7 @@ public class PreparedViewHolder extends RecyclerView.ViewHolder {
         linearLayout.setBackgroundColor(ContextCompat.getColor(context,R.color.item_blue));
         tvTitle.setText(context.getString(R.string.prepared));
         SortAdapter adapter = new SortAdapter(context,preparedArrayList);
+        adapter.setMode(PREPARED);
         adapter.setCheck(isCheck);
         recyclerView.setAdapter(adapter);
         adapter.setOnSortItemClickListener(new SortAdapter.OnSortItemClickListener() {

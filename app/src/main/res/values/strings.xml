@@ -107,4 +107,9 @@
     <string name="share_successful">分享成功!</string>
     <string name="delete_notice">此為刪除整筆裝備清單(刪除後將不存在),確認是否要刪除整筆?</string>
     <string name="confirm_to_delete_single_data">確定要刪除此筆資料嗎?</string>
+    <string name="enter_user_email">請輸入Email</string>
+    <string name="search">搜尋</string>
+    <string name="apply_friend">送出邀請</string>
+    <string name="is_friend_already">已經是朋友了.</string>
+    <string name="do_not_search_yourself">請不要沒事搜尋自己好嗎?</string>
 </resources>

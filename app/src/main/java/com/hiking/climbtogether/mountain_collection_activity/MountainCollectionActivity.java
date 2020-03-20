@@ -2,6 +2,7 @@ package com.hiking.climbtogether.mountain_collection_activity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -14,6 +15,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -96,8 +98,6 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
 
     private TextView spinner;
 
-    private static final int IMAGE_REQUEST_CODE = 2;
-
     private StorageReference storageRef;
 
     private String userPreessedMtName;
@@ -109,6 +109,10 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
     private long pickTime;
 
     private ArrayList<DataDTO> dataArrayList;
+
+    private static final String COLLECTION_MOUNTAIN = "collection_mountain";
+
+    private static final String COLLECTION = "collection";
 
 
 
@@ -212,26 +216,29 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
 
         String email = user.getEmail();
         if (email != null){
-            firestore.collection(email).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if (task.isSuccessful()){
-                        if (task.getResult() != null){
-                            for (QueryDocumentSnapshot snapshot : task.getResult()){
-                                mtNameArray.add(snapshot.getId());
-                                Map<String,Object> map = snapshot.getData();
-                                timeArray.add((Long) map.get("topTime"));
-                                downloadUrlArray.add((String) map.get("photoUrl"));
-                            }
-                            if (mtNameArray.size() != 0 && timeArray.size() != 0 && downloadUrlArray.size() != 0){
-                                presenter.onSearchDataSuccessFromFirebase(mtNameArray,timeArray,downloadUrlArray);
-                            }else {
-                                presenter.onSearchNoDataFromFirebase();
+
+            firestore.collection(COLLECTION_MOUNTAIN)
+                    .document(email)
+                    .collection(COLLECTION)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful() && task.getResult() != null){
+                                for (QueryDocumentSnapshot snapshot : task.getResult()){
+                                    mtNameArray.add(snapshot.getId());
+                                    Map<String,Object> map = snapshot.getData();
+                                    timeArray.add((Long) map.get("topTime"));
+                                    downloadUrlArray.add((String) map.get("photoUrl"));
+                                }
+                                if (mtNameArray.size() != 0 && timeArray.size() != 0 && downloadUrlArray.size() != 0){
+                                    presenter.onSearchDataSuccessFromFirebase(mtNameArray,timeArray,downloadUrlArray);
+                                }else {
+                                    presenter.onSearchNoDataFromFirebase();
+                                }
                             }
                         }
-                    }
-                }
-            });
+                    });
         }
     }
 
@@ -414,7 +421,9 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
         if (user != null){
             String email = user.getEmail();
             if (email != null){
-                firestore.collection(user.getEmail()).document(dataDTO.getName())
+                firestore.collection(COLLECTION_MOUNTAIN).document(email)
+                        .collection(COLLECTION)
+                        .document(dataDTO.getName())
                         .delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -446,6 +455,7 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void showDatePickerDialog(final DataDTO dataDTO) {
 
@@ -493,7 +503,9 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
             map.put("sid", data.getSid());
             map.put("photoUrl",data.getUserPhoto());
             if (email != null){
-                firestore.collection(email).document(data.getName())
+                firestore.collection(COLLECTION_MOUNTAIN).document(email)
+                        .collection(COLLECTION)
+                        .document(data.getName())
                         .set(map)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
@@ -589,7 +601,8 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
         map.put("topTime", userPressedTime);
         map.put("sid", userPressedSid);
         map.put("photoUrl",downloadUrl);
-        firestore.collection(email).document(userPreessedMtName).set(map)
+        firestore.collection(COLLECTION_MOUNTAIN).document(email).collection(COLLECTION)
+                .document(userPreessedMtName).set(map)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {

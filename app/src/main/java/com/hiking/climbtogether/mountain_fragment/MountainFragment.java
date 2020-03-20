@@ -84,6 +84,10 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     private FireStoreManager manager;
 
+    private static final String COLLECTION_MOUNTAIN = "collection_mountain";
+
+    private static final String COLLECTION = "collection";
+
     public static MountainFragment newInstance() {
         MountainFragment fragment = new MountainFragment();
 
@@ -167,8 +171,11 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
                     Log.i("Michael","searchDataFromDb");
                     firestoreData = new ArrayList<>();
                     timeArray = new ArrayList<>();
-                    manager.setFirstCollection(email);
-                    manager.catchOneCollectionData(new FireStoreManager.OnConnectingFirebaseListener() {
+
+                    manager.setFirstCollection(COLLECTION_MOUNTAIN);
+                    manager.setFirstDocument(email);
+                    manager.setSecondCollection(COLLECTION);
+                    manager.catchTwoCollectionData(new FireStoreManager.OnConnectingFirebaseListener() {
                         @Override
                         public void onSuccess(Task<QuerySnapshot> task) {
                             if (getActivity() != null){
@@ -448,8 +455,6 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
                         String isShow = "true";
                         presenter.onTopIconChange(sid,isShow,topTime);
                         presenter.onCreateDocumentInFirestore(sid, topTime);
-
-
                     }
                 }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
@@ -493,10 +498,12 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
                 map.put("topTime", topTime);
                 map.put("sid", data.getSid());
                 map.put("photoUrl","");
-                manager.setFirstCollection(email);
-                manager.setFirstDocument(mountainName);
+                manager.setFirstCollection(COLLECTION_MOUNTAIN);
+                manager.setFirstDocument(user.getEmail());
+                manager.setSecondCollection(COLLECTION);
+                manager.setSecondDocument(mountainName);
                 manager.setMap(map);
-                manager.setDocumentData(new FireStoreManager.OnFirebaseSetDocumentListener() {
+                manager.setTwoDocumentData(new FireStoreManager.OnFirebaseSetDocumentListener() {
                     @Override
                     public void onSuccessful() {
                         if (getActivity() != null){
@@ -514,18 +521,6 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
                     }
                 });
-//                firestore.collection(email).document(mountainName)
-//                        .set(map)
-//                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                            @Override
-//                            public void onComplete(@NonNull Task<Void> task) {
-//                                if (task.isSuccessful()) {
-//
-//                                }
-//                            }
-//                        });
-
-
             }
         }
     }

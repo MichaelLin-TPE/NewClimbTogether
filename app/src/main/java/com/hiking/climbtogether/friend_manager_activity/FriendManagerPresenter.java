@@ -14,4 +14,6 @@ public interface FriendManagerPresenter {
     void onDeleteButtonClickListener(String email,int itemPosition);
 
     void onConfirmToDelectFriendClick(String friendEmail,int itemPosition);
+
+    void onSearchButtonClick();
 }

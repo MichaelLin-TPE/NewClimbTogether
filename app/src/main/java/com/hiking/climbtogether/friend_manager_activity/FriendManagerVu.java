@@ -18,4 +18,6 @@ public interface FriendManagerVu {
     void changeRecyclerView(int itemPosition);
 
     void showNoFriendInfo(boolean isShow);
+
+    void intentToSearchFriendPage();
 }

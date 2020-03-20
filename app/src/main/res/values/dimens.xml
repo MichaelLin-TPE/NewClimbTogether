@@ -51,4 +51,5 @@
     <dimen name="detail_content_icon_size">50dp</dimen>
     <dimen name="friend_photo_size">50dp</dimen>
     <dimen name="smaller_icon_size">40dp</dimen>
+    <dimen name="user_photo_size">100dp</dimen>
 </resources>

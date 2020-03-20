@@ -14,6 +14,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
@@ -26,6 +28,7 @@ import com.hiking.climbtogether.friend_manager_activity.friend_presenter.FriendP
 import com.hiking.climbtogether.friend_manager_activity.view.FriendViewAdapter;
 import com.hiking.climbtogether.friend_manager_activity.view.InviteViewAdapter;
 import com.hiking.climbtogether.personal_chat_activity.PersonalChatActivity;
+import com.hiking.climbtogether.search_friend_activity.SearchFriendActivity;
 import com.hiking.climbtogether.tool.ImageLoaderManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -92,6 +95,23 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
     private ArrayList<ChatRoomDTO> chatPathArray;
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.friend_manager_menu,menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == R.id.search_icon){
+            presenter.onSearchButtonClick();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -501,6 +521,12 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
     public void showNoFriendInfo(boolean isShow) {
         tvInfo.setVisibility(isShow ? View.VISIBLE : View.GONE);
         ivLogo.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void intentToSearchFriendPage() {
+        Intent it = new Intent(this, SearchFriendActivity.class);
+        startActivity(it);
     }
 
     private void deleteUserFriend(final String userEmail, final String friendEmail) {

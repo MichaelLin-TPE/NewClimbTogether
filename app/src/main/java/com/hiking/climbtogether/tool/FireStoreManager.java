@@ -86,6 +86,30 @@ public class FireStoreManager{
         }).start();
     }
 
+    public void setTwoDocumentData(OnFirebaseSetDocumentListener listener){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                firestore.collection(firstCollection)
+                        .document(firstDocument)
+                        .collection(secondCollection)
+                        .document(secondDocument)
+                        .set(map)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    Log.i("Michael","Collection : "+firstCollection + " , document : "+firstDocument+" 資料新增成功");
+                                    listener.onSuccessful();
+                                }else {
+                                    listener.onFailure();
+                                }
+                            }
+                        });
+            }
+        }).start();
+    }
+
     public void setDocumentData(OnFirebaseSetDocumentListener listener){
         new Thread(new Runnable() {
             @Override
