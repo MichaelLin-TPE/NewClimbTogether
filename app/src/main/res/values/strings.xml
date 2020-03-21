@@ -26,7 +26,7 @@
     <string name="client_id" translatable="false">687642928001-e1ap4bnm29borhlvo6osdq3iapveg95m.apps.googleusercontent.com</string>
     <string name="question">問題</string>
     <string name="search_no_data">查無資料唷~</string>
-    <string name="member_notice">註冊/登入會員後,即可享有收藏百岳與即時對話功能</string>
+    <string name="member_notice">免費註冊/登入會員後,即可享所有功能唷</string>
     <string name="login_and_registered">註冊/登入</string>
     <string name="favorite_mt">百岳戰績</string>
     <string name="search_bed">床鋪查詢</string>
@@ -114,4 +114,10 @@
     <string name="apply_friend">送出邀請</string>
     <string name="is_friend_already">已經是朋友了.</string>
     <string name="do_not_search_yourself">請不要沒事搜尋自己好嗎?</string>
+    <string name="free_title">免責申明</string>
+    <string name="free_content">本APP僅供科研、學習、保護隱私之用，切勿用於其他任何用途，嚴禁使用者違反當地相關法律，本應用不付任何相關責任．如不同意以上所述申明，請自覺移除此APP，使用本APP便默認同意以上所有申明，感謝您的配合與體諒，若此APP已侵犯到您任何地方請與我聯繫，謝謝．</string>
+    <string name="contact_me">聯繫我</string>
+    <string name="i_know">我知道了</string>
+    <string name="email_body">有任何的問題請寫在下方,我會依依的回覆您,感謝</string>
+    <string name="question_report">App問題信件</string>
 </resources>

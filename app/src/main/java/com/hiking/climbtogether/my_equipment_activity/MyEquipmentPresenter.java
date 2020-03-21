@@ -28,4 +28,6 @@ public interface MyEquipmentPresenter {
     void onDeleteAllListConfirmClick();
 
     void onDeleteLongClick(String name, int itemPosition, String type);
+
+    void onShowProgress();
 }

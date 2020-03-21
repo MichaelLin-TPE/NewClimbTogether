@@ -54,4 +54,14 @@ public class HomePagePresenterImpl implements HomePagePresenter {
     public void onMemberIconClickListener() {
         mView.intentToMemberActivity();
     }
+
+    @Override
+    public void onQuestionButtonClickListener() {
+        mView.showQuestionDialog();
+    }
+
+    @Override
+    public void onContactMeButtonClickListener() {
+        mView.contactMe();
+    }
 }

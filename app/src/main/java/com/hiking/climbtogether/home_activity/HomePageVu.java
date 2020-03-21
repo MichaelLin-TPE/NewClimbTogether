@@ -13,4 +13,8 @@ public interface HomePageVu {
     void showViewPager();
 
     void intentToMemberActivity();
+
+    void showQuestionDialog();
+
+    void contactMe();
 }

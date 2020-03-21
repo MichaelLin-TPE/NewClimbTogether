@@ -6,4 +6,8 @@ public interface HomePagePresenter {
     void onPrepareViewPager();
 
     void onMemberIconClickListener();
+
+    void onQuestionButtonClickListener();
+
+    void onContactMeButtonClickListener();
 }

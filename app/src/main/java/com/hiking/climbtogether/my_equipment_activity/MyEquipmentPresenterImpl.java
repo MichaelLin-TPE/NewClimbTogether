@@ -21,7 +21,17 @@ public class MyEquipmentPresenterImpl implements MyEquipmentPresenter {
 
     @Override
     public void onCatchDataSuccessful(ArrayList<EquipmentListDTO> notPrepareArrayList, ArrayList<EquipmentListDTO> preparedArrayList) {
-        mView.setRecyclerView(notPrepareArrayList,preparedArrayList);
+
+        if (notPrepareArrayList.size() != 0 || preparedArrayList.size() != 0){
+            mView.showProgress(false);
+            mView.setViewMaintain(true);
+            mView.setRecyclerView(notPrepareArrayList,preparedArrayList);
+        }else {
+            mView.showProgress(false);
+            mView.setViewMaintain(false);
+        }
+
+
     }
 
     @Override
@@ -79,6 +89,11 @@ public class MyEquipmentPresenterImpl implements MyEquipmentPresenter {
     @Override
     public void onDeleteLongClick(String name, int itemPosition, String type) {
         mView.showConfirmDialog(name,itemPosition,type);
+    }
+
+    @Override
+    public void onShowProgress() {
+        mView.showProgress(true);
     }
 
 

@@ -1,14 +1,17 @@
 package com.hiking.climbtogether.home_activity;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -16,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.member_activity.MemberActivity;
@@ -65,6 +69,7 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
                 homePresenter.onMemberIconClickListener();
                 break;
             case R.id.question:
+                homePresenter.onQuestionButtonClickListener();
                 break;
             default:
                 return true;
@@ -154,6 +159,41 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
     public void intentToMemberActivity() {
         Intent it = new Intent(this, MemberActivity.class);
         startActivity(it);
+    }
+
+    @Override
+    public void showQuestionDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.free_title)
+                .setMessage(getString(R.string.free_content))
+                .setPositiveButton(getString(R.string.contact_me), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        homePresenter.onContactMeButtonClickListener();
+                    }
+                }).setNegativeButton(getString(R.string.i_know), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    @Override
+    public void contactMe() {
+        try {
+            String emailBody = getString(R.string.email_body);
+            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+            emailIntent.setData(Uri.parse("mailto:"));
+            emailIntent.setType("message/rfc822");
+            emailIntent.putExtra(Intent.EXTRA_EMAIL,new String[]{"go.hiking.together@gmail.com"});
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.question_report));
+            emailIntent.putExtra(Intent.EXTRA_TEXT, emailBody);
+            startActivity(emailIntent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private View prepareView(String title, Drawable icon) {

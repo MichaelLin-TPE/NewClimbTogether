@@ -308,8 +308,14 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
 
     @Override
     public void intentToFriendManagerActivity() {
-        Intent it = new Intent(this, FriendManagerActivity.class);
-        startActivity(it);
+        if (currentUser != null){
+            Intent it = new Intent(this, FriendManagerActivity.class);
+            startActivity(it);
+        }else {
+            Intent it = new Intent(this,LoginActivity.class);
+            startActivity(it);
+        }
+
     }
 
     @Override
@@ -317,11 +323,9 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         if (currentUser != null){
             Intent it = new Intent(this, MyEquipmentActivity.class);
             startActivity(it);
-            finish();
         }else {
             Intent it = new Intent(this, LoginActivity.class);
             startActivity(it);
-            finish();
         }
 
     }

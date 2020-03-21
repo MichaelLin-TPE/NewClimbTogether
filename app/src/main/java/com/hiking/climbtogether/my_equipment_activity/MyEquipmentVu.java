@@ -40,4 +40,6 @@ public interface MyEquipmentVu {
     String getDeleteDataSuccess();
 
     void showConfirmDialog(String name, int itemPosition, String type);
+
+    void showProgress(boolean isShow);
 }

@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -84,6 +85,8 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
 
     private ArrayList<EquipmentListDTO> preparedArrayList;
 
+    private ProgressBar progressBar;
+
     private MyEquipmentAdapter adapter;
 
     @Override
@@ -125,6 +128,7 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
     }
 
     private void searchData() {
+        presenter.onShowProgress();
         ArrayList<EquipmentListDTO> notPrepareArrayList = new ArrayList<>();
         ArrayList<EquipmentListDTO> preparedArrayList = new ArrayList<>();
         if (user != null && user.getEmail() != null) {
@@ -142,14 +146,12 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
                                     data.setDescription((String) snapshot.get("description"));
                                     notPrepareArrayList.add(data);
                                 }
-                                if (notPrepareArrayList.size() != 0) {
 
-                                    searchPreparedEquipment(preparedArrayList, notPrepareArrayList);
 
-                                    Log.i("Michael", "尚未準備好的裝備數量 : " + notPrepareArrayList.size());
-                                } else {
-                                    presenter.onViewMaintain();
-                                }
+                                searchPreparedEquipment(preparedArrayList, notPrepareArrayList);
+
+                                Log.i("Michael", "尚未準備好的裝備數量 : " + notPrepareArrayList.size());
+
                             }
                         }
                     });
@@ -181,6 +183,7 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
     }
 
     private void initView() {
+        progressBar = findViewById(R.id.my_equipment_progressbar);
         ivLogo = findViewById(R.id.my_equipment_logo);
         tvNotice = findViewById(R.id.my_equipment_tv_notice);
         Toolbar toolbar = findViewById(R.id.my_equipment_toolbar);
@@ -248,7 +251,7 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
 
             @Override
             public void onDeleteLongClick(String name, int itemPosition) {
-                presenter.onDeleteLongClick(name,itemPosition,"equipment");
+                presenter.onDeleteLongClick(name, itemPosition, "equipment");
             }
         });
 
@@ -276,7 +279,7 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
             @Override
             public void onDeleteLongClick(String name, int itemPosition) {
 
-                presenter.onDeleteLongClick(name,itemPosition,"prepared");
+                presenter.onDeleteLongClick(name, itemPosition, "prepared");
 
             }
         });
@@ -290,16 +293,16 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
                 .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        if (type.equals("prepared")){
+                        if (type.equals("prepared")) {
                             preparedArrayList.remove(itemPosition);
                             sortPresenter.setPreparedData(preparedArrayList);
                             adapter.notifyDataSetChanged();
-                            deleteDataFromFirebase(name,type);
-                        }else {
+                            deleteDataFromFirebase(name, type);
+                        } else {
                             notPrepareArrayList.remove(itemPosition);
                             sortPresenter.setNotPrepareData(notPrepareArrayList);
                             adapter.notifyDataSetChanged();
-                            deleteDataFromFirebase(name,"notPrepare");
+                            deleteDataFromFirebase(name, "notPrepare");
                         }
 
                     }
@@ -312,15 +315,20 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
         dialog.show();
     }
 
+    @Override
+    public void showProgress(boolean isShow) {
+        progressBar.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    }
+
     private void deleteDataFromFirebase(String name, String type) {
-        if (type.equals("prepared") && user != null && user.getEmail() != null){
+        if (type.equals("prepared") && user != null && user.getEmail() != null) {
             firestore.collection("my_equipment")
                     .document(user.getEmail())
                     .collection("prepare")
                     .document(name)
                     .delete();
-        }else {
-            if (user != null && user.getEmail() != null){
+        } else {
+            if (user != null && user.getEmail() != null) {
                 firestore.collection("my_equipment")
                         .document(user.getEmail())
                         .collection("equipment")
@@ -464,7 +472,7 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
 
     @Override
     public void showDeleteDialog() {
-        AlertDialog dialog =new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.warning))
                 .setMessage(getString(R.string.delete_notice))
                 .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
@@ -490,7 +498,7 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
 
     @Override
     public void clearView() {
-        if (adapter != null){
+        if (adapter != null) {
             sortPresenter.setNotPrepareData(new ArrayList<EquipmentListDTO>());
             sortPresenter.setPreparedData(new ArrayList<EquipmentListDTO>());
             adapter.notifyDataSetChanged();
@@ -505,10 +513,9 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
     }
 
 
-
     private void deletePrepareData() {
-        if (preparedArrayList.size() != 0 && user != null && user.getEmail() != null){
-            for (EquipmentListDTO data : preparedArrayList){
+        if (preparedArrayList.size() != 0 && user != null && user.getEmail() != null) {
+            for (EquipmentListDTO data : preparedArrayList) {
                 firestore.collection("my_equipment")
                         .document(user.getEmail())
                         .collection("prepare")
@@ -519,8 +526,8 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
     }
 
     private void deleteNotPrepareData() {
-        if (notPrepareArrayList.size() != 0 && user != null && user.getEmail() != null){
-            for (EquipmentListDTO data : notPrepareArrayList){
+        if (notPrepareArrayList.size() != 0 && user != null && user.getEmail() != null) {
+            for (EquipmentListDTO data : notPrepareArrayList) {
                 firestore.collection("my_equipment")
                         .document(user.getEmail())
                         .collection("equipment")
