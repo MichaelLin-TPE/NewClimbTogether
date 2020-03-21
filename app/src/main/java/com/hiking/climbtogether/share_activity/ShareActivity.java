@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.SetOptions;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.friend_manager_activity.ChatRoomDTO;
 import com.hiking.climbtogether.personal_chat_activity.PersonalChatActivity;
@@ -173,6 +174,8 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                             }
                             if (jsonStrArray.size() != 0) {
                                 presenter.onCatchAllJson(jsonStrArray);
+                            }else {
+                                Log.i("Michael","分享沒資料");
                             }
                         }
                     }
@@ -719,16 +722,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         map.put("json",str);
         firestore.collection(SHARE)
                 .document(shareArticleJson.getContent())
-                .set(map)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            Log.i("Michael","更新成功");
-                        }
-                    }
-                });
-
+                .set(map, SetOptions.merge());
     }
 
     //如果不是好友 擇檢查有沒有邀請紀錄
