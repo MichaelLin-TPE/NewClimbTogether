@@ -72,7 +72,7 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
 
     private ImageView ivNoFriendLogo;
 
-    private int equipmentCount, deleteCount;
+    private int equipmentCount;
 
     private ArrayList<EquipmentListDTO> notPrepareArrayList;
 

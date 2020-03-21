@@ -13,13 +13,11 @@ public interface EquipmentVu {
     void setRecyclerView(ArrayList<EquipmentDTO> bodyArrayList, ArrayList<EquipmentDTO> moveArrayList, ArrayList<EquipmentDTO> campArrayList, ArrayList<EquipmentDTO> foodArrayList, ArrayList<EquipmentDTO> electronicArrayList, ArrayList<EquipmentDTO> drogArrayList, ArrayList<EquipmentDTO> otherArrayList);
 
     void setUpdateData(ArrayList<EquipmentDTO> bodyArrayList, ArrayList<EquipmentDTO> moveArrayList, ArrayList<EquipmentDTO> campArrayList, ArrayList<EquipmentDTO> foodArrayList, ArrayList<EquipmentDTO> electronicArrayList, ArrayList<EquipmentDTO> drogArrayList, ArrayList<EquipmentDTO> otherArrayList);
-
-    void showAddListSuccessfulMessage(String message);
     void intentToMyEquipmentActivity();
 
-    void saveMyEquipmentToFirebase(ArrayList<EquipmentListDTO> myList);
-
-    void setGoToMyEquipmentEnable();
-
     void intentToLoginActivity();
+
+    void deleteToFirebase(EquipmentDTO data);
+
+    void insertToFirebase(EquipmentDTO data);
 }

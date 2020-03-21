@@ -94,7 +94,7 @@
     <string name="confirm_to_delete_message">確定要刪除所有的訊息嗎?</string>
     <string name="equipment_list">裝備清單</string>
     <string name="add_equipment">增加清單</string>
-    <string name="go_equipment_list">前往清單</string>
+    <string name="go_equipment_list">前往個人裝備清單</string>
     <string name="discuss_chat">登山\n即時討論區</string>
     <string name="share_news">登山\n動態分享</string>
     <string name="no_equipment_list">沒有任何個人的裝備清單唷,快去新增吧~</string>

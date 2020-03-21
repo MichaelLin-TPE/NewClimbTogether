@@ -5,11 +5,10 @@ public interface EquipmentPresenter {
 
     void onItemCheckListener(String name, int sid, String sort);
 
-    void onButtonAddListClickListener();
-
     void onButtonGoListClickListener();
 
     void onClearView();
 
     void onNotLoginEvent();
+
 }

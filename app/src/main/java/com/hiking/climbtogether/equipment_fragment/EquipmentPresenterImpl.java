@@ -172,7 +172,6 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
                 dataBaseApi.updateEquipmentData(data,OTHER);
                 break;
         }
-
         insertMyList(data);
 
         bodyArrayList = dataBaseApi.getStuffInformation(BODY);
@@ -187,47 +186,40 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
     }
 
     private void insertMyList(EquipmentDTO data) {
-        EquipmentListDTO list = new EquipmentListDTO();
-        int listIndex = 0;
-        boolean isRepeat = false;
-
-        if (myList.size() != 0){
-            for (int i = 0 ; i < myList.size() ; i ++){
-                if (myList.get(i).getName().equals(data.getName())){
-                    listIndex = i;
-                    isRepeat = true;
-
-                    break;
-                }
-            }
-        }
-        if (isRepeat){
-            Log.i("Michael","資料刪除");
-            myList.remove(listIndex);
-        }else {
-            list.setName(data.getName());
-            Log.i("Michael","資料新增成功");
-            list.setDescription(data.getDescription());
-            myList.add(list);
+        if (data.getCheck().equals("true")){
+            mView.insertToFirebase(data);
+        }else if (data.getCheck().equals("false")){
+            mView.deleteToFirebase(data);
         }
 
 
-    }
 
-    @Override
-    public void onButtonAddListClickListener() {
-        if (myList != null && myList.size() != 0){
-//            for (EquipmentListDTO data : myList){
-//                dataBaseApi.insert(data);
+
+
+//        EquipmentListDTO list = new EquipmentListDTO();
+//        int listIndex = 0;
+//        boolean isRepeat = false;
+//
+//        if (myList.size() != 0){
+//            for (int i = 0 ; i < myList.size() ; i ++){
+//                if (myList.get(i).getName().equals(data.getName())){
+//                    listIndex = i;
+//                    isRepeat = true;
+//                    break;
+//                }
 //            }
-            mView.setGoToMyEquipmentEnable();
-            mView.saveMyEquipmentToFirebase(myList);
-        }else {
-            String message = "請選擇你要的裝備";
-            mView.showAddListSuccessfulMessage(message);
-        }
-
+//        }
+//        if (isRepeat){
+//            Log.i("Michael","資料刪除");
+//            myList.remove(listIndex);
+//        }else {
+//            list.setName(data.getName());
+//            Log.i("Michael","資料新增成功");
+//            list.setDescription(data.getDescription());
+//            myList.add(list);
+//        }
     }
+
 
     private void resetDatabase() {
 
@@ -303,6 +295,7 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
     public void onNotLoginEvent() {
         mView.intentToLoginActivity();
     }
+
 
     private void updateData(String table ,int sid) {
         Log.i("Michael","重製資料");
