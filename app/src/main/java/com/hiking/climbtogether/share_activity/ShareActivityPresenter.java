@@ -45,4 +45,12 @@ public interface ShareActivityPresenter {
     void onUserArticleItemClickListener(int which, ShareArticleJson data, int itemPosition);
 
     void onDeleteArticleConfirm(ShareArticleJson data, int itemPosition);
+
+    void onEditButtonClickListener(ShareArticleJson data, int itemPosition, String content);
+
+    void onCatchNoData();
+
+    void onStrangerItemClickListener(int which,ShareArticleJson data,int itemPosition);
+
+    void onImpeachmentItemClickListener(ArrayList<String> dialogList, int type, ShareArticleJson data);
 }

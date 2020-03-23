@@ -126,6 +126,10 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
     private Gson gson;
     private ArrayList<ChatRoomDTO> chatRoomArrayList;
 
+    private ImageView ivLogo;
+
+    private TextView tvNotice;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,6 +180,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                             if (jsonStrArray.size() != 0) {
                                 presenter.onCatchAllJson(jsonStrArray);
                             }else {
+                                presenter.onCatchNoData();
                                 Log.i("Michael","分享沒資料");
                             }
                         }
@@ -197,6 +202,8 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
     }
 
     private void initView() {
+        ivLogo = findViewById(R.id.share_logo);
+        tvNotice = findViewById(R.id.share_text_notice);
         progressBar = findViewById(R.id.share_progressbar);
         Toolbar toolbar = findViewById(R.id.share_toolbar);
         recyclerView = findViewById(R.id.share_recycler_view);
@@ -320,7 +327,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         replayRv.setLayoutManager(new LinearLayoutManager(this));
 
         firestore.collection(SHARE)
-                .document(data.getContent())
+                .document(data.getOldContent())
                 .collection(REPLY)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -378,7 +385,8 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         map.put("content", content);
         map.put("user", userDataManager.getDisplayName());
         map.put("userPhoto", userDataManager.getPhotoUrl());
-        firestore.collection(SHARE).document(shareArticleDTO.getContent())
+        firestore.collection(SHARE)
+                .document(shareArticleDTO.getOldContent())
                 .collection(REPLY)
                 .document(content)
                 .set(map)
@@ -687,13 +695,14 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     @Override
     public void deleteArticle(ShareArticleJson data, int itemPosition) {
-
-        dataArrayList.remove(itemPosition);
-        newAdapter.notifyDataSetChanged();
         ArrayList<String> replyId = new ArrayList<>();
         if (dataArrayList.get(itemPosition).getReply() != 0){
+            dataArrayList.remove(itemPosition);
+            newAdapter.notifyDataSetChanged();
+
+            Log.i("Michael","正要刪除的文章 : "+data.getOldContent());
             firestore.collection(SHARE)
-                    .document(data.getContent())
+                    .document(data.getOldContent())
                     .collection(REPLY)
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -703,11 +712,10 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                 for (QueryDocumentSnapshot snapshot : task.getResult()){
                                     replyId.add(snapshot.getId());
                                 }
-
                                 if (replyId.size() != 0){
                                     for (String id : replyId){
                                         firestore.collection(SHARE)
-                                                .document(data.getContent())
+                                                .document(data.getOldContent())
                                                 .collection(REPLY)
                                                 .document(id)
                                                 .delete()
@@ -721,7 +729,19 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                                 });
                                     }
                                     firestore.collection(SHARE)
-                                            .document(data.getContent())
+                                            .document(data.getOldContent())
+                                            .delete()
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()){
+                                                        Log.i("Michael","有留言 刪除成功");
+                                                    }
+                                                }
+                                            });
+                                }else {
+                                    firestore.collection(SHARE)
+                                            .document(data.getOldContent())
                                             .delete()
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
@@ -737,7 +757,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                     });
         }else {
             firestore.collection(SHARE)
-                    .document(data.getContent())
+                    .document(data.getOldContent())
                     .delete()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -747,6 +767,8 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                             }
                         }
                     });
+            dataArrayList.remove(itemPosition);
+            newAdapter.notifyDataSetChanged();
         }
 
 
@@ -754,7 +776,137 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     @Override
     public void showEditDialog(ShareArticleJson data, int itemPosition) {
+        View view = View.inflate(this, R.layout.add_article_custom_dialog, null);
+        viewPager = view.findViewById(R.id.article_view_pager);
+        ImageView addBtn = view.findViewById(R.id.article_add_btn);
 
+        TextView tvShare = view.findViewById(R.id.article_text_share);
+        TextView tvCancel = view.findViewById(R.id.article_text_cancel);
+
+
+
+
+        EditText edContent = view.findViewById(R.id.article_edit_content);
+        //设置EditText的显示方式为多行文本输入
+        edContent.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        //文本显示的位置在EditText的最上方
+        edContent.setGravity(Gravity.TOP);
+        //改变默认的单行模式
+        edContent.setSingleLine(false);
+        //水平滚动设置为False
+        edContent.setHorizontallyScrolling(false);
+
+        //設置資料
+        tvShare.setText(getString(R.string.edit));
+
+        EditViewPagerAdapter viewPagerAdapter = new EditViewPagerAdapter(this,data.getSharePhoto());
+
+        viewPager.setAdapter(viewPagerAdapter);
+
+        edContent.setText(data.getContent());
+
+        addBtn.setVisibility(View.GONE);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view).create();
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+        dialog.show();
+
+        tvShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                presenter.onEditButtonClickListener(data,itemPosition,edContent.getText().toString());
+            }
+        });
+        tvCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+
+    }
+
+    @Override
+    public void updateFirebase(String jsonStr, int itemPosition, String newContent, String oldContent) {
+        dataArrayList.get(itemPosition).setContent(newContent);
+        newAdapter.notifyDataSetChanged();
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("json",jsonStr);
+
+        firestore.collection(SHARE)
+                .document(oldContent)
+                .set(map,SetOptions.merge());
+
+    }
+
+    @Override
+    public void showNoDataView(boolean isShow) {
+        ivLogo.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        tvNotice.setVisibility(isShow ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public String getImpeachment() {
+        return getString(R.string.impeachment);
+    }
+
+    @Override
+    public void showStrangerArticleDialog(ArrayList<String> dialogList, ShareArticleJson data, int itemPosition) {
+        String[] items = dialogList.toArray(new String[0]);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                          presenter.onStrangerItemClickListener(which,data,itemPosition);
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    @Override
+    public void showImpeachmentDialog(ArrayList<String> dialogList, ShareArticleJson data) {
+        String[] items = dialogList.toArray(new String[0]);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.why_do_you_impeachment))
+                .setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int type) {
+                        presenter.onImpeachmentItemClickListener(dialogList,type,data);
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    @Override
+    public String getTrushArticle() {
+        return getString(R.string.truch);
+    }
+
+    @Override
+    public String getNotGoodMessage() {
+        return getString(R.string.not_good_message);
+    }
+
+    @Override
+    public void sendEmailToCreator(String emailBody) {
+        try {
+            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+            emailIntent.setData(Uri.parse("mailto:"));
+            emailIntent.setType("message/rfc822");
+            emailIntent.putExtra(Intent.EXTRA_EMAIL,new String[]{"go.hiking.together@gmail.com"});
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.impeachment_report));
+            emailIntent.putExtra(Intent.EXTRA_TEXT, emailBody);
+            startActivity(emailIntent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void uploadPhotoToStorage() {
@@ -776,6 +928,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                 }
             });
         }else {
+            Log.i("Michael","上傳完成");
             presenter.onCatchallPhotoUrl(userDataManager,content,downloadUrlArray);
         }
 
@@ -842,7 +995,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         Map<String,Object> map = new HashMap<>();
         map.put("json",str);
         firestore.collection(SHARE)
-                .document(shareArticleJson.getContent())
+                .document(shareArticleJson.getOldContent())
                 .set(map, SetOptions.merge());
     }
 

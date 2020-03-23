@@ -22,7 +22,16 @@ public class ShareArticleJson implements Serializable {
     private long like;
     @SerializedName("reply")
     private long reply;
+    @SerializedName("old_content")
+    private String oldContent;
 
+    public String getOldContent() {
+        return oldContent;
+    }
+
+    public void setOldContent(String oldContent) {
+        this.oldContent = oldContent;
+    }
 
     public ArrayList<String> getSharePhoto() {
         return sharePhoto;

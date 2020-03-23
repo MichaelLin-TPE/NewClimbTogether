@@ -124,4 +124,10 @@
     <string name="delete_article">刪除文章</string>
     <string name="edit">編輯</string>
     <string name="delete_notice_article">是否要刪除此文章?(刪除後將無法復原)</string>
+    <string name="share_no_data">目前沒有任何資料可以顯示,快快分享你的動態吧!</string>
+    <string name="impeachment">檢舉</string>
+    <string name="truch">垃圾訊息</string>
+    <string name="not_good_message">內容不適當</string>
+    <string name="why_do_you_impeachment">為什麼你想要檢舉此篇文章呢?</string>
+    <string name="impeachment_report">APP檢舉信件</string>
 </resources>

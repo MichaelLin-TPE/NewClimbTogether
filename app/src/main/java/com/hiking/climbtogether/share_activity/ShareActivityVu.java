@@ -55,4 +55,20 @@ public interface ShareActivityVu {
     void deleteArticle(ShareArticleJson data, int itemPosition);
 
     void showEditDialog(ShareArticleJson data, int itemPosition);
+
+    void updateFirebase(String jsonStr, int itemPosition, String newContent, String oldContent);
+
+    void showNoDataView(boolean isShow);
+
+    String getImpeachment();
+
+    void showStrangerArticleDialog(ArrayList<String> dialogList, ShareArticleJson data, int itemPosition);
+
+    void showImpeachmentDialog(ArrayList<String> dialogList, ShareArticleJson data);
+
+    String getTrushArticle();
+
+    String getNotGoodMessage();
+
+    void sendEmailToCreator(String emailBody);
 }

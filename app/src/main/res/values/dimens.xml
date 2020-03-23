@@ -41,7 +41,7 @@
     <dimen name="delete_click_area">60dp</dimen>
     <dimen name="share_item_photo">450dp</dimen>
     <dimen name="like_icon_size">30dp</dimen>
-    <dimen name="article_photo_size">300dp</dimen>
+    <dimen name="article_photo_size">450dp</dimen>
     <dimen name="user_photo_size_reply">40dp</dimen>
     <dimen name="user_photo_smaller_size_reply">30dp</dimen>
     <dimen name="pic_count_width">50dp</dimen>

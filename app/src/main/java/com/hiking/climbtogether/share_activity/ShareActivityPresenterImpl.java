@@ -8,6 +8,7 @@ import com.hiking.climbtogether.tool.UserDataManager;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class ShareActivityPresenterImpl implements ShareActivityPresenter {
 
@@ -20,6 +21,8 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
     private static final int EDIT = 1;
 
     private static final int DELETE = 0;
+
+    private static final int IMPEACHMENT = 0;
 
     public ShareActivityPresenterImpl(ShareActivityVu mView) {
         this.mView = mView;
@@ -138,12 +141,14 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
             Log.i("Michael", "content : " + data.getContent());
             dataArrayList.add(data);
         }
+        mView.showNoDataView(false);
         mView.setNewRecyclerView(dataArrayList);
     }
 
     @Override
     public void onCatchallPhotoUrl(UserDataManager userDataManager, String content, ArrayList<String> photoUrlArray) {
         ShareArticleJson json = new ShareArticleJson();
+        json.setOldContent(content);
         json.setContent(content);
         json.setEmail(userDataManager.getEmail());
         json.setLike(0);
@@ -170,7 +175,9 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
 
             mView.showUserArticleDialog(dialogList,data,itemPosition);
         } else {
-
+            ArrayList<String> dialogList = new ArrayList<>();
+            dialogList.add(mView.getImpeachment());
+            mView.showStrangerArticleDialog(dialogList,data,itemPosition);
         }
     }
 
@@ -191,5 +198,36 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
     @Override
     public void onDeleteArticleConfirm(ShareArticleJson data, int itemPosition) {
         mView.deleteArticle(data,itemPosition);
+    }
+
+    @Override
+    public void onEditButtonClickListener(ShareArticleJson data, int itemPosition, String content) {
+        data.setContent(content);
+        String jsonStr = gson.toJson(data);
+        mView.updateFirebase(jsonStr,itemPosition,content,data.getOldContent());
+    }
+
+    @Override
+    public void onCatchNoData() {
+        mView.showProgress(false);
+        mView.showNoDataView(true);
+    }
+
+    @Override
+    public void onStrangerItemClickListener(int which, ShareArticleJson data, int itemPosition) {
+        switch (itemPosition){
+            case IMPEACHMENT:
+                ArrayList<String> dialogList = new ArrayList<>();
+                dialogList.add(mView.getTrushArticle());
+                dialogList.add(mView.getNotGoodMessage());
+                mView.showImpeachmentDialog(dialogList,data);
+                break;
+        }
+    }
+
+    @Override
+    public void onImpeachmentItemClickListener(ArrayList<String> dialogList, int type, ShareArticleJson data) {
+        String emailBody = String.format(Locale.getDefault(),"文章 : %s 內文 : %s \n檢舉內容 : %s\n還有其他想說的可以打在下方(檢舉文若屬實,我會立即處理請放心,處理完會在回信給您. 請耐心等候:\n",data.getOldContent(),data.getContent(),dialogList.get(type));
+        mView.sendEmailToCreator(emailBody);
     }
 }
