@@ -121,4 +121,7 @@
     <string name="email_body">有任何的問題請寫在下方,我會依依的回覆您,感謝</string>
     <string name="question_report">App問題信件</string>
     <string name="please_enter_lower">請小寫,謝謝您的合作</string>
+    <string name="delete_article">刪除文章</string>
+    <string name="edit">編輯</string>
+    <string name="delete_notice_article">是否要刪除此文章?(刪除後將無法復原)</string>
 </resources>

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
@@ -636,6 +637,126 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     }
 
+    @Override
+    public String getUserEmail() {
+        return user.getEmail();
+    }
+
+    @Override
+    public String getDeleteStr() {
+        return getString(R.string.delete_article);
+    }
+
+    @Override
+    public String getEditStr() {
+        return getString(R.string.edit);
+    }
+
+    @Override
+    public void showUserArticleDialog(ArrayList<String> dialogList, ShareArticleJson data, int itemPosition) {
+        String[] item = dialogList.toArray(new String[dialogList.size()]);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setItems(item, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        presenter.onUserArticleItemClickListener(which,data,itemPosition);
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    @Override
+    public void showConfirmDeleteDialog(ShareArticleJson data, int itemPosition) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.warning))
+                .setMessage(getString(R.string.delete_notice_article))
+                .setPositiveButton(getString(R.string.delete_article), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        presenter.onDeleteArticleConfirm(data,itemPosition);
+                    }
+                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).create();
+        dialog.show();
+
+    }
+
+    @Override
+    public void deleteArticle(ShareArticleJson data, int itemPosition) {
+
+        dataArrayList.remove(itemPosition);
+        newAdapter.notifyDataSetChanged();
+        ArrayList<String> replyId = new ArrayList<>();
+        if (dataArrayList.get(itemPosition).getReply() != 0){
+            firestore.collection(SHARE)
+                    .document(data.getContent())
+                    .collection(REPLY)
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful() && task.getResult()!= null){
+                                for (QueryDocumentSnapshot snapshot : task.getResult()){
+                                    replyId.add(snapshot.getId());
+                                }
+
+                                if (replyId.size() != 0){
+                                    for (String id : replyId){
+                                        firestore.collection(SHARE)
+                                                .document(data.getContent())
+                                                .collection(REPLY)
+                                                .document(id)
+                                                .delete()
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()){
+                                                            Log.i("Michael","刪除成功");
+                                                        }
+                                                    }
+                                                });
+                                    }
+                                    firestore.collection(SHARE)
+                                            .document(data.getContent())
+                                            .delete()
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()){
+                                                        Log.i("Michael","有留言 刪除成功");
+                                                    }
+                                                }
+                                            });
+                                }
+                            }
+                        }
+                    });
+        }else {
+            firestore.collection(SHARE)
+                    .document(data.getContent())
+                    .delete()
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                Log.i("Michael","無留言 刪除成功");
+                            }
+                        }
+                    });
+        }
+
+
+    }
+
+    @Override
+    public void showEditDialog(ShareArticleJson data, int itemPosition) {
+
+    }
+
     private void uploadPhotoToStorage() {
         if (photoCount < photoBytesArray.size()){
             StorageReference river = storage.child(userDataManager.getEmail()+"/"+content+"/"+content+photoCount+".jpg");
@@ -699,7 +820,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
             @Override
             public void onSetting(ShareArticleJson data, int itemPosition) {
-
+                presenter.onSettingButtonClickListener(data,itemPosition);
             }
 
             @Override

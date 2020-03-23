@@ -17,6 +17,10 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
 
     private Gson gson;
 
+    private static final int EDIT = 1;
+
+    private static final int DELETE = 0;
+
     public ShareActivityPresenterImpl(ShareActivityVu mView) {
         this.mView = mView;
         gson = new Gson();
@@ -34,14 +38,14 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
 
     @Override
     public void onShareButtonClick(UserDataManager userDataManager, String content, ArrayList<byte[]> photoBytesArray) {
-        if (content == null || content.isEmpty()){
+        if (content == null || content.isEmpty()) {
             String message = "請輸入內容";
             mView.showErrorMessage(message);
             return;
         }
         String message = "上傳中....請稍後";
         mView.showProgressMessage(message);
-        mView.uploadPhoto(userDataManager,content,photoBytesArray);
+        mView.uploadPhoto(userDataManager, content, photoBytesArray);
 
 
     }
@@ -69,12 +73,12 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
 
     @Override
     public void onButtonSendReplyClick(ArrayList<ReplyDTO> replyArray, String content, ShareArticleJson shareArticleDTO) {
-        if (content == null || content.isEmpty()){
+        if (content == null || content.isEmpty()) {
             String message = "留下些甚麼吧...";
             mView.showErrorMessage(message);
             return;
         }
-        mView.sendReply(content,replyArray,shareArticleDTO);
+        mView.sendReply(content, replyArray, shareArticleDTO);
 
 
     }
@@ -89,7 +93,7 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
     @Override
     public void onShowUserDialog(ShareArticleJson data, boolean isInvite, boolean isFriend) {
         mView.setProgressStart(false);
-        mView.showUserDialog(data,isInvite,isFriend);
+        mView.showUserDialog(data, isInvite, isFriend);
     }
 
     @Override
@@ -104,7 +108,7 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
 
     @Override
     public void onAddFriendButtonClickListener(String strangerEmail, String userEmail) {
-        mView.sendInviteToStranger(strangerEmail,userEmail);
+        mView.sendInviteToStranger(strangerEmail, userEmail);
     }
 
     @Override
@@ -115,11 +119,11 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
     @Override
     public void onIsFriend(ShareArticleJson data, boolean isFriendSend) {
         this.data = data;
-        if (isFriendSend){
-            Log.i("Michael","是朋友");
+        if (isFriendSend) {
+            Log.i("Michael", "是朋友");
             mView.intentToPersonalChatActivity(data);
-        }else {
-            Log.i("Michael","不是朋友");
+        } else {
+            Log.i("Michael", "不是朋友");
             mView.showNoticeDialog(data);
         }
     }
@@ -129,9 +133,9 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
 
         ArrayList<ShareArticleJson> dataArrayList = new ArrayList<>();
 
-        for (String jsonStr : jsonStrArray){
-            ShareArticleJson data = gson.fromJson(jsonStr,ShareArticleJson.class);
-            Log.i("Michael","content : "+data.getContent());
+        for (String jsonStr : jsonStrArray) {
+            ShareArticleJson data = gson.fromJson(jsonStr, ShareArticleJson.class);
+            Log.i("Michael", "content : " + data.getContent());
             dataArrayList.add(data);
         }
         mView.setNewRecyclerView(dataArrayList);
@@ -149,10 +153,43 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
         json.setClick_member(new ArrayList<ShareClickLikeObject>());
         json.setDisplayName(userDataManager.getDisplayName());
         String jsonStr = gson.toJson(json);
-        long currentTime =  System.currentTimeMillis();
-        mView.shareArticleJson(jsonStr,json.getContent(),currentTime);
+        long currentTime = System.currentTimeMillis();
+        mView.shareArticleJson(jsonStr, json.getContent(), currentTime);
 
 
-        Log.i("Michael","json 格式 : "+jsonStr);
+        Log.i("Michael", "json 格式 : " + jsonStr);
+    }
+
+    @Override
+    public void onSettingButtonClickListener(ShareArticleJson data, int itemPosition) {
+        if (data.getEmail().equals(mView.getUserEmail())) {
+            Log.i("Michael", "我的文章");
+            ArrayList<String> dialogList = new ArrayList<>();
+            dialogList.add(mView.getDeleteStr());
+            dialogList.add(mView.getEditStr());
+
+            mView.showUserArticleDialog(dialogList,data,itemPosition);
+        } else {
+
+        }
+    }
+
+    @Override
+    public void onUserArticleItemClickListener(int which, ShareArticleJson data, int itemPosition) {
+        switch (which) {
+            case DELETE:
+                mView.showConfirmDeleteDialog(data,itemPosition);
+                break;
+            case EDIT:
+                mView.showEditDialog(data,itemPosition);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onDeleteArticleConfirm(ShareArticleJson data, int itemPosition) {
+        mView.deleteArticle(data,itemPosition);
     }
 }

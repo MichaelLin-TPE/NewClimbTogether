@@ -39,4 +39,10 @@ public interface ShareActivityPresenter {
     void onCatchAllJson(ArrayList<String> jsonStrArray);
 
     void onCatchallPhotoUrl(UserDataManager userDataManager,String content,ArrayList<String> photoUrlArray);
+
+    void onSettingButtonClickListener(ShareArticleJson data, int itemPosition);
+
+    void onUserArticleItemClickListener(int which, ShareArticleJson data, int itemPosition);
+
+    void onDeleteArticleConfirm(ShareArticleJson data, int itemPosition);
 }

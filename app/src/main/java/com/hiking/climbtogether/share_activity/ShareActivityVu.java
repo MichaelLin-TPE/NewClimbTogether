@@ -41,4 +41,18 @@ public interface ShareActivityVu {
     void showProgressMessage(String message);
 
     void uploadPhoto(UserDataManager userDataManager, String content, ArrayList<byte[]> photoBytesArray);
+
+    String getUserEmail();
+
+    String getDeleteStr();
+
+    String getEditStr();
+
+    void showUserArticleDialog(ArrayList<String> dialogList, ShareArticleJson data, int itemPosition);
+
+    void showConfirmDeleteDialog(ShareArticleJson data, int itemPosition);
+
+    void deleteArticle(ShareArticleJson data, int itemPosition);
+
+    void showEditDialog(ShareArticleJson data, int itemPosition);
 }

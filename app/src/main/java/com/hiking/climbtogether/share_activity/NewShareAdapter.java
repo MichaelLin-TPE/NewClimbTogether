@@ -163,6 +163,13 @@ public class NewShareAdapter extends RecyclerView.Adapter<NewShareAdapter.ViewHo
             }
         });
 
+        holder.ivSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onSetting(data,position);
+            }
+        });
+
 
     }
 
