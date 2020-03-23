@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVu 
 
     private void initGoogleOptions() {
         GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken(getString(R.string.client_id))
                 .requestEmail()
                 .build();
         signInClient = GoogleSignIn.getClient(this, options);
@@ -114,6 +114,7 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVu 
             @Override
             public void onClick(View v) {
                 String email = editAccount.getText().toString();
+
                 String password = editPassword.getText().toString();
 
                 presenter.onLoginButtonClickListener(email, password);
@@ -216,10 +217,11 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVu 
             @Override
             public void onClick(View v) {
                 String email = editEmail.getText().toString();
+                String replaceEmail = email.toLowerCase();
                 String password = editPassword.getText().toString();
                 String displayName = editDisplayName.getText().toString();
                 long currentTime = System.currentTimeMillis();
-                presenter.onDialogRegisterButtonClickListener(email, password, displayName, currentTime);
+                presenter.onDialogRegisterButtonClickListener(replaceEmail, password, displayName, currentTime);
             }
         });
     }

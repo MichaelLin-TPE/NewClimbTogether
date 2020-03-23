@@ -23,7 +23,7 @@
     <string name="cancel">取消</string>
     <string name="member">會員中心</string>
 
-    <string name="client_id" translatable="false">687642928001-e1ap4bnm29borhlvo6osdq3iapveg95m.apps.googleusercontent.com</string>
+    <string name="client_id" translatable="false">687642928001-s3jkcc6kc3o20ggq2e7ut8tf685mmmq6.apps.googleusercontent.com</string>
     <string name="question">問題</string>
     <string name="search_no_data">查無資料唷~</string>
     <string name="member_notice">免費註冊/登入會員後,即可享所有功能唷</string>
@@ -32,11 +32,11 @@
     <string name="search_bed">床鋪查詢</string>
     <string name="apply_mt">申請入園證</string>
     <string name="center_weather">中央氣象局</string>
-    <string name="login_page">登入/註冊 頁面</string>
+    <string name="login_page">登入/註冊</string>
     <string name="login_to_user_all_function">登入後使用完整功能</string>
     <string name="email">電子郵件</string>
     <string name="password">密碼</string>
-    <string name="edit_email_style">格式 : 電子郵件</string>
+    <string name="edit_email_style">格式 : 電子郵件(均以小寫,謝謝)</string>
     <string name="input_password">輸入密碼</string>
     <string name="login">登入</string>
     <string name="register">註冊</string>
@@ -120,4 +120,5 @@
     <string name="i_know">我知道了</string>
     <string name="email_body">有任何的問題請寫在下方,我會依依的回覆您,感謝</string>
     <string name="question_report">App問題信件</string>
+    <string name="please_enter_lower">請小寫,謝謝您的合作</string>
 </resources>

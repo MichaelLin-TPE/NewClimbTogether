@@ -8,52 +8,14 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:687642928001:android:bd0802e5d40afb76a4fe80",
-        "android_client_info": {
-          "package_name": "com.example.changeicon"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyD4WFPW-dZmFmyRVXE7GDDkv8PxN4jTtVM"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:687642928001:android:d2c9d6ee2592bffea4fe80",
-        "android_client_info": {
-          "package_name": "com.example.newchangeicon"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyD4WFPW-dZmFmyRVXE7GDDkv8PxN4jTtVM"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:687642928001:android:a9c44017b889875aa4fe80",
+        "mobilesdk_app_id": "1:687642928001:android:f298ebefcbbd4cbca4fe80",
         "android_client_info": {
           "package_name": "com.hiking.climbtogether"
         }
       },
       "oauth_client": [
         {
-          "client_id": "687642928001-qdp8quc2h9ognc0sao33g0aorre5anlh.apps.googleusercontent.com",
+          "client_id": "687642928001-s3jkcc6kc3o20ggq2e7ut8tf685mmmq6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.hiking.climbtogether",

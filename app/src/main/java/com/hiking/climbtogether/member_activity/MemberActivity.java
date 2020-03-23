@@ -207,7 +207,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     public void signOut() {
         if (mAuth != null) {
             GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(getResources().getString(R.string.default_web_client_id))
+                    .requestIdToken(getResources().getString(R.string.client_id))
                     .requestEmail()
                     .build();
             if (signInClient == null) {
