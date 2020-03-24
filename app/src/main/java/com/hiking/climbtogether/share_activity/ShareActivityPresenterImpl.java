@@ -46,8 +46,6 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
             mView.showErrorMessage(message);
             return;
         }
-        String message = "上傳中....請稍後";
-        mView.showProgressMessage(message);
         mView.uploadPhoto(userDataManager, content, photoBytesArray);
 
 
@@ -229,5 +227,17 @@ public class ShareActivityPresenterImpl implements ShareActivityPresenter {
     public void onImpeachmentItemClickListener(ArrayList<String> dialogList, int type, ShareArticleJson data) {
         String emailBody = String.format(Locale.getDefault(),"文章 : %s 內文 : %s \n檢舉內容 : %s\n還有其他想說的可以打在下方(檢舉文若屬實,我會立即處理請放心,處理完會在回信給您. 請耐心等候:\n",data.getOldContent(),data.getContent(),dialogList.get(type));
         mView.sendEmailToCreator(emailBody);
+    }
+
+    @Override
+    public void onShowWaitMessage() {
+        String message = "上傳中....請稍後";
+        mView.showProgressMessage(message);
+    }
+
+    @Override
+    public void onCatchUploadError(String exceptionError) {
+        String message = "上傳失敗,請確認網路狀況在重式一次 : "+exceptionError;
+        mView.showErrorMessage(message);
     }
 }

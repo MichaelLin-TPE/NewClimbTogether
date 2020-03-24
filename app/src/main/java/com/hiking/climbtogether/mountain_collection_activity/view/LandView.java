@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat;
 
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.db_modle.DataDTO;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,8 +27,6 @@ public class LandView extends ConstraintLayout {
 
     private Context context;
 
-    private ImageLoaderManager imageLoaderManager;
-
     private PortView.OnPortViewItemClickListener listener;
 
 
@@ -37,7 +35,6 @@ public class LandView extends ConstraintLayout {
         this.context = context;
         View view = View.inflate(context, R.layout.mt_collection_land_view,this);
         initView(view);
-        imageLoaderManager = new ImageLoaderManager(context);
     }
 
 
@@ -59,7 +56,7 @@ public class LandView extends ConstraintLayout {
                 : ContextCompat.getDrawable(context,R.drawable.mountain_collection_blue));
         if (dataDTO.getUserPhoto() != null){
             ivIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageLoaderManager.setPhotoUrl(dataDTO.getUserPhoto(),ivIcon);
+            NewImageLoaderManager.getInstance(context).setPhotoUrl(dataDTO.getUserPhoto(),ivIcon);
         }else {
             ivIcon.setScaleType(null);
             Log.i("Michael","照片沒資料");

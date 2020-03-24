@@ -15,6 +15,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -31,44 +32,28 @@ public class ChatLeftViewHolder extends RecyclerView.ViewHolder {
 
     private RoundedImageView ivUserPhoto;
 
-    private StorageReference storage;
-
-    private DisplayImageOptions options;
-
-    private ImageLoader imageLoader = ImageLoader.getInstance();
+    private Context context;
 
     private OnUserPhotoClickListener listener;
 
     public void setOnUserPhotoClickListener(OnUserPhotoClickListener listener){
         this.listener = listener;
+
     }
 
 //    private TextView tvEmail;
 
     public ChatLeftViewHolder(@NonNull View itemView, Context context) {
         super(itemView);
-        storage = FirebaseStorage.getInstance().getReference();
+        this.context = context;
         tvName = itemView.findViewById(R.id.chat_left_item_name);
         tvMessage = itemView.findViewById(R.id.chat_left_item_message);
         tvTime = itemView.findViewById(R.id.chat_left_item_time);
         ivUserPhoto = itemView.findViewById(R.id.chat_left_item_user_photo);
 //        tvEmail = itemView.findViewById(R.id.chat_left_item_email);
-        initImageLoader(context);
     }
 
-    private void initImageLoader(Context context) {
-        options = new DisplayImageOptions.Builder()
-                .showImageForEmptyUri(R.drawable.empty_photo)
-                .showImageOnFail(R.drawable.empty_photo)
-                .showImageOnLoading(R.drawable.empty_photo)
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .bitmapConfig(Bitmap.Config.ALPHA_8)
-                .build();
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
-                .defaultDisplayImageOptions(options).build();
-        imageLoader.init(config);
-    }
+
 
     public void setData(final ChatData chatData) {
         tvMessage.setText(chatData.getMessage());
@@ -83,7 +68,7 @@ public class ChatLeftViewHolder extends RecyclerView.ViewHolder {
         }
         tvTime.setText(String.format(Locale.getDefault(),"%s %s",new SimpleDateFormat("HH:mm", Locale.TAIWAN).format(new Date(chatData.getTime())),hour));
 
-        imageLoader.displayImage(chatData.getPhotoUrl(),ivUserPhoto,options);
+        NewImageLoaderManager.getInstance(context).setPhotoUrl(chatData.getPhotoUrl(),ivUserPhoto);
 
         ivUserPhoto.setOnClickListener(new View.OnClickListener() {
             @Override

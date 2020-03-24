@@ -12,7 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hiking.climbtogether.R;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.text.SimpleDateFormat;
@@ -26,8 +26,6 @@ public class PersonalFragmentAdapter extends RecyclerView.Adapter<PersonalFragme
     private Context context;
 
     private ArrayList<PersonalChatDTO> dataList;
-
-    private ImageLoaderManager imageLoaderManager;
 
     private OnChatItemClickListener listener;
 
@@ -47,7 +45,6 @@ public class PersonalFragmentAdapter extends RecyclerView.Adapter<PersonalFragme
 
     public PersonalFragmentAdapter(Context context) {
         this.context = context;
-        imageLoaderManager = new ImageLoaderManager(context);
     }
 
     @NonNull
@@ -65,7 +62,7 @@ public class PersonalFragmentAdapter extends RecyclerView.Adapter<PersonalFragme
             holder.ivUserPhoto.setImageResource(R.drawable.empty_photo);
         }else {
             holder.ivUserPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageLoaderManager.setPhotoUrl(data.getPhotoUrl(),holder.ivUserPhoto);
+            NewImageLoaderManager.getInstance(context).setPhotoUrl(data.getPhotoUrl(),holder.ivUserPhoto);
         }
 
 

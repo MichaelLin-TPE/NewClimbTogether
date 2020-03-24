@@ -32,7 +32,7 @@ import com.hiking.climbtogether.friend_manager_activity.FriendManagerActivity;
 import com.hiking.climbtogether.login_activity.LoginActivity;
 import com.hiking.climbtogether.mountain_collection_activity.MountainCollectionActivity;
 import com.hiking.climbtogether.my_equipment_activity.MyEquipmentActivity;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.hiking.climbtogether.tool.UserDataManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -86,8 +86,6 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     private MemberRecyclerViewAdapter adapter;
 
     private FirebaseFirestore firestore;
-
-    private ImageLoaderManager imageLoaderManager;
 
     private UserDataManager userDataManager;
 
@@ -290,7 +288,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
                 public void onSuccess(Uri uri) {
                     String url = uri.toString();
                     ivUserIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                    imageLoaderManager.setPhotoUrl(url, ivUserIcon);
+                    NewImageLoaderManager.getInstance(MemberActivity.this).setPhotoUrl(url,ivUserIcon);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -483,7 +481,6 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         mAuth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance().getReference();
         firestore = FirebaseFirestore.getInstance();
-        imageLoaderManager = new ImageLoaderManager(this);
         userDataManager = new UserDataManager(this);
     }
 

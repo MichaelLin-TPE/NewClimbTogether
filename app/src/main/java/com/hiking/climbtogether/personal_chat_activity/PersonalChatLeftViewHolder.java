@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.chat_activity.ChatLeftViewHolder;
 import com.hiking.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.text.SimpleDateFormat;
@@ -25,9 +25,9 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
 
     private RoundedImageView ivUserPhoto;
 
-    private ImageLoaderManager imageLoaderManager;
-
     private ChatLeftViewHolder.OnUserPhotoClickListener listener;
+
+    private Context context;
 
     public void setOnUserPhotoClickListener(ChatLeftViewHolder.OnUserPhotoClickListener listener){
         this.listener = listener;
@@ -37,11 +37,11 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
 
     public PersonalChatLeftViewHolder(@NonNull View itemView, Context context) {
         super(itemView);
+        this.context = context;
         tvName = itemView.findViewById(R.id.chat_left_item_name);
         tvMessage = itemView.findViewById(R.id.chat_left_item_message);
         tvTime = itemView.findViewById(R.id.chat_left_item_time);
         ivUserPhoto = itemView.findViewById(R.id.chat_left_item_user_photo);
-        imageLoaderManager = new ImageLoaderManager(context);
     }
 
 
@@ -52,8 +52,7 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
         }else {
             ivUserPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }
-
-        imageLoaderManager.setPhotoUrl(friendPhotoUrl,ivUserPhoto);
+        NewImageLoaderManager.getInstance(context).setPhotoUrl(friendPhotoUrl,ivUserPhoto);
         tvName.setText(displayName);
         tvMessage.setText(personalChatData.getMessage());
         String hour = new SimpleDateFormat("HH",Locale.TAIWAN).format(new Date(personalChatData.getTime()));

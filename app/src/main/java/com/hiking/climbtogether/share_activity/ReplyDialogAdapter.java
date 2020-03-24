@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hiking.climbtogether.R;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
@@ -21,12 +21,10 @@ public class ReplyDialogAdapter extends RecyclerView.Adapter<ReplyDialogAdapter.
 
     private Context context;
 
-    private ImageLoaderManager imageLoaderManager;
 
     public ReplyDialogAdapter(ArrayList<ReplyDTO> dataArrayList, Context context) {
         this.dataArrayList = dataArrayList;
         this.context = context;
-        imageLoaderManager = new ImageLoaderManager(context);
     }
 
     @NonNull
@@ -38,7 +36,7 @@ public class ReplyDialogAdapter extends RecyclerView.Adapter<ReplyDialogAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ReplyDTO data = dataArrayList.get(position);
-        imageLoaderManager.setPhotoUrl(data.getUserPhoto(),holder.ivUserPhoto);
+        NewImageLoaderManager.getInstance(context).setPhotoUrl(data.getUserPhoto(),holder.ivUserPhoto);
         holder.tvName.setText(data.getUserName());
         holder.tvContent.setText(data.getContent());
     }

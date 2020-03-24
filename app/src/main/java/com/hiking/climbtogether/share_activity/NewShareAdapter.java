@@ -15,7 +15,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.share_activity.share_json.ShareArticleJson;
 import com.hiking.climbtogether.share_activity.share_json.ShareClickLikeObject;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
@@ -27,8 +27,6 @@ public class NewShareAdapter extends RecyclerView.Adapter<NewShareAdapter.ViewHo
     private Context context;
 
     private onArticleItemClickListener listener;
-
-    private ImageLoaderManager manager;
 
     private String userEmail;
 
@@ -43,7 +41,6 @@ public class NewShareAdapter extends RecyclerView.Adapter<NewShareAdapter.ViewHo
     public NewShareAdapter(ArrayList<ShareArticleJson> dataArrayList, Context context,String userEmail) {
         this.dataArrayList = dataArrayList;
         this.context = context;
-        manager = new ImageLoaderManager(context);
         this.userEmail = userEmail;
     }
 
@@ -87,7 +84,7 @@ public class NewShareAdapter extends RecyclerView.Adapter<NewShareAdapter.ViewHo
             holder.tvReplyCount.setVisibility(View.VISIBLE);
             holder.tvReplyCount.setText(String.format(Locale.getDefault(),"%d筆留言",data.getReply()));
         }
-        manager.setPhotoUrl(data.getUserPhoto(),holder.ivUserPhoto);
+        NewImageLoaderManager.getInstance(context).setPhotoUrl(data.getUserPhoto(),holder.ivUserPhoto);
 
 
         NewShareActivityViewPagerAdapter adapter = new NewShareActivityViewPagerAdapter(context,data.getSharePhoto());

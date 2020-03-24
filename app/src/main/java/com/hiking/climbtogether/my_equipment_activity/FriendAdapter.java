@@ -11,7 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hiking.climbtogether.R;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
@@ -24,7 +24,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
 
     private Context context;
 
-    private ImageLoaderManager imageLoaderManager;
 
     public void setOnFriendListClickListener(OnFriendListClickListener listClickListener){
         this.listClickListener = listClickListener;
@@ -33,7 +32,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
 
     public FriendAdapter(Context context) {
         this.context = context;
-        imageLoaderManager = new ImageLoaderManager(context);
     }
 
     public void setDataArrayList(ArrayList<FriendData> dataArrayList){
@@ -49,7 +47,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         FriendData data = dataArrayList.get(position);
-        imageLoaderManager.setPhotoUrl(data.getPhoto(),holder.ivPhoto);
+        NewImageLoaderManager.getInstance(context).setPhotoUrl(data.getPhoto(),holder.ivPhoto);
         holder.tvName.setText(data.getName());
         holder.clickArea.setOnClickListener(new View.OnClickListener() {
             @Override

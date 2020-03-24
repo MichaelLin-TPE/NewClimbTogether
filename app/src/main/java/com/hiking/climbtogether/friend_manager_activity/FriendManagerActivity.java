@@ -29,7 +29,6 @@ import com.hiking.climbtogether.friend_manager_activity.view.FriendViewAdapter;
 import com.hiking.climbtogether.friend_manager_activity.view.InviteViewAdapter;
 import com.hiking.climbtogether.personal_chat_activity.PersonalChatActivity;
 import com.hiking.climbtogether.search_friend_activity.SearchFriendActivity;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -42,6 +41,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
@@ -80,8 +80,6 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
 
     private FriendManagerAdapter adapter;
 
-    private ImageLoaderManager imageLoaderManager;
-
     private String friendPhotoUrl;
 
     private AlertDialog userDialog;
@@ -117,7 +115,6 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_manager);
-        imageLoaderManager = new ImageLoaderManager(this);
         initPresenter();
         initFirebase();
         searchForChatRoom();
@@ -407,7 +404,7 @@ public class FriendManagerActivity extends AppCompatActivity implements FriendMa
                     public void onSuccess(Uri uri) {
                         friendPhotoUrl = uri.toString();
                         ivUserPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        imageLoaderManager.setPhotoUrl(friendPhotoUrl, ivUserPhoto);
+                        NewImageLoaderManager.getInstance(FriendManagerActivity.this).setPhotoUrl(friendPhotoUrl,ivUserPhoto);
                         tvEmail.setText(data.getEmail());
                         tvName.setText(data.getDisplayName());
                         showView(view);

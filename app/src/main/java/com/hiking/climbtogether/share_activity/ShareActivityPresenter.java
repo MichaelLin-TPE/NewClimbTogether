@@ -53,4 +53,8 @@ public interface ShareActivityPresenter {
     void onStrangerItemClickListener(int which,ShareArticleJson data,int itemPosition);
 
     void onImpeachmentItemClickListener(ArrayList<String> dialogList, int type, ShareArticleJson data);
+
+    void onShowWaitMessage();
+
+    void onCatchUploadError(String exceptionError);
 }

@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.friend_manager_activity.FriendInviteDTO;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -22,6 +21,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
@@ -31,8 +31,6 @@ public class InviteViewAdapter extends RecyclerView.Adapter<InviteViewAdapter.Vi
     private Context context;
 
     private ArrayList<FriendInviteDTO> inviteArrayList;
-
-    private ImageLoaderManager imageLoaderManager;
 
     private FirebaseFirestore firestore;
 
@@ -48,7 +46,6 @@ public class InviteViewAdapter extends RecyclerView.Adapter<InviteViewAdapter.Vi
     public InviteViewAdapter(Context context, ArrayList<FriendInviteDTO> inviteArrayList) {
         this.context = context;
         this.inviteArrayList = inviteArrayList;
-        imageLoaderManager = new ImageLoaderManager(context);
         firestore = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance().getReference();
     }
@@ -71,7 +68,7 @@ public class InviteViewAdapter extends RecyclerView.Adapter<InviteViewAdapter.Vi
                     public void onSuccess(Uri uri) {
                         String photoUrl = uri.toString();
                         holder.ivUserPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        imageLoaderManager.setPhotoUrl(photoUrl,holder.ivUserPhoto);
+                        NewImageLoaderManager.getInstance(context).setPhotoUrl(photoUrl,holder.ivUserPhoto);
                         searchForStrangerData(data.getEmail(),holder.tvDisplayName,holder.tvEmail,holder.ivYes,holder.ivNo,data,position);
                     }
                 }).addOnFailureListener(new OnFailureListener() {

@@ -14,12 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.friend_manager_activity.FriendDTO;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
@@ -30,8 +30,6 @@ public class FriendViewAdapter extends RecyclerView.Adapter<FriendViewAdapter.Vi
     private ArrayList<FriendDTO> friendArrayList;
 
     private StorageReference storage;
-
-    private ImageLoaderManager loaderManager;
 
 
     private FirebaseUser user;
@@ -46,7 +44,6 @@ public class FriendViewAdapter extends RecyclerView.Adapter<FriendViewAdapter.Vi
         this.context = context;
         this.friendArrayList = friendArrayList;
         storage = FirebaseStorage.getInstance().getReference();
-        loaderManager = new ImageLoaderManager(context);
     }
 
     public void setCurrentUser(FirebaseUser user){
@@ -69,7 +66,7 @@ public class FriendViewAdapter extends RecyclerView.Adapter<FriendViewAdapter.Vi
             public void onSuccess(Uri uri) {
                 String url = uri.toString();
                 holder.ivUserPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                loaderManager.setPhotoUrl(url,holder.ivUserPhoto);
+                NewImageLoaderManager.getInstance(context).setPhotoUrl(url,holder.ivUserPhoto);
                 holder.tvEmai.setText(data.getEmail());
                 holder.tvDisplayName.setText(data.getDisplayName());
             }

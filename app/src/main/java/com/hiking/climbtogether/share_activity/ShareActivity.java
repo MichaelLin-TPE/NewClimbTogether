@@ -27,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.SetOptions;
 import com.hiking.climbtogether.R;
@@ -35,7 +36,7 @@ import com.hiking.climbtogether.personal_chat_activity.PersonalChatActivity;
 import com.hiking.climbtogether.share_activity.share_json.ShareArticleJson;
 import com.hiking.climbtogether.share_activity.share_json.ShareClickLikeObject;
 import com.hiking.climbtogether.tool.GlideEngine;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.hiking.climbtogether.tool.UserDataManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -87,8 +88,6 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     private ArrayList<ReplyDTO> replayArray;
 
-    private ImageLoaderManager imageLoaderManager;
-
     private ReplyDialogAdapter replyAdapter;
 
     private int itemPosition;
@@ -121,6 +120,9 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     private NewShareAdapter newAdapter;
 
+    private EditText edContent;
+
+    private AlertDialog dialogAddArticle;
 
     private ArrayList<ShareArticleJson> dataArrayList;
     private Gson gson;
@@ -135,7 +137,6 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share);
         userDataManager = new UserDataManager(this);
-        imageLoaderManager = new ImageLoaderManager(this);
         gson = new Gson();
         initFirebase();
         searchChatRoom();
@@ -237,7 +238,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         TextView tvShare = view.findViewById(R.id.article_text_share);
         TextView tvCancel = view.findViewById(R.id.article_text_cancel);
 
-        EditText edContent = view.findViewById(R.id.article_edit_content);
+        edContent = view.findViewById(R.id.article_edit_content);
         //设置EditText的显示方式为多行文本输入
         edContent.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         //文本显示的位置在EditText的最上方
@@ -246,26 +247,32 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         edContent.setSingleLine(false);
         //水平滚动设置为False
         edContent.setHorizontallyScrolling(false);
-        AlertDialog dialog = new AlertDialog.Builder(this)
+        dialogAddArticle = new AlertDialog.Builder(this)
                 .setView(view).create();
-        Window window = dialog.getWindow();
+        Window window = dialogAddArticle.getWindow();
         if (window != null) {
             window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         }
-        dialog.show();
+        dialogAddArticle.show();
 
         tvShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String content = edContent.getText().toString();
-                presenter.onShareButtonClick(userDataManager, content, photoBytesArray);
-                dialog.dismiss();
+                //解壓縮完再丟
+                dialogAddArticle.dismiss();
+                photoBytesArray = new ArrayList<>();
+                //再次解壓縮
+                photoCount = 0;
+                presenter.onShowWaitMessage();
+                compressPhoto();
+
+
             }
         });
         tvCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialog.dismiss();
+                dialogAddArticle.dismiss();
             }
         });
         addBtn.setVisibility(View.VISIBLE);
@@ -276,6 +283,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                         .openGallery(PictureMimeType.ofImage())
                         .loadImageEngine(GlideEngine.createGlideEngine())
                         .maxSelectNum(3)
+                        .compress(true)
                         .enableCrop(true)
                         .hideBottomControls(false)
                         .showCropFrame(false)
@@ -285,17 +293,13 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                             public void onResult(List<LocalMedia> result) {
                                 addBtn.setVisibility(View.GONE);
                                 bitmapArrayList = new ArrayList<>();
-                                photoBytesArray = new ArrayList<>();
+
                                 for (int i = 0; i < result.size(); i++) {
                                     File file = new File(result.get(i).getCutPath());
                                     Uri uri = Uri.fromFile(file);
                                     try {
                                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                                         bitmapArrayList.add(bitmap);
-                                        //再次解壓縮
-                                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(bitmap.getByteCount());
-                                        bitmap.compress(Bitmap.CompressFormat.JPEG, 60, outputStream);
-                                        photoBytesArray.add(outputStream.toByteArray());
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -306,6 +310,21 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                         });
             }
         });
+    }
+
+    private void compressPhoto() {
+        if (photoCount < bitmapArrayList.size()){
+            Log.i("Michael","需要上傳的照片 : "+bitmapArrayList.size()+" 張");
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(bitmapArrayList.get(photoCount).getByteCount());
+            bitmapArrayList.get(photoCount).compress(Bitmap.CompressFormat.JPEG, 60, outputStream);
+            photoBytesArray.add(outputStream.toByteArray());
+            photoCount ++;
+            compressPhoto();
+        }else {
+            String content = edContent.getText().toString();
+            presenter.onShareButtonClick(userDataManager, content, photoBytesArray);
+
+        }
     }
 
     @Override
@@ -347,7 +366,8 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                 replayRv.setAdapter(replyAdapter);
 
                                 tvName.setText(data.getDisplayName());
-                                imageLoaderManager.setPhotoUrl(data.getUserPhoto(), ivUserPhoto);
+                                NewImageLoaderManager.getInstance(ShareActivity.this).setPhotoUrl(data.getUserPhoto(),ivUserPhoto);
+
                                 tvContent.setText(data.getContent());
 
 
@@ -437,8 +457,6 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                             }
                         }
                     });
-
-
         }
 
     }
@@ -451,7 +469,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
             ivUserPhoto.setScaleType(ImageView.ScaleType.FIT_CENTER);
         } else {
             ivUserPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageLoaderManager.setPhotoUrl(data.getUserPhoto(), ivUserPhoto);
+            NewImageLoaderManager.getInstance(ShareActivity.this).setPhotoUrl(data.getUserPhoto(),ivUserPhoto);
         }
         tvName.setText(data.getDisplayName());
         tvEmail.setText(data.getEmail());
@@ -641,6 +659,7 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
         this.content = content;
         this.photoBytesArray = photoBytesArray;
         downloadUrlArray = new ArrayList<>();
+        photoCount = 0;
         uploadPhotoToStorage();
 
     }
@@ -911,7 +930,9 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
 
     private void uploadPhotoToStorage() {
         if (photoCount < photoBytesArray.size()){
-            StorageReference river = storage.child(userDataManager.getEmail()+"/"+content+"/"+content+photoCount+".jpg");
+            Log.i("Michael","準備上傳第一張 : "+photoBytesArray.get(photoCount).toString());
+            long randomNumber = (long) Math.floor(Math.random()*100000);
+            StorageReference river = storage.child(userDataManager.getEmail()+"/"+SHARE+"/"+randomNumber+".jpg");
             UploadTask task = river.putBytes(photoBytesArray.get(photoCount));
             task.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -925,6 +946,11 @@ public class ShareActivity extends AppCompatActivity implements ShareActivityVu 
                                     uploadPhotoToStorage();
                                 }
                             });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    presenter.onCatchUploadError(e.toString());
                 }
             });
         }else {

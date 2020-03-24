@@ -10,24 +10,22 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
-public class ImageLoaderManager  {
-
-    private DisplayImageOptions options;
+public class NewImageLoaderManager {
+    private static NewImageLoaderManager imageLoaderManager;
 
     private ImageLoader imageLoader = ImageLoader.getInstance();
 
-    private Context context;
+    private DisplayImageOptions options;
 
-    public ImageLoaderManager(Context context){
-        this.context = context;
-        initImageLoader();
+    private NewImageLoaderManager(Context context){
+        initImageLoader(context);
     }
 
-    private void initImageLoader() {
+    private void initImageLoader(Context context) {
         options = new DisplayImageOptions.Builder()
-                .showImageForEmptyUri(R.drawable.empty_photo)
-                .showImageOnFail(R.drawable.empty_photo)
-                .showImageOnLoading(R.drawable.empty_photo)
+                .showImageForEmptyUri(R.drawable.hiking_logo)
+                .showImageOnFail(R.drawable.hiking_logo)
+                .showImageOnLoading(R.drawable.hiking_logo)
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
@@ -35,6 +33,13 @@ public class ImageLoaderManager  {
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
                 .defaultDisplayImageOptions(options).build();
         imageLoader.init(config);
+    }
+
+    public static synchronized NewImageLoaderManager getInstance(Context context){
+        if (imageLoaderManager == null){
+            imageLoaderManager = new NewImageLoaderManager(context);
+        }
+        return imageLoaderManager;
     }
 
     public void setPhotoUrl(String url, RoundedImageView ivImage){

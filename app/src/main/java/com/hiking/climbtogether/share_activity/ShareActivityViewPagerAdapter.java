@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.hiking.climbtogether.R;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
@@ -18,14 +18,14 @@ import java.util.Locale;
 
 public class ShareActivityViewPagerAdapter extends PagerAdapter {
 
-    private ImageLoaderManager loaderManager;
+//    private ImageLoaderManager loaderManager;
 
     private Context context;
 
     private ArrayList<String> downloadUrlArray;
 
     public ShareActivityViewPagerAdapter( Context context, ArrayList<String> downloadUrlArray) {
-        loaderManager = new ImageLoaderManager(context);
+//        loaderManager = new ImageLoaderManager(context);
         this.context = context;
         this.downloadUrlArray = downloadUrlArray;
     }
@@ -49,8 +49,8 @@ public class ShareActivityViewPagerAdapter extends PagerAdapter {
             tvCount.setText(String.format(Locale.getDefault(),"%d/%d",position+1,downloadUrlArray.size()));
         }
 
-
-        loaderManager.setPhotoUrl(downloadUrlArray.get(position),ivPhoto);
+        NewImageLoaderManager.getInstance(context).setPhotoUrl(downloadUrlArray.get(position),ivPhoto);
+//        loaderManager.setPhotoUrl(downloadUrlArray.get(position),ivPhoto);
 
         container.addView(view);
 

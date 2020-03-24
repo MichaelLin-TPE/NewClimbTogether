@@ -31,18 +31,17 @@ import com.hiking.climbtogether.chat_activity.chat_view_presenter.ViewPresenter;
 import com.hiking.climbtogether.chat_activity.chat_view_presenter.ViewPresenterImpl;
 import com.hiking.climbtogether.friend_manager_activity.ChatRoomDTO;
 import com.hiking.climbtogether.personal_chat_activity.PersonalChatActivity;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.hiking.climbtogether.tool.UserDataManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
@@ -88,8 +87,6 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
 
     private StorageReference storage;
 
-    private ImageLoaderManager imageLoaderManager;
-
     private static final String FRIENDSHIP = "friendship";
 
     private static final String FRIEND = "friend";
@@ -121,7 +118,6 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        imageLoaderManager = new ImageLoaderManager(this);
         userDataManager = new UserDataManager(this);
         initPresenter();
         initFirebase();
@@ -415,7 +411,7 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
             ivPhoto.setImageResource(R.drawable.empty_photo);
         } else {
             ivPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageLoaderManager.setPhotoUrl(photoUrl, ivPhoto);
+            NewImageLoaderManager.getInstance(this).setPhotoUrl(photoUrl,ivPhoto);
         }
         tvDisplayName.setText(displayName);
         tvEmail.setText(mail);

@@ -29,7 +29,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.hiking.climbtogether.R;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.Locale;
@@ -51,9 +51,6 @@ public class SearchFriendActivity extends AppCompatActivity implements SearchFri
     private ImageView ivIsFriend;
 
     private Button btnSend;
-
-    private ImageLoaderManager loaderManager;
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -85,7 +82,6 @@ public class SearchFriendActivity extends AppCompatActivity implements SearchFri
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_friend);
-        loaderManager = new ImageLoaderManager(this);
         initFirebase();
         initPresenter();
         initView();
@@ -173,7 +169,7 @@ public class SearchFriendActivity extends AppCompatActivity implements SearchFri
             tvIsFriendInfo.setVisibility(View.GONE);
             btnSend.setVisibility(View.VISIBLE);
         }
-        loaderManager.setPhotoUrl(photoUrl,ivPhoto);
+        NewImageLoaderManager.getInstance(this).setPhotoUrl(photoUrl,ivPhoto);
         tvUserInfo.setText(String.format(Locale.getDefault(),"%s",name));
     }
 
@@ -187,7 +183,7 @@ public class SearchFriendActivity extends AppCompatActivity implements SearchFri
         tvStartInfo.setVisibility(View.GONE);
         tvIsFriendInfo.setText(getString(R.string.is_friend_already));
         btnSend.setVisibility(View.GONE);
-        loaderManager.setPhotoUrl(photoUrl,ivPhoto);
+        NewImageLoaderManager.getInstance(this).setPhotoUrl(photoUrl,ivPhoto);
         tvUserInfo.setText(String.format(Locale.getDefault(),"%s",name));
     }
 

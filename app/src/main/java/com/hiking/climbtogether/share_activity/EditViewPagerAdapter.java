@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.hiking.climbtogether.R;
-import com.hiking.climbtogether.tool.ImageLoaderManager;
+import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
@@ -18,7 +18,6 @@ import java.util.Locale;
 
 public class EditViewPagerAdapter extends PagerAdapter {
 
-    private ImageLoaderManager loaderManager;
 
     private Context context;
 
@@ -27,7 +26,6 @@ public class EditViewPagerAdapter extends PagerAdapter {
     public EditViewPagerAdapter(Context context, ArrayList<String> downloadUrlArray) {
         this.context = context;
         this.downloadUrlArray = downloadUrlArray;
-        loaderManager = new ImageLoaderManager(context);
     }
 
     @Override
@@ -49,8 +47,7 @@ public class EditViewPagerAdapter extends PagerAdapter {
             tvCount.setText(String.format(Locale.getDefault(),"%d/%d",position+1,downloadUrlArray.size()));
         }
 
-
-        loaderManager.setPhotoUrl(downloadUrlArray.get(position),ivPhoto);
+        NewImageLoaderManager.getInstance(context).setPhotoUrl(downloadUrlArray.get(position),ivPhoto);
 
         container.addView(view);
 
