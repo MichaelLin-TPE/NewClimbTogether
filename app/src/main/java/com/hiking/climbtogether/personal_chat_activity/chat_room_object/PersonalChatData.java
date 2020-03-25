@@ -3,6 +3,7 @@ package com.hiking.climbtogether.personal_chat_activity.chat_room_object;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class PersonalChatData implements Serializable {
     @SerializedName("message")
@@ -16,6 +17,16 @@ public class PersonalChatData implements Serializable {
     private String displayName;
     @SerializedName("photo_url")
     private String photoUrl;
+    @SerializedName("image_url")
+    private ArrayList<String> imageUrl;
+
+    public ArrayList<String> getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(ArrayList<String> imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public String getDisplayName() {
         return displayName;

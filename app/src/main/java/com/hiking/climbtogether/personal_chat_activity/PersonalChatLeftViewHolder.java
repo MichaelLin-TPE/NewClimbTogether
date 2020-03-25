@@ -15,22 +15,23 @@ import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
 public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
     private TextView tvMessage;
 
-    private TextView tvTime,tvName;
+    private TextView tvTime,tvName,tvOneTime,tvTwoTime;
 
-    private RoundedImageView ivUserPhoto;
-
-    private ChatLeftViewHolder.OnUserPhotoClickListener listener;
+    private RoundedImageView ivUserPhoto,ivOnePhoto,ivTwoPhoto;
 
     private Context context;
 
-    public void setOnUserPhotoClickListener(ChatLeftViewHolder.OnUserPhotoClickListener listener){
-        this.listener = listener;
+    private OnPhotoClickListenr listenr;
+
+    public void setOnPhotoClickListenr(OnPhotoClickListenr listenr){
+        this.listenr = listenr;
     }
 
 
@@ -42,6 +43,10 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
         tvMessage = itemView.findViewById(R.id.chat_left_item_message);
         tvTime = itemView.findViewById(R.id.chat_left_item_time);
         ivUserPhoto = itemView.findViewById(R.id.chat_left_item_user_photo);
+        tvOneTime = itemView.findViewById(R.id.chat_left_item_time_one);
+        tvTwoTime = itemView.findViewById(R.id.chat_left_item_time_two);
+        ivOnePhoto = itemView.findViewById(R.id.chat_left_image_one);
+        ivTwoPhoto = itemView.findViewById(R.id.chat_left_image_two);
     }
 
 
@@ -52,9 +57,8 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
         }else {
             ivUserPhoto.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }
-        NewImageLoaderManager.getInstance(context).setPhotoUrl(friendPhotoUrl,ivUserPhoto);
         tvName.setText(displayName);
-        tvMessage.setText(personalChatData.getMessage());
+        NewImageLoaderManager.getInstance(context).setPhotoUrl(friendPhotoUrl,ivUserPhoto);
         String hour = new SimpleDateFormat("HH",Locale.TAIWAN).format(new Date(personalChatData.getTime()));
         int hours = Integer.parseInt(hour);
         if (hours < 12){
@@ -62,6 +66,53 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
         }else {
             hour = "下午";
         }
-        tvTime.setText(String.format(Locale.getDefault(),"%s%s",new SimpleDateFormat("HH:mm",Locale.TAIWAN).format(new Date(personalChatData.getTime())),hour));
+        String time = String.format(Locale.getDefault(),"%s%s",new SimpleDateFormat("HH:mm",Locale.TAIWAN).format(new Date(personalChatData.getTime())),hour);
+
+        if (!personalChatData.getMessage().isEmpty()){
+            tvMessage.setVisibility(View.VISIBLE);
+            tvTime.setVisibility(View.VISIBLE);
+            ivTwoPhoto.setVisibility(View.GONE);
+            tvTwoTime.setVisibility(View.GONE);
+            ivOnePhoto.setVisibility(View.GONE);
+            tvOneTime.setVisibility(View.GONE);
+            tvMessage.setText(personalChatData.getMessage());
+            tvTime.setText(time);
+        }else if (personalChatData.getImageUrl().size() == 1){
+            tvMessage.setVisibility(View.GONE);
+            tvTime.setVisibility(View.GONE);
+            ivTwoPhoto.setVisibility(View.GONE);
+            tvTwoTime.setVisibility(View.GONE);
+            ivOnePhoto.setVisibility(View.VISIBLE);
+            tvOneTime.setVisibility(View.VISIBLE);
+            NewImageLoaderManager.getInstance(context).setPhotoUrl(personalChatData.getImageUrl().get(0),ivOnePhoto);
+            tvOneTime.setText(time);
+        }else if (personalChatData.getImageUrl().size() == 2){
+            tvMessage.setVisibility(View.GONE);
+            tvTime.setVisibility(View.GONE);
+            ivTwoPhoto.setVisibility(View.VISIBLE);
+            tvTwoTime.setVisibility(View.VISIBLE);
+            ivOnePhoto.setVisibility(View.VISIBLE);
+            tvOneTime.setVisibility(View.GONE);
+            NewImageLoaderManager.getInstance(context).setPhotoUrl(personalChatData.getImageUrl().get(0),ivOnePhoto);
+            NewImageLoaderManager.getInstance(context).setPhotoUrl(personalChatData.getImageUrl().get(1),ivTwoPhoto);
+            tvTwoTime.setText(time);
+        }
+
+        ivOnePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listenr.onClick(personalChatData.getImageUrl().get(0));
+            }
+        });
+        ivTwoPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listenr.onClick(personalChatData.getImageUrl().get(1));
+            }
+        });
+    }
+
+    public interface OnPhotoClickListenr{
+        void onClick(String downLoadUrl);
     }
 }

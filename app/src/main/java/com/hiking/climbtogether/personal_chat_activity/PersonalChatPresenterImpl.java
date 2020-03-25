@@ -13,6 +13,7 @@ import com.hiking.climbtogether.tool.HttpConnection;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class PersonalChatPresenterImpl implements PersonalChatPresenter {
 
@@ -118,6 +119,7 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
             data.setTime(time);
             data.setPhotoUrl(friendPhotoUrl);
             data.setDisplayName(userDisplayName);
+            data.setImageUrl(new ArrayList<>());
             chatArrayList.add(data);
             object.setUserOneDataDTO(user1);
             object.setUserTwoDataDTO(user2);
@@ -129,13 +131,83 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
             data.setEmail(mView.getEmail());
             data.setMessage(message);
             data.setTime(time);
+            data.setImageUrl(new ArrayList<>());
             data.setPhotoUrl(friendPhotoUrl);
             data.setDisplayName(userDisplayName);
             dataArrayList.get(0).getChatData().add(data);
             String jsonStr = gson.toJson(dataArrayList.get(0));
             mView.setChatDataToFireStore(jsonStr);
         }
+    }
 
+    @Override
+    public void onSendPhotoButtonClickListener() {
+        mView.showPhotoPage();
+    }
 
+    @Override
+    public void onCatchAllPhoto(ArrayList<byte[]> photoBytesArray) {
+        mView.uploadPhoto(photoBytesArray);
+    }
+
+    @Override
+    public void onCatchUploadError(String toString) {
+        String message = String.format(Locale.getDefault(),"上傳失敗,請確認網路狀況再重試一次,錯誤代碼 : %s",toString);
+        mView.showErrorCode(message);
+    }
+
+    @Override
+    public void onShowProgressMessage(String message) {
+        mView.showErrorCode(message);
+    }
+
+    @Override
+    public void onCatchAllPhotoUrl(String message, long time, String path, String userPhotoUrl, String userDisplayName, String friendEmail, String friendDisplayName, String friendPhotoUrl,ArrayList<String> downloadUrlArray) {
+        if (dataArrayList == null){
+            PersonalChatData data = new PersonalChatData();
+            ArrayList<PersonalChatData> chatArrayList = new ArrayList<>();
+            PersonalChatObject object = new PersonalChatObject();
+            UserOneDataDTO user1 = new UserOneDataDTO();
+            UserTwoDataDTO user2 = new UserTwoDataDTO();
+            user1.setDisplayNmae(userDisplayName);
+            user1.setEmai(mView.getEmail());
+            user1.setPhotoUrl(userPhotoUrl);
+            user2.setDisplayNmae(friendDisplayName);
+            user2.setEmai(friendEmail);
+            user2.setPhotoUrl(friendPhotoUrl);
+            data.setEmail(mView.getEmail());
+            data.setMessage(message);
+            data.setTime(time);
+            data.setPhotoUrl(friendPhotoUrl);
+            data.setDisplayName(userDisplayName);
+            data.setImageUrl(downloadUrlArray);
+            chatArrayList.add(data);
+            object.setUserOneDataDTO(user1);
+            object.setUserTwoDataDTO(user2);
+            object.setChatData(chatArrayList);
+            String jsonStr = gson.toJson(object);
+            mView.setChatDataToFireStore(jsonStr);
+        }else {
+            PersonalChatData data = new PersonalChatData();
+            data.setEmail(mView.getEmail());
+            data.setMessage(message);
+            data.setTime(time);
+            data.setImageUrl(downloadUrlArray);
+            data.setPhotoUrl(friendPhotoUrl);
+            data.setDisplayName(userDisplayName);
+            dataArrayList.get(0).getChatData().add(data);
+            String jsonStr = gson.toJson(dataArrayList.get(0));
+            mView.setChatDataToFireStore(jsonStr);
+        }
+    }
+
+    @Override
+    public void onPhotoClickListener(String downLoadUrl) {
+        mView.intentToPhotoActivity(downLoadUrl);
+    }
+
+    @Override
+    public void onCameraButtonClickListener() {
+        mView.showCamera();
     }
 }

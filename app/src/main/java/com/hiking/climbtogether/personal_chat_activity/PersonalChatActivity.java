@@ -8,22 +8,35 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.hiking.climbtogether.MyFirbaseMessagingService;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.personal_chat_activity.chat_room_object.ChatRoomDTO;
 import com.hiking.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
 import com.hiking.climbtogether.personal_chat_activity.personal_presenter.PersonalPresenter;
 import com.hiking.climbtogether.personal_chat_activity.personal_presenter.PersonalPresenterImpl;
+import com.hiking.climbtogether.photo_activity.PhotoActivity;
+import com.hiking.climbtogether.share_activity.DialogViewPagerAdapter;
+import com.hiking.climbtogether.share_activity.ShareActivity;
+import com.hiking.climbtogether.tool.GlideEngine;
 import com.hiking.climbtogether.tool.UserDataManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -34,9 +47,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.luck.picture.lib.PictureSelector;
+import com.luck.picture.lib.config.PictureMimeType;
+import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.listener.OnResultCallbackListener;
+import com.luck.picture.lib.tools.PictureFileUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PersonalChatActivity extends AppCompatActivity implements PersonalChatVu {
@@ -55,7 +76,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     private EditText edMessage;
 
-    private Button btnSend;
+    private ImageView ivSend;
 
     private PersonalPresenter personalPresenter;
 
@@ -67,25 +88,24 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     private String testPath;
 
-    private boolean isStillPosting;
-
     private UserDataManager userDataManager;
 
-    private int countSecond = 0;
+    private StorageReference storage;
 
-    private MyFirbaseMessagingService service;
+    private ImageView ivSendPhoto,ivCamera;
 
-    private static final String IS_UPDATE = "is_chat_update";
+    private ArrayList<Bitmap> bitmapArrayList;
 
-    private static final String UPDATE = "update";
+    private ArrayList<byte[]> photoBytesArray;
 
-    private String lastMessage;
+    private int uploadPhotoCount;
+
+    private ArrayList<String> downloadUrlArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_personal_chat);
-        service = new MyFirbaseMessagingService();
         userDataManager = new UserDataManager(this);
         initPresenter();
         initFirebase();
@@ -177,6 +197,8 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
     }
 
     private void initView() {
+        ivSendPhoto = findViewById(R.id.personal_iv_send_photo);
+        ivCamera = findViewById(R.id.personal_iv_send_camera);
         Toolbar toolbar = findViewById(R.id.personal_chat_toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(displayName);
@@ -189,8 +211,8 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
         });
         recyclerView = findViewById(R.id.personal_chat_recycler_view);
         edMessage = findViewById(R.id.personal_chat_edit_message);
-        btnSend = findViewById(R.id.personal_chat_btn_send);
-        btnSend.setOnClickListener(new View.OnClickListener() {
+        ivSend = findViewById(R.id.personal_chat_btn_send);
+        ivSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String message = edMessage.getText().toString();
@@ -205,11 +227,29 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                 presenter.onSendNotificationToFriend(friendEmail, message, displayName);
             }
         });
+
+
+        //傳送照片
+        ivSendPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onSendPhotoButtonClickListener();
+            }
+        });
+
+        //拍照傳送照片
+        ivCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onCameraButtonClickListener();
+            }
+        });
     }
 
     private void initFirebase() {
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance().getReference();
         user = mAuth.getCurrentUser();
     }
 
@@ -252,8 +292,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
     @Override
     protected void onPause() {
         super.onPause();
-        isStillPosting = false;
-        countSecond = 0;
+
     }
 
     @Override
@@ -278,6 +317,13 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
         recyclerView.scrollToPosition(chatArrayList.size() - 1);
+
+        adapter.setOnPhotoClickListenr(new PersonalChatLeftViewHolder.OnPhotoClickListenr() {
+            @Override
+            public void onClick(String downLoadUrl) {
+                presenter.onPhotoClickListener(downLoadUrl);
+            }
+        });
 
     }
 
@@ -342,6 +388,130 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                         }
                     }
                 });
+    }
+
+    @Override
+    public void showPhotoPage() {
+        PictureSelector.create(PersonalChatActivity.this)
+                .openGallery(PictureMimeType.ofImage())
+                .loadImageEngine(GlideEngine.createGlideEngine())
+                .maxSelectNum(2)
+                .compress(true)
+                .enableCrop(true)
+                .hideBottomControls(false)
+                .showCropFrame(false)
+                .freeStyleCropEnabled(true)
+                .forResult(new OnResultCallbackListener() {
+                    @Override
+                    public void onResult(List<LocalMedia> result) {
+                        bitmapArrayList = new ArrayList<>();
+                        photoBytesArray = new ArrayList<>();
+                        for (int i = 0; i < result.size(); i++) {
+                            File file = new File(result.get(i).getCutPath());
+                            Uri uri = Uri.fromFile(file);
+                            try {
+                                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                                bitmapArrayList.add(bitmap);
+                                ByteArrayOutputStream outputStream = new ByteArrayOutputStream(bitmapArrayList.get(i).getByteCount());
+                                bitmapArrayList.get(i).compress(Bitmap.CompressFormat.JPEG, 60, outputStream);
+                                photoBytesArray.add(outputStream.toByteArray());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        if (photoBytesArray.size() != 0){
+                            Log.i("Michael","照片有 : "+photoBytesArray.size()+" 張");
+                            uploadPhotoCount = 0;
+                            presenter.onCatchAllPhoto(photoBytesArray);
+                        }
+                    }
+                });
+    }
+    @Override
+    public void showCamera() {
+        PictureSelector.create(this)
+                .openCamera(PictureMimeType.ofImage())
+                .loadImageEngine(GlideEngine.createGlideEngine())
+                .compress(true)
+                .forResult(new OnResultCallbackListener() {
+                    @Override
+                    public void onResult(List<LocalMedia> result) {
+                        bitmapArrayList = new ArrayList<>();
+                        photoBytesArray = new ArrayList<>();
+                        for (int i = 0; i < result.size(); i++) {
+
+                            File file = new File(result.get(i).getCompressPath());
+                            Uri uri = Uri.fromFile(file);
+                            try {
+                                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                                bitmapArrayList.add(bitmap);
+                                ByteArrayOutputStream outputStream = new ByteArrayOutputStream(bitmapArrayList.get(i).getByteCount());
+                                bitmapArrayList.get(i).compress(Bitmap.CompressFormat.JPEG, 60, outputStream);
+                                photoBytesArray.add(outputStream.toByteArray());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        if (photoBytesArray.size() != 0){
+                            Log.i("Michael","照片有 : "+photoBytesArray.size()+" 張");
+                            uploadPhotoCount = 0;
+                            presenter.onCatchAllPhoto(photoBytesArray);
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void uploadPhoto(ArrayList<byte[]> photoBytesArray) {
+        downloadUrlArray = new ArrayList<>();
+        presenter.onShowProgressMessage(getString(R.string.uploading));
+        upLoadPhotoToStorage();
+
+    }
+
+    @Override
+    public void showErrorCode(String message) {
+        Toast.makeText(this,message,Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void intentToPhotoActivity(String downLoadUrl) {
+        Intent it = new Intent(this, PhotoActivity.class);
+        it.putExtra("photoUrl",downLoadUrl);
+        startActivity(it);
+    }
+
+
+
+    private void upLoadPhotoToStorage() {
+        if (uploadPhotoCount < photoBytesArray.size()){
+            long randomNumber = (long) Math.floor(Math.random()*100000);
+            StorageReference river = storage.child(userDataManager.getEmail()+"/"+"PERSONAL_CHAT"+"/"+randomNumber+".jpg");
+            UploadTask task = river.putBytes(photoBytesArray.get(uploadPhotoCount));
+            task.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    river.getDownloadUrl()
+                            .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    downloadUrlArray.add(uri.toString());
+                                    uploadPhotoCount ++;
+                                    upLoadPhotoToStorage();
+                                }
+                            });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    presenter.onCatchUploadError(e.toString());
+                }
+            });
+        }else {
+            long time = System.currentTimeMillis();
+            presenter.onCatchAllPhotoUrl("",time,testPath,userDataManager.getPhotoUrl(),userDataManager.getDisplayName(),friendEmail,displayName,friendPhotoUrl,downloadUrlArray);
+            PictureFileUtils.deleteAllCacheDirFile(this);
+        }
     }
 
 

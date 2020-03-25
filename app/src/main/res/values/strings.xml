@@ -130,4 +130,6 @@
     <string name="not_good_message">內容不適當</string>
     <string name="why_do_you_impeachment">為什麼你想要檢舉此篇文章呢?</string>
     <string name="impeachment_report">APP檢舉信件</string>
+    <string name="uploading">上傳中....</string>
+    <string name="send_photo">發送了一張圖片</string>
 </resources>

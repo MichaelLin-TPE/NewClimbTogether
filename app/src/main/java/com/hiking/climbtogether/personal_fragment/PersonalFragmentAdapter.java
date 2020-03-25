@@ -78,7 +78,13 @@ public class PersonalFragmentAdapter extends RecyclerView.Adapter<PersonalFragme
 
         holder.tvTitle.setText(data.getDisplayName());
 
-        holder.tvMessage.setText(data.getMessage());
+
+        if (!data.getMessage().isEmpty()){
+            holder.tvMessage.setText(data.getMessage());
+        }else {
+            holder.tvMessage.setText(context.getString(R.string.send_photo));
+        }
+
 
         holder.clickArea.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -73,19 +73,9 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
 
     private static final String DISCUSSION = "discussion";
 
-    private static final String CHAT_DATA = "chat_data";
-
-    private boolean isStillPosting;
-
-    private int secondSize;
-
-    private long countSecond = 0;
-
     private String displayName;
 
     private String friendPhotoUrl = "";
-
-    private StorageReference storage;
 
     private static final String FRIENDSHIP = "friendship";
 
@@ -202,13 +192,11 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     @Override
     protected void onPause() {
         super.onPause();
-        isStillPosting = false;
-        countSecond = 0;
+
     }
     private void initFirebase() {
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance().getReference();
     }
 
     private void initView() {
@@ -224,7 +212,7 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
         });
 
         editMessage = findViewById(R.id.chat_edit_message);
-        Button btnSend = findViewById(R.id.chat_btn_send);
+        ImageView btnSend = findViewById(R.id.chat_btn_send);
         recyclerView = findViewById(R.id.chat_recycler_view);
 
         btnSend.setOnClickListener(new View.OnClickListener() {

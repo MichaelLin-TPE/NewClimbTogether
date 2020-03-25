@@ -20,4 +20,8 @@ public interface PersonalPresenter {
     void setFriendData(String displayName, String friendPhotoUrl);
 
     void onBindRightViewHolder(PersonalChatRightViewHolder holder, int position);
+
+    void setOnPhotoClickListenr(PersonalChatLeftViewHolder holder, PersonalChatLeftViewHolder.OnPhotoClickListenr listener);
+
+    void setOnPhotoClickListenrRight(PersonalChatRightViewHolder holder, PersonalChatLeftViewHolder.OnPhotoClickListenr listener);
 }

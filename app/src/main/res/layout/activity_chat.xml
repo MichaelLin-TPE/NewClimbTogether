@@ -31,33 +31,42 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_recycler_view"
         app:layout_constraintTop_toBottomOf="@id/chat_toolbar"
-        app:layout_constraintBottom_toTopOf="@id/chat_edit_message"
+        app:layout_constraintBottom_toTopOf="@id/chat_bottom_view"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="10dp"
         android:layout_width="0dp"
         android:layout_height="0dp"/>
 
-    <EditText
-        android:id="@+id/chat_edit_message"
-        app:layout_constraintTop_toBottomOf="@id/chat_recycler_view"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:padding="5dp"
+        android:id="@+id/chat_bottom_view"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/chat_btn_send"
-        android:layout_marginEnd="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/chat_edit_height"/>
+        android:background="@color/grey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-    <Button
-        android:id="@+id/chat_btn_send"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:text="@string/send"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/btn_selector"
-        android:layout_marginEnd="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/chat_edit_height"/>
+        <EditText
+            android:id="@+id/chat_edit_message"
+            android:background="@drawable/edit_shap"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/chat_btn_send"
+            android:layout_marginEnd="10dp"
+            android:padding="10dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:src="@drawable/send_message"
+            android:id="@+id/chat_btn_send"
+            app:layout_constraintTop_toTopOf="@id/chat_edit_message"
+            app:layout_constraintBottom_toBottomOf="@id/chat_edit_message"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="@dimen/chat_edit_height"
+            android:layout_height="@dimen/chat_edit_height"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

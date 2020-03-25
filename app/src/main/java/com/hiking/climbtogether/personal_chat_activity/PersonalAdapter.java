@@ -20,6 +20,12 @@ public class PersonalAdapter extends RecyclerView.Adapter {
 
     private PersonalPresenter personalPresenter;
 
+    private PersonalChatLeftViewHolder.OnPhotoClickListenr listener;
+
+    public void setOnPhotoClickListenr(PersonalChatLeftViewHolder.OnPhotoClickListenr listener){
+        this.listener = listener;
+    }
+
     public PersonalAdapter(Context context, PersonalPresenter personalPresenter) {
         this.context = context;
         this.personalPresenter = personalPresenter;
@@ -37,7 +43,7 @@ public class PersonalAdapter extends RecyclerView.Adapter {
                 return new PersonalChatLeftViewHolder(view, context);
             case RIGHT:
                 view = inflater.inflate(R.layout.chat_right_item_layout, parent, false);
-                return new PersonalChatRightViewHolder(view);
+                return new PersonalChatRightViewHolder(view,context);
         }
         return null;
     }
@@ -46,9 +52,11 @@ public class PersonalAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof PersonalChatLeftViewHolder){
             personalPresenter.onBindLeftViewHolder((PersonalChatLeftViewHolder)holder,position);
+            personalPresenter.setOnPhotoClickListenr((PersonalChatLeftViewHolder)holder,listener);
         }
         if (holder instanceof PersonalChatRightViewHolder){
             personalPresenter.onBindRightViewHolder((PersonalChatRightViewHolder)holder,position);
+            personalPresenter.setOnPhotoClickListenrRight((PersonalChatRightViewHolder)holder,listener);
         }
     }
 

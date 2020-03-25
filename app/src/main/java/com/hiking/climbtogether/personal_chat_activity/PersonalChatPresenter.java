@@ -22,4 +22,18 @@ public interface PersonalChatPresenter {
     void onCatchChatJson(String jsonStr);
 
     void sendMessage(String message, long time, String path, String userPhotoUrl, String userDisplayName, String friendEmail, String friendPhotoUrl, String FriendDisplayName);
+
+    void onSendPhotoButtonClickListener();
+
+    void onCatchAllPhoto(ArrayList<byte[]> photoBytesArray);
+
+    void onCatchUploadError(String toString);
+
+    void onShowProgressMessage(String message);
+
+    void onCatchAllPhotoUrl(String message, long time, String path, String userPhotoUrl, String userDisplayName, String friendEmail, String friendDisplayName, String friendPhotoUrl,ArrayList<String> downloadUrlArray);
+
+    void onPhotoClickListener(String downLoadUrl);
+
+    void onCameraButtonClickListener();
 }

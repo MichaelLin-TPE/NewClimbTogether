@@ -21,4 +21,14 @@ public interface PersonalChatVu {
     String getEmail();
 
     void setChatDataToFireStore(String jsonStr);
+
+    void showPhotoPage();
+
+    void uploadPhoto(ArrayList<byte[]> photoBytesArray);
+
+    void showErrorCode(String message);
+
+    void intentToPhotoActivity(String downLoadUrl);
+
+    void showCamera();
 }

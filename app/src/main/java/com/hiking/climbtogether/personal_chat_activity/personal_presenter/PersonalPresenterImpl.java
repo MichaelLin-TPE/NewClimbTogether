@@ -58,4 +58,14 @@ public class PersonalPresenterImpl implements PersonalPresenter{
     public void onBindRightViewHolder(PersonalChatRightViewHolder holder, int position) {
         holder.setData(chatArrayList.get(position));
     }
+
+    @Override
+    public void setOnPhotoClickListenr(PersonalChatLeftViewHolder holder, PersonalChatLeftViewHolder.OnPhotoClickListenr listener) {
+        holder.setOnPhotoClickListenr(listener);
+    }
+
+    @Override
+    public void setOnPhotoClickListenrRight(PersonalChatRightViewHolder holder, PersonalChatLeftViewHolder.OnPhotoClickListenr listener) {
+        holder.setOnPhotoClicklistener(listener);
+    }
 }

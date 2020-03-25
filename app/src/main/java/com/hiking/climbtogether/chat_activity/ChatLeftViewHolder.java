@@ -79,6 +79,6 @@ public class ChatLeftViewHolder extends RecyclerView.ViewHolder {
     }
 
     public interface OnUserPhotoClickListener{
-        void onClick(String mail);
+        void onClick(String downLoadUrl);
     }
 }
