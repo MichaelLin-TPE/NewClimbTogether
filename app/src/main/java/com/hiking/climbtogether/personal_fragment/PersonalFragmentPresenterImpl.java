@@ -53,7 +53,7 @@ public class PersonalFragmentPresenterImpl implements PersonalFragmentPresenter 
 
     @Override
     public void onCatchallData(ArrayList<String> jsonArray, ArrayList<String> documentIdArray) {
-
+        mView.showLoginInformation(false);
         if (jsonArray.size() == 0){
             Log.i("Michael","沒資料");
             mView.showNoChatDataView(true);

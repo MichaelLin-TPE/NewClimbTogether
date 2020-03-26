@@ -22,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.login_activity.LoginActivity;
 import com.hiking.climbtogether.personal_chat_activity.PersonalChatActivity;
@@ -137,6 +139,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.i("Michael", "chat onActivityCreated");
+
     }
 
     private void searchData() {
@@ -146,6 +149,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
             presenter.onShowProgress(true);
             jsonArray = new ArrayList<>();
             documentIdArray = new ArrayList<>();
+
             firestore.collection("chat_data")
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -204,6 +208,12 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                 @Override
                 public void run() {
                     chatDataArrayList = chatDataArray;
+
+                    if (adapter != null){
+                        adapter.setData(chatDataArrayList);
+                        adapter.notifyDataSetChanged();
+                    }
+
                     adapter = new PersonalFragmentAdapter(context);
                     adapter.setData(chatDataArrayList);
                     recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
@@ -307,7 +317,32 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
         if (user != null) {
             Log.i("Michael", "有用戶");
 
-            searchData();
+            firestore.collection("chat_data")
+                    .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException e) {
+                            if (e != null){
+                                Log.i("Michael","Listen failed : "+e);
+                                return;
+                            }
+                            if (value != null){
+                                jsonArray = new ArrayList<>();
+                                documentIdArray = new ArrayList<>();
+                                for (QueryDocumentSnapshot snapshot : value){
+                                    if (snapshot.get("json") != null){
+                                        Log.i("Michael","監聽器json : "+snapshot.get("json"));
+                                        String jsonStr = (String) snapshot.get("json");
+                                        String path = snapshot.getId();
+                                        if (jsonStr != null) {
+                                            jsonArray.add(jsonStr);
+                                            documentIdArray.add(path);
+                                        }
+                                    }
+                                }
+                                presenter.onCatchallData(jsonArray,documentIdArray);
+                            }
+                        }
+                    });
 
         } else {
             if (adapter != null) {
@@ -325,11 +360,11 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
     public void onPause() {
         super.onPause();
         Log.i("Michael", "chat onPause");
-        if (adapter != null) {
-            adapter = new PersonalFragmentAdapter(context);
-            adapter.setData(new ArrayList<PersonalChatDTO>());
-            recyclerView.setAdapter(adapter);
-        }
+//        if (adapter != null) {
+//            adapter = new PersonalFragmentAdapter(context);
+//            adapter.setData(new ArrayList<PersonalChatDTO>());
+//            recyclerView.setAdapter(adapter);
+//        }
     }
 
     @Override
