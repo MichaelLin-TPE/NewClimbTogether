@@ -216,7 +216,6 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
                     adapter = new PersonalFragmentAdapter(context);
                     adapter.setData(chatDataArrayList);
-                    recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
                     recyclerView.setAdapter(adapter);
                     adapter.setOnChatItemClickListener(new PersonalFragmentAdapter.OnChatItemClickListener() {
                         @Override

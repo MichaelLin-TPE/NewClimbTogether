@@ -26,6 +26,8 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
 
     private RoundedImageView ivUserPhoto,ivOnePhoto,ivTwoPhoto;
 
+    private ImageView ivShareOne,ivShareTwo;
+
     private Context context;
 
     private OnPhotoClickListenr listenr;
@@ -47,6 +49,8 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
         tvTwoTime = itemView.findViewById(R.id.chat_left_item_time_two);
         ivOnePhoto = itemView.findViewById(R.id.chat_left_image_one);
         ivTwoPhoto = itemView.findViewById(R.id.chat_left_image_two);
+        ivShareOne = itemView.findViewById(R.id.chat_left_share_image_one);
+        ivShareTwo = itemView.findViewById(R.id.chat_left_share_image_two);
     }
 
 
@@ -75,6 +79,8 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
             tvTwoTime.setVisibility(View.GONE);
             ivOnePhoto.setVisibility(View.GONE);
             tvOneTime.setVisibility(View.GONE);
+            ivShareTwo.setVisibility(View.GONE);
+            ivShareOne.setVisibility(View.GONE);
             tvMessage.setText(personalChatData.getMessage());
             tvTime.setText(time);
         }else if (personalChatData.getImageUrl().size() == 1){
@@ -84,6 +90,8 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
             tvTwoTime.setVisibility(View.GONE);
             ivOnePhoto.setVisibility(View.VISIBLE);
             tvOneTime.setVisibility(View.VISIBLE);
+            ivShareTwo.setVisibility(View.GONE);
+            ivShareOne.setVisibility(View.VISIBLE);
             NewImageLoaderManager.getInstance(context).setPhotoUrl(personalChatData.getImageUrl().get(0),ivOnePhoto);
             tvOneTime.setText(time);
         }else if (personalChatData.getImageUrl().size() == 2){
@@ -93,6 +101,8 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
             tvTwoTime.setVisibility(View.VISIBLE);
             ivOnePhoto.setVisibility(View.VISIBLE);
             tvOneTime.setVisibility(View.GONE);
+            ivShareTwo.setVisibility(View.VISIBLE);
+            ivShareOne.setVisibility(View.GONE);
             NewImageLoaderManager.getInstance(context).setPhotoUrl(personalChatData.getImageUrl().get(0),ivOnePhoto);
             NewImageLoaderManager.getInstance(context).setPhotoUrl(personalChatData.getImageUrl().get(1),ivTwoPhoto);
             tvTwoTime.setText(time);
@@ -110,9 +120,22 @@ public class PersonalChatLeftViewHolder extends RecyclerView.ViewHolder {
                 listenr.onClick(personalChatData.getImageUrl().get(1));
             }
         });
+        ivShareOne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listenr.onShareClick(personalChatData.getImageUrl());
+            }
+        });
+        ivShareTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listenr.onShareClick(personalChatData.getImageUrl());
+            }
+        });
     }
 
     public interface OnPhotoClickListenr{
         void onClick(String downLoadUrl);
+        void onShareClick(ArrayList<String> downloadUrl);
     }
 }

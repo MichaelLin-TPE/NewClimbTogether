@@ -2,6 +2,7 @@ package com.hiking.climbtogether.tool;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.hiking.climbtogether.R;
@@ -9,6 +10,8 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 public class NewImageLoaderManager {
     private static NewImageLoaderManager imageLoaderManager;

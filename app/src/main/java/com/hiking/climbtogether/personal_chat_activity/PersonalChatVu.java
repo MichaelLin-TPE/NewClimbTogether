@@ -31,4 +31,16 @@ public interface PersonalChatVu {
     void intentToPhotoActivity(String downLoadUrl);
 
     void showCamera();
+
+    void showBottomShareView(ArrayList<String> downloadUrl);
+
+    void closeBottomView(boolean isShow);
+
+    void intentToPersonalChatActivity(String email, String name, String photo, String path);
+
+    void addPhoto(String email, String name, String photo, ArrayList<String> downloadUrl, String path);
+
+    String getPhotoUrl();
+
+    void updateFriendChatData(String jsonStr, String path);
 }

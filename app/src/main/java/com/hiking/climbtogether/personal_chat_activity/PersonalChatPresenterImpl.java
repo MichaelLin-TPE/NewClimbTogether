@@ -2,6 +2,8 @@ package com.hiking.climbtogether.personal_chat_activity;
 
 import android.util.Log;
 
+import com.hiking.climbtogether.my_equipment_activity.FriendData;
+import com.hiking.climbtogether.personal_chat_activity.chat_room_object.ChatRoomDTO;
 import com.hiking.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
 import com.hiking.climbtogether.personal_chat_activity.chat_room_object.PersonalChatObject;
 import com.hiking.climbtogether.personal_chat_activity.chat_room_object.UserOneDataDTO;
@@ -209,5 +211,79 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
     @Override
     public void onCameraButtonClickListener() {
         mView.showCamera();
+    }
+
+    @Override
+    public void onShareButtonClickListener(ArrayList<String> downloadUrl) {
+        mView.showBottomShareView(downloadUrl);
+    }
+
+    @Override
+    public void onTouchScreenEvent(boolean isShowBottomView) {
+        if (isShowBottomView){
+            mView.closeBottomView(true);
+        }
+    }
+
+    @Override
+    public void onShareUserClickListener(FriendData data, ArrayList<ChatRoomDTO> chatRoomArray, ArrayList<String> downloadUrl) {
+        String path = "";
+
+        for (ChatRoomDTO chatData : chatRoomArray){
+            if (chatData.getUser1().equals(data.getEmail()) && chatData.getUser2().equals(mView.getEmail())){
+                path = chatData.getDocument();
+                break;
+            }else if (chatData.getUser1().equals(mView.getEmail())&&chatData.getUser2().equals(data.getEmail())){
+                path = chatData.getDocument();
+                break;
+            }
+        }
+
+        mView.addPhoto(data.getEmail(),data.getName(),data.getPhoto(),downloadUrl,path);
+
+        mView.intentToPersonalChatActivity(data.getEmail(),data.getName(),data.getPhoto(),path);
+    }
+
+    @Override
+    public void onCatchFriendJson(String json, String email, String name, String photo, ArrayList<String> downloadUrl, String path) {
+        if (json != null){
+            PersonalChatObject data = gson.fromJson(json,PersonalChatObject.class);
+            ArrayList<PersonalChatData> chatDataArray = data.getChatData();
+            PersonalChatData chat = new PersonalChatData();
+            chat.setImageUrl(downloadUrl);
+            chat.setDisplayName(mView.getDisplayName());
+            chat.setEmail(mView.getEmail());
+            chat.setMessage("");
+            chat.setPhotoUrl(mView.getPhotoUrl());
+            chat.setTime(System.currentTimeMillis());
+            chatDataArray.add(chat);
+            data.setChatData(chatDataArray);
+            String jsonStr = gson.toJson(data);
+            mView.updateFriendChatData(jsonStr,path);
+        }else {
+            PersonalChatData data = new PersonalChatData();
+            ArrayList<PersonalChatData> chatArrayList = new ArrayList<>();
+            PersonalChatObject object = new PersonalChatObject();
+            UserOneDataDTO user1 = new UserOneDataDTO();
+            UserTwoDataDTO user2 = new UserTwoDataDTO();
+            user1.setDisplayNmae(mView.getDisplayName());
+            user1.setEmai(mView.getEmail());
+            user1.setPhotoUrl(mView.getPhotoUrl());
+            user2.setDisplayNmae(name);
+            user2.setEmai(email);
+            user2.setPhotoUrl(photo);
+            data.setEmail(mView.getEmail());
+            data.setMessage("");
+            data.setTime(System.currentTimeMillis());
+            data.setPhotoUrl(mView.getPhotoUrl());
+            data.setDisplayName(mView.getDisplayName());
+            data.setImageUrl(downloadUrl);
+            chatArrayList.add(data);
+            object.setUserOneDataDTO(user1);
+            object.setUserTwoDataDTO(user2);
+            object.setChatData(chatArrayList);
+            String jsonStr = gson.toJson(object);
+            mView.updateFriendChatData(jsonStr,path);
+        }
     }
 }

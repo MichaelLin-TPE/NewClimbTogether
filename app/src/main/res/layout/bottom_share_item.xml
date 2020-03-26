@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/bottom_share_item_click_area"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/bottom_share_item_photo"
+        app:riv_oval="true"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_width="@dimen/weather_big_icon"
+        android:layout_height="@dimen/weather_big_icon"/>
+
+    <TextView
+        android:id="@+id/bottom_share_item_name"
+        android:textSize="@dimen/big_text_size"
+        tools:text="XXX"
+        android:textColor="@color/colorPrimaryDark"
+        app:layout_constraintTop_toBottomOf="@id/bottom_share_item_photo"
+        app:layout_constraintLeft_toLeftOf="@id/bottom_share_item_photo"
+        app:layout_constraintRight_toRightOf="@id/bottom_share_item_photo"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

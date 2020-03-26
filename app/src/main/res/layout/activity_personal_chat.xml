@@ -94,5 +94,14 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
+    <com.hiking.climbtogether.personal_chat_activity.BottomShareView
+        android:id="@+id/personal_chat_bottom_share"
+        android:visibility="gone"
+        android:elevation="0.1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

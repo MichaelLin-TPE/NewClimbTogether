@@ -7,14 +7,16 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
+import android.view.animation.TranslateAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -24,18 +26,17 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.hiking.climbtogether.MyFirbaseMessagingService;
 import com.hiking.climbtogether.R;
+import com.hiking.climbtogether.my_equipment_activity.FriendData;
 import com.hiking.climbtogether.personal_chat_activity.chat_room_object.ChatRoomDTO;
 import com.hiking.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
 import com.hiking.climbtogether.personal_chat_activity.personal_presenter.PersonalPresenter;
 import com.hiking.climbtogether.personal_chat_activity.personal_presenter.PersonalPresenterImpl;
 import com.hiking.climbtogether.photo_activity.PhotoActivity;
-import com.hiking.climbtogether.share_activity.DialogViewPagerAdapter;
-import com.hiking.climbtogether.share_activity.ShareActivity;
 import com.hiking.climbtogether.tool.GlideEngine;
 import com.hiking.climbtogether.tool.UserDataManager;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -46,12 +47,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.listener.OnResultCallbackListener;
 import com.luck.picture.lib.tools.PictureFileUtils;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -102,6 +103,14 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     private ArrayList<String> downloadUrlArray;
 
+    private BottomShareView bottomShareView;
+
+    private ArrayList<FriendData> friendDataArray;
+
+    private ArrayList<ChatRoomDTO> chatRoomArray;
+
+    private boolean isShowBottomView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +118,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
         userDataManager = new UserDataManager(this);
         initPresenter();
         initFirebase();
+        initFriendList();
         initBundle();
         initView();
         //新方法
@@ -132,8 +142,52 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
             });
         }
 
+    }
+
+    private void initFriendList() {
+        if (user != null && user.getEmail() != null){
+            friendDataArray = new ArrayList<>();
+            chatRoomArray = new ArrayList<>();
+            firestore.collection("friendship")
+                    .document(user.getEmail())
+                    .collection("friend")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful() && task.getResult()!= null){
+                                for (QueryDocumentSnapshot snapshot : task.getResult()){
+                                    FriendData data = new FriendData();
+                                    data.setPhoto((String)snapshot.get("photoUrl"));
+                                    data.setName((String)snapshot.get("displayName"));
+                                    data.setEmail(snapshot.getId());
+                                    friendDataArray.add(data);
+                                }
+                                Log.i("Michael","取得所有朋友清單成功");
+                            }
+                        }
+                    });
+            firestore.collection("chat_room")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()&& task.getResult() != null){
+                                for (QueryDocumentSnapshot snapshot : task.getResult()){
+                                    ChatRoomDTO data = new ChatRoomDTO();
+                                    data.setDocument(snapshot.getId());
+                                    data.setUser1((String)snapshot.get("user1"));
+                                    data.setUser2((String)snapshot.get("user2"));
+                                    chatRoomArray.add(data);
+                                }
+                                Log.i("Michael","取得所有聊天室清單成功");
+                            }
+                        }
+                    });
+        }
 
     }
+
     private void searchChatPath() {
         if (testPath != null && !testPath.isEmpty()){
             searchNewChatData(testPath);
@@ -197,6 +251,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
     }
 
     private void initView() {
+        bottomShareView = findViewById(R.id.personal_chat_bottom_share);
         ivSendPhoto = findViewById(R.id.personal_iv_send_photo);
         ivCamera = findViewById(R.id.personal_iv_send_camera);
         Toolbar toolbar = findViewById(R.id.personal_chat_toolbar);
@@ -295,6 +350,7 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void setRecyclerView(ArrayList<PersonalChatData> chatArrayList) {
 
@@ -322,6 +378,21 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
             @Override
             public void onClick(String downLoadUrl) {
                 presenter.onPhotoClickListener(downLoadUrl);
+            }
+
+            @Override
+            public void onShareClick(ArrayList<String> downloadUrl) {
+                presenter.onShareButtonClickListener(downloadUrl);
+            }
+        });
+
+        recyclerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP){
+                    presenter.onTouchScreenEvent(isShowBottomView);
+                }
+                return false;
             }
         });
 
@@ -459,6 +530,111 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                         }
                     }
                 });
+    }
+
+
+    @Override
+    public void showBottomShareView(ArrayList<String> downloadUrl) {
+        bottomShareView.setData(friendDataArray);
+
+        TranslateAnimation ctrlAnimation = new TranslateAnimation(
+                TranslateAnimation.RELATIVE_TO_SELF, 0, TranslateAnimation.RELATIVE_TO_SELF, 0,
+                TranslateAnimation.RELATIVE_TO_SELF, 1, TranslateAnimation.RELATIVE_TO_SELF, 0);
+
+        ctrlAnimation.setDuration(400L);
+        bottomShareView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                bottomShareView.setVisibility(View.VISIBLE);
+                isShowBottomView = true;
+                bottomShareView.setAnimation(ctrlAnimation);
+            }
+        },300);
+
+
+        bottomShareView.setOnShareItemClickListener(new BottomShareView.OnBottomViewClickListener() {
+            @Override
+            public void onUserClick(FriendData data) {
+
+                presenter.onShareUserClickListener(data,chatRoomArray,downloadUrl);
+            }
+
+            @Override
+            public void onCancelClick() {
+                TranslateAnimation ctrlAnimation = new TranslateAnimation(
+                        TranslateAnimation.RELATIVE_TO_SELF, 0, TranslateAnimation.RELATIVE_TO_SELF, 0,
+                        TranslateAnimation.RELATIVE_TO_SELF, 0, TranslateAnimation.RELATIVE_TO_SELF, 1);
+                ctrlAnimation.setDuration(400L);
+                bottomShareView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        isShowBottomView = false;
+                        bottomShareView.setVisibility(View.GONE);
+                        bottomShareView.setAnimation(ctrlAnimation);
+                    }
+                },300);
+            }
+        });
+    }
+
+    @Override
+    public void closeBottomView(boolean isShow) {
+        TranslateAnimation ctrlAnimation = new TranslateAnimation(
+                TranslateAnimation.RELATIVE_TO_SELF, 0, TranslateAnimation.RELATIVE_TO_SELF, 0,
+                TranslateAnimation.RELATIVE_TO_SELF, 0, TranslateAnimation.RELATIVE_TO_SELF, 1);
+
+        ctrlAnimation.setDuration(400L);
+        bottomShareView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                isShowBottomView = false;
+                bottomShareView.setVisibility(View.GONE);
+                bottomShareView.setAnimation(ctrlAnimation);
+            }
+        },300);
+    }
+
+    @Override
+    public void intentToPersonalChatActivity(String email, String name, String photo, String path) {
+        Intent it = new Intent(this,PersonalChatActivity.class);
+        it.putExtra("displayName",name);
+        it.putExtra("mail",email);
+        it.putExtra("photoUrl",photo);
+        it.putExtra("path",path);
+        startActivity(it);
+        finish();
+    }
+
+    @Override
+    public void addPhoto(String email, String name, String photo, ArrayList<String> downloadUrl, String path) {
+        firestore.collection(CHAT_DATA)
+                .document(path)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            DocumentSnapshot snapshot = task.getResult();
+                            String json = (String) snapshot.get("json");
+                            presenter.onCatchFriendJson(json,email,name,photo,downloadUrl,path);
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public String getPhotoUrl() {
+        return userDataManager.getPhotoUrl();
+    }
+
+    @Override
+    public void updateFriendChatData(String jsonStr, String path) {
+        Map<String,Object> map = new HashMap<>();
+        map.put("json",jsonStr);
+        firestore.collection(CHAT_DATA)
+                .document(path)
+                .set(map, SetOptions.merge());
+        Log.i("Michael","更新成功");
     }
 
     @Override

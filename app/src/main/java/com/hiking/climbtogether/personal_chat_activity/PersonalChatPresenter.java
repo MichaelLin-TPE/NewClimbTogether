@@ -1,5 +1,7 @@
 package com.hiking.climbtogether.personal_chat_activity;
 
+import com.hiking.climbtogether.my_equipment_activity.FriendData;
+import com.hiking.climbtogether.personal_chat_activity.chat_room_object.ChatRoomDTO;
 import com.hiking.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
 
 import java.util.ArrayList;
@@ -36,4 +38,12 @@ public interface PersonalChatPresenter {
     void onPhotoClickListener(String downLoadUrl);
 
     void onCameraButtonClickListener();
+
+    void onShareButtonClickListener(ArrayList<String> downloadUrl);
+
+    void onTouchScreenEvent(boolean isShowBottomView);
+
+    void onShareUserClickListener(FriendData data, ArrayList<ChatRoomDTO> chatRoomArray, ArrayList<String> downloadUrl);
+
+    void onCatchFriendJson(String json, String email, String name, String photo, ArrayList<String> downloadUrl,String path);
 }

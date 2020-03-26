@@ -35,6 +35,18 @@
         tools:visibility="visible"
         android:layout_width="@dimen/chat_left_image_width"
         android:layout_height="@dimen/chat_left_image_height"/>
+
+    <ImageView
+        android:contentDescription="@null"
+        android:id="@+id/chat_left_share_image_one"
+        android:src="@drawable/share_chat"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/chat_left_image_one"
+        app:layout_constraintBottom_toBottomOf="@id/chat_left_image_one"
+        app:layout_constraintLeft_toRightOf="@id/chat_left_image_one"
+        android:layout_marginStart="2dp"
+        android:layout_width="@dimen/share_chat_size"
+        android:layout_height="@dimen/share_chat_size"/>
     <TextView
         android:id="@+id/chat_left_item_time_one"
         tools:text="15:00PM"
@@ -59,6 +71,18 @@
         tools:visibility="visible"
         android:layout_width="@dimen/chat_left_image_width"
         android:layout_height="@dimen/chat_left_image_height"/>
+
+    <ImageView
+        android:contentDescription="@null"
+        android:id="@+id/chat_left_share_image_two"
+        android:src="@drawable/share_chat"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/chat_left_image_two"
+        app:layout_constraintBottom_toBottomOf="@id/chat_left_image_two"
+        app:layout_constraintLeft_toRightOf="@id/chat_left_image_two"
+        android:layout_marginStart="2dp"
+        android:layout_width="@dimen/share_chat_size"
+        android:layout_height="@dimen/share_chat_size"/>
 
     <TextView
         android:id="@+id/chat_left_item_time_two"

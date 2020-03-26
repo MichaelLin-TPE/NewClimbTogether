@@ -46,10 +46,10 @@ public class DiscussFragmentAdapter extends RecyclerView.Adapter<DiscussFragment
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
 
         if (position == 0){
-            holder.clickArea.setBackground(ContextCompat.getDrawable(context,R.drawable.discuss_selector2));
+            holder.clickArea.setBackground(ContextCompat.getDrawable(context,R.drawable.circle_blue_selector));
             holder.ivIcon.setImageResource(R.drawable.chat);
         }else {
-            holder.clickArea.setBackground(ContextCompat.getDrawable(context,R.drawable.discuss_selector));
+            holder.clickArea.setBackground(ContextCompat.getDrawable(context,R.drawable.circle_green_selector));
             holder.ivIcon.setImageResource(R.drawable.hiking);
         }
 

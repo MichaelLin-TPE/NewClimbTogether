@@ -12,5 +12,7 @@
     <color name="speech_bubble_user">#F8EFB4</color>
     <color name="floating_button_green">#B9EC7C</color>
     <color name="item_blue">#D2E6F7</color>
+    <color name="blue_lite">#8CD3F5</color>
     <color name="black_background_color">#b3000000</color>
+    <color name="green">#000000</color>
 </resources>

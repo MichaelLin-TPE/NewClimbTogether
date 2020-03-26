@@ -55,4 +55,6 @@
     <dimen name="chat_left_image_width">150dp</dimen>
     <dimen name="chat_left_image_height">180dp</dimen>
     <dimen name="personal_photo_size">35dp</dimen>
+    <dimen name="share_chat_size">30dp</dimen>
+    <dimen name="bottom_share_view_height">400dp</dimen>
 </resources>
