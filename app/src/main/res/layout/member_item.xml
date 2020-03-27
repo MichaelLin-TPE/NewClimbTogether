@@ -18,8 +18,8 @@
     <TextView
         android:id="@+id/member_item_text_title"
         android:textColor="@color/colorPrimaryDark"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@id/member_item_icon"
+        app:layout_constraintBottom_toBottomOf="@id/member_item_icon"
         android:layout_marginStart="10dp"
         app:layout_constraintLeft_toRightOf="@id/member_item_icon"
         app:layout_constraintRight_toLeftOf="@id/member_item_next"

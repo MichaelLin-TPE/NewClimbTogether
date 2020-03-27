@@ -2,21 +2,28 @@ package com.hiking.climbtogether.personal_chat_activity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -36,6 +43,8 @@ import com.hiking.climbtogether.personal_chat_activity.chat_room_object.ChatRoom
 import com.hiking.climbtogether.personal_chat_activity.chat_room_object.PersonalChatData;
 import com.hiking.climbtogether.personal_chat_activity.personal_presenter.PersonalPresenter;
 import com.hiking.climbtogether.personal_chat_activity.personal_presenter.PersonalPresenterImpl;
+import com.hiking.climbtogether.personal_chat_activity.tools_view.ToolsListView;
+import com.hiking.climbtogether.personal_chat_photo_activity.PersonalPhotoActivity;
 import com.hiking.climbtogether.photo_activity.PhotoActivity;
 import com.hiking.climbtogether.tool.GlideEngine;
 import com.hiking.climbtogether.tool.UserDataManager;
@@ -52,7 +61,7 @@ import com.luck.picture.lib.config.PictureMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.listener.OnResultCallbackListener;
 import com.luck.picture.lib.tools.PictureFileUtils;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.utils.L;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -111,11 +120,26 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
     private boolean isShowBottomView;
 
+
+    private ToolsListView toolsListView;
+
+    private SearchChatDataView searchChatDataView;
+
+    private ArrayList<Integer> searchContentIndexArray;
+
+    private LinearLayoutManager linearLayoutManager;
+
+
+    private int contentIndex;
+
+    private GestureDetector gestureDetector;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_personal_chat);
         userDataManager = new UserDataManager(this);
+
         initPresenter();
         initFirebase();
         initFriendList();
@@ -142,6 +166,25 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
             });
         }
 
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.personal_chat_menu,menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == R.id.personal_tools){
+            presenter.onToolsButtonClickListener();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void initFriendList() {
@@ -251,6 +294,8 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
     }
 
     private void initView() {
+        searchChatDataView = findViewById(R.id.personal_chat_search_view);
+        toolsListView = findViewById(R.id.personal_chat_tools_view);
         bottomShareView = findViewById(R.id.personal_chat_bottom_share);
         ivSendPhoto = findViewById(R.id.personal_iv_send_photo);
         ivCamera = findViewById(R.id.personal_iv_send_camera);
@@ -370,7 +415,9 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
 
         adapter = new PersonalAdapter(this, personalPresenter);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        linearLayoutManager = new LinearLayoutManager(this);
+
+        recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(adapter);
         recyclerView.scrollToPosition(chatArrayList.size() - 1);
 
@@ -389,11 +436,107 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
         recyclerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_UP){
-                    presenter.onTouchScreenEvent(isShowBottomView);
-                }
+
+                gestureDetector.onTouchEvent(event);
+
                 return false;
             }
+        });
+
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+
+            @Override
+
+            public boolean onSingleTapUp(MotionEvent e) {
+
+
+                return super.onSingleTapUp(e);
+
+            }
+
+
+            @Override
+
+            public void onLongPress(MotionEvent e) {
+
+
+
+                super.onLongPress(e);
+
+            }
+
+
+            @Override
+
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+
+
+
+                return super.onScroll(e1, e2, distanceX, distanceY);
+
+            }
+
+
+            @Override
+
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+
+
+                return super.onFling(e1, e2, velocityX, velocityY);
+
+            }
+
+
+            @Override
+
+            public void onShowPress(MotionEvent e) {
+
+
+                super.onShowPress(e);
+
+            }
+
+
+            @Override
+
+            public boolean onDown(MotionEvent e) {
+
+
+                return super.onDown(e);
+
+            }
+
+
+            @Override
+
+            public boolean onDoubleTap(MotionEvent e) {
+
+
+                return super.onDoubleTap(e);
+
+            }
+
+
+            @Override
+
+            public boolean onDoubleTapEvent(MotionEvent e) {
+
+
+                return super.onDoubleTapEvent(e);
+
+            }
+
+
+            @Override
+
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+
+                presenter.onTouchScreenEvent(isShowBottomView);
+
+                return super.onSingleTapConfirmed(e);
+
+            }
+
         });
 
     }
@@ -592,6 +735,9 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                 bottomShareView.setAnimation(ctrlAnimation);
             }
         },300);
+
+
+
     }
 
     @Override
@@ -635,6 +781,120 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
                 .document(path)
                 .set(map, SetOptions.merge());
         Log.i("Michael","更新成功");
+    }
+
+    @Override
+    public void showToolsListView() {
+
+        toolsListView.setVisibility(View.VISIBLE);
+
+        toolsListView.setOnToolsListClickListener(new ToolsListView.OnToolsListClickListener() {
+            @Override
+            public void onClick(String name) {
+                presenter.onToolsListClickListener(name);
+            }
+        });
+
+
+    }
+
+    @Override
+    public String getSearchStr() {
+        return getString(R.string.search);
+    }
+
+    @Override
+    public void closeToolsList(boolean isShow) {
+        toolsListView.setVisibility(isShow ? View.GONE : View.VISIBLE);
+    }
+
+    @Override
+    public void showSearchDataView(boolean isShow) {
+        searchChatDataView.setVisibility(isShow ? View.VISIBLE : View.GONE);
+
+        searchChatDataView.setOnSearchChatDataListener(new SearchChatDataView.OnSearchChatDataListener() {
+            @Override
+            public void onUpClick() {
+                presenter.onUpClickListener(searchContentIndexArray,contentIndex);
+
+            }
+
+            @Override
+            public void onDownClick() {
+                presenter.onDownClickListener(searchContentIndexArray,contentIndex);
+            }
+
+            @Override
+            public void onTextWatcherListener(String content) {
+                Log.i("Michael","搜尋內容 : "+content);
+                presenter.onSearchContentListener(content);
+            }
+        });
+
+    }
+
+    @Override
+    public void closeAllToolsView() {
+        searchChatDataView.setEditTextEmpty();
+        toolsListView.setVisibility(View.GONE);
+        searchChatDataView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showSearchNoChatDataDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.search_result))
+                .setMessage(getString(R.string.search_no_data))
+                .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    @Override
+    public void showSearchResult(ArrayList<Integer> searchContentIndexArray) {
+        this.searchContentIndexArray = searchContentIndexArray;
+        RecyclerView.SmoothScroller smoothScroller = new CenterSmoothScroller(this);
+
+        smoothScroller.setTargetPosition(searchContentIndexArray.get(0));
+
+        linearLayoutManager.startSmoothScroll(smoothScroller);
+
+        searchChatDataView.setUpDownButtonClickAble();
+    }
+
+    @Override
+    public void scrollToPosition(Integer contentIndex) {
+        RecyclerView.SmoothScroller smoothScroller = new CenterSmoothScroller(this);
+
+        smoothScroller.setTargetPosition(contentIndex);
+
+        linearLayoutManager.startSmoothScroll(smoothScroller);
+
+    }
+
+    @Override
+    public void hideKeyBoard() {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null){
+            imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(),0);
+        }
+
+    }
+
+    @Override
+    public String getPictureStr() {
+        return getString(R.string.picture);
+    }
+
+    @Override
+    public void intentToPersonalChatImageActivity(ArrayList<String> photoUrlArray) {
+        Intent it = new Intent(this, PersonalPhotoActivity.class);
+        it.putExtra("imageUrl",photoUrlArray);
+        startActivity(it);
     }
 
     @Override

@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hiking.climbtogether.R;
+import com.hiking.climbtogether.favorite_activity.FavoriteActivity;
 import com.hiking.climbtogether.friend_manager_activity.FriendManagerActivity;
 import com.hiking.climbtogether.login_activity.LoginActivity;
 import com.hiking.climbtogether.mountain_collection_activity.MountainCollectionActivity;
@@ -329,6 +330,12 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
     }
 
     @Override
+    public void intentToMyFavoriteActivity() {
+        Intent it = new Intent(this, FavoriteActivity.class);
+        startActivity(it);
+    }
+
+    @Override
     public void uploadUserPhoto() {
 
 //        Intent it = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -538,6 +545,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
         iconArray.add(R.drawable.weather);
         iconArray.add(R.drawable.add_user);
         iconArray.add(R.drawable.backpack);
+        iconArray.add(R.drawable.like_pressed);
 
         adapter = new MemberRecyclerViewAdapter(iconArray, btnList, this);
         adapter.setInviteCount(inviteCount);

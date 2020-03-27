@@ -30,4 +30,6 @@ public interface MemberActivityVu {
     void intentToFriendManagerActivity();
 
     void intentToMyEquipmentActivity();
+
+    void intentToMyFavoriteActivity();
 }

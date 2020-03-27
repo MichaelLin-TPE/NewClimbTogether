@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="5dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/favorite_photo"
+        android:scaleType="centerCrop"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="10dp"
+        app:riv_corner_radius="5dip"
+        android:layout_width="@dimen/favorite_photo_width"
+        android:layout_height="@dimen/favorite_photo_height"/>
+
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/favorite_photo"
+        app:layout_constraintLeft_toLeftOf="@id/favorite_photo"
+        android:layout_marginTop="5dp"
+        android:id="@+id/favorite_name"
+        android:textSize="@dimen/big_text_size"
+        android:textColor="@color/colorPrimaryDark"
+        android:textStyle="bold"
+        tools:text="玉山"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/favorite_name"
+        app:layout_constraintLeft_toLeftOf="@id/favorite_photo"
+        android:layout_marginTop="5dp"
+        android:id="@+id/favorite_meter"
+        tools:text="3954公尺"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/favorite_meter"
+        app:layout_constraintLeft_toLeftOf="@id/favorite_photo"
+        app:layout_constraintRight_toRightOf="@id/favorite_photo"
+        android:layout_marginTop="5dp"
+        android:lines="1"
+        android:ellipsize="end"
+        android:id="@+id/favorite_location"
+        tools:text="地區"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"/>
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/favorite_location"
+        app:layout_constraintLeft_toLeftOf="@id/favorite_photo"
+        android:layout_marginTop="5dp"
+        android:id="@+id/favorite_difficult"
+        tools:text="A級"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/favorite_difficult"
+        app:layout_constraintLeft_toLeftOf="@id/favorite_photo"
+        android:layout_marginTop="5dp"
+        android:id="@+id/favorite_title"
+        tools:text="五獄"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/favorite_title"
+        app:layout_constraintLeft_toLeftOf="@id/favorite_photo"
+        android:layout_marginTop="5dp"
+        android:id="@+id/favorite_day"
+        tools:text="1~3天"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/favorite_day"
+        app:layout_constraintLeft_toLeftOf="@id/favorite_photo"
+        android:layout_marginTop="5dp"
+        android:id="@+id/favorite_top"
+        tools:text="已登頂"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

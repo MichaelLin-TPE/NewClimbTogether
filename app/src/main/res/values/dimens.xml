@@ -57,4 +57,7 @@
     <dimen name="personal_photo_size">35dp</dimen>
     <dimen name="share_chat_size">30dp</dimen>
     <dimen name="bottom_share_view_height">400dp</dimen>
+    <dimen name="photo_grid_size">100dp</dimen>
+    <dimen name="favorite_photo_width">100dp</dimen>
+    <dimen name="favorite_photo_height">90dp</dimen>
 </resources>

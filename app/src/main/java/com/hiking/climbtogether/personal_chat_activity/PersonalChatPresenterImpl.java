@@ -25,6 +25,11 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
 
     private ArrayList<PersonalChatObject> dataArrayList;
 
+    private ArrayList<PersonalChatData> chatDataArrayList;
+
+    private boolean isOpenToolsView;
+
+
     public PersonalChatPresenterImpl(PersonalChatVu mView){
         this.mView = mView;
         gson = new Gson();
@@ -99,7 +104,7 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
         PersonalChatObject data = gson.fromJson(jsonStr,PersonalChatObject.class);
         dataArrayList.add(data);
         mView.setRecyclerView(dataArrayList.get(0).getChatData());
-
+        this.chatDataArrayList = data.getChatData();
     }
 
     @Override
@@ -220,6 +225,8 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
 
     @Override
     public void onTouchScreenEvent(boolean isShowBottomView) {
+        isOpenToolsView = false;
+        mView.closeAllToolsView();
         if (isShowBottomView){
             mView.closeBottomView(true);
         }
@@ -284,6 +291,87 @@ public class PersonalChatPresenterImpl implements PersonalChatPresenter {
             object.setChatData(chatArrayList);
             String jsonStr = gson.toJson(object);
             mView.updateFriendChatData(jsonStr,path);
+        }
+    }
+
+    @Override
+    public void onToolsButtonClickListener() {
+        if (!isOpenToolsView){
+            mView.showToolsListView();
+            isOpenToolsView = true;
+        }else {
+            isOpenToolsView = false;
+            mView.closeToolsList(true);
+        }
+
+    }
+
+    @Override
+    public void onToolsListClickListener(String name) {
+        if (name.equals(mView.getSearchStr())){
+            isOpenToolsView = false;
+            mView.closeToolsList(true);
+            mView.showSearchDataView(true);
+        }
+        if (name.equals(mView.getPictureStr())){
+            isOpenToolsView = false;
+            mView.closeToolsList(true);
+            ArrayList<String> photoUrlArray = new ArrayList<>();
+            for (PersonalChatData data : chatDataArrayList){
+                if (data.getImageUrl() != null){
+                    photoUrlArray.addAll(data.getImageUrl());
+                }
+            }
+            if (photoUrlArray.size() != 0){
+                mView.intentToPersonalChatImageActivity(photoUrlArray);
+            }else {
+                String message = "沒有任何照片唷";
+                mView.showErrorCode(message);
+            }
+
+        }
+    }
+
+    @Override
+    public void onSearchContentListener(String content) {
+        mView.hideKeyBoard();
+        ArrayList<Integer> searchContentIndexArray = new ArrayList<>();
+        int index = 0;
+        for (PersonalChatData data : chatDataArrayList){
+            if (data.getMessage().contains(content)){
+                searchContentIndexArray.add(index);
+            }
+            index ++;
+        }
+        if (searchContentIndexArray.size() != 0){
+            mView.showSearchResult(searchContentIndexArray);
+        }else {
+            mView.showSearchNoChatDataDialog();
+        }
+    }
+
+    @Override
+    public void onUpClickListener(ArrayList<Integer> searchContentIndexArray, int contentIndex) {
+        contentIndex ++;
+        if (contentIndex < searchContentIndexArray.size()){
+            mView.scrollToPosition(searchContentIndexArray.get(contentIndex));
+        }else {
+            contentIndex --;
+            mView.scrollToPosition(searchContentIndexArray.get(contentIndex));
+        }
+    }
+
+    @Override
+    public void onDownClickListener(ArrayList<Integer> searchContentIndexArray, int contentIndex) {
+        contentIndex --;
+        if (contentIndex < 0){
+            contentIndex = 0;
+        }
+        if (contentIndex < searchContentIndexArray.size()){
+            mView.scrollToPosition(searchContentIndexArray.get(contentIndex));
+        }else {
+            contentIndex ++;
+            mView.scrollToPosition(searchContentIndexArray.get(contentIndex));
         }
     }
 }

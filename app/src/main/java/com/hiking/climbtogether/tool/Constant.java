@@ -16,5 +16,6 @@ public class Constant {
     public static final int CENTER_WEATHER = 3;
     public static final int FRIEND_MANAGER = 4;
     public static final int EQUIPMENT = 5;
+    public static final int FAVORITE = 6;
 
 }

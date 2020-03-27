@@ -6,4 +6,12 @@ public interface DetailActivityPresenter {
     void onBackButtonClickListener();
 
     void onPrepareData(DataDTO data);
+
+    void onFavoriteItemClickListener(boolean isCheck);
+
+    void onUploadPhotoSuccessful(String url);
+
+    void onCatchJson(String jsonStr);
+
+    void onNoUserEvent();
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import static com.hiking.climbtogether.tool.Constant.APPLY_MT;
 import static com.hiking.climbtogether.tool.Constant.CENTER_WEATHER;
 import static com.hiking.climbtogether.tool.Constant.EQUIPMENT;
+import static com.hiking.climbtogether.tool.Constant.FAVORITE;
 import static com.hiking.climbtogether.tool.Constant.FRIEND_MANAGER;
 import static com.hiking.climbtogether.tool.Constant.SEARCH_BED;
 import static com.hiking.climbtogether.tool.Constant.TOP_PEAK;
@@ -29,6 +30,7 @@ public class MemberActivityPresenterImpl implements MemberActivityPresenter {
         btnList.add(mView.getVuContext().getString(R.string.center_weather));
         btnList.add(mView.getVuContext().getString(R.string.friend_manager));
         btnList.add(mView.getVuContext().getString(R.string.equipment_list));
+        btnList.add(mView.getVuContext().getString(R.string.favorite));
 
         mView.setRecyclerView(btnList);
 
@@ -83,8 +85,9 @@ public class MemberActivityPresenterImpl implements MemberActivityPresenter {
                 break;
             case EQUIPMENT:
                 mView.intentToMyEquipmentActivity();
-
                 break;
+            case FAVORITE:
+                mView.intentToMyFavoriteActivity();
             default:
                 break;
         }

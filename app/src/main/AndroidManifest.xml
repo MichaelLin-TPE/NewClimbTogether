@@ -3,7 +3,7 @@
     package="com.hiking.climbtogether">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -17,7 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustResize">
-        <activity android:name=".photo_activity.PhotoActivity"></activity>
+        <activity android:name=".favorite_activity.FavoriteActivity"></activity>
+        <activity android:name=".personal_chat_photo_activity.PersonalPhotoActivity" />
+        <activity android:name=".photo_activity.PhotoActivity" />
         <activity
             android:name=".search_friend_activity.SearchFriendActivity"
             android:screenOrientation="portrait" />

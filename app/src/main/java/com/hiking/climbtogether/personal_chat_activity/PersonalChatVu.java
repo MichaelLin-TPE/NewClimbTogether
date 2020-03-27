@@ -43,4 +43,26 @@ public interface PersonalChatVu {
     String getPhotoUrl();
 
     void updateFriendChatData(String jsonStr, String path);
+
+    void showToolsListView();
+
+    String getSearchStr();
+
+    void closeToolsList(boolean isShow);
+
+    void showSearchDataView(boolean isShow);
+
+    void closeAllToolsView();
+
+    void showSearchNoChatDataDialog();
+
+    void showSearchResult(ArrayList<Integer> searchContentIndexArray);
+
+    void scrollToPosition(Integer contentIndex);
+
+    void hideKeyBoard();
+
+    String getPictureStr();
+
+    void intentToPersonalChatImageActivity(ArrayList<String> photoUrlArray);
 }

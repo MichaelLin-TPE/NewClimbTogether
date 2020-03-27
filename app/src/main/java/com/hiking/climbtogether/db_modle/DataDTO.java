@@ -3,29 +3,32 @@ package com.hiking.climbtogether.db_modle;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class DataDTO implements Serializable {
+    @SerializedName("sid")
     private int sid;
-
+    @SerializedName("name")
     private String name;
-
+    @SerializedName("height")
     private String height;
-
+    @SerializedName("day")
     private String day;
-
+    @SerializedName("day")
     private String content;
-
+    @SerializedName("day")
     private byte[] photo;
-
+    @SerializedName("day")
     private String location;
-
+    @SerializedName("day")
     private String difficulty;
-
+    @SerializedName("day")
     private String check;
-
+    @SerializedName("day")
     private String userPhoto;
-
+    @SerializedName("day")
     private long time;
 
     private String allTitle;
