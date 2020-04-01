@@ -60,4 +60,9 @@
     <dimen name="photo_grid_size">100dp</dimen>
     <dimen name="favorite_photo_width">100dp</dimen>
     <dimen name="favorite_photo_height">90dp</dimen>
+    <dimen name="vote_edit_width">115dp</dimen>
+    <dimen name="smaller_icon_size_vote">30dp</dimen>
+    <dimen name="vote_tv_number_width">70dp</dimen>
+    <dimen name="very_small_icon">20dp</dimen>
+    <dimen name="vote_result_content_width">60dp</dimen>
 </resources>

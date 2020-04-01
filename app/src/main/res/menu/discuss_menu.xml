@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/discuss_vote"
+        android:icon="@drawable/vote"
+        android:title="@string/vote"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/discuss_vote_list"
+        android:icon="@drawable/vote_list"
+        android:title="@string/vote_list"
+        app:showAsAction="always"/>
+
+
+</menu>

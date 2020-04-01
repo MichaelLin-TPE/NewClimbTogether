@@ -28,4 +28,8 @@ public interface ChatActivityPresenter {
     void onCatchNewChatData(String jsonStr);
 
     void onCatchNoChatData();
+
+    void onCreateVoteButtonClickListener();
+
+    void onVoteListClickListener();
 }

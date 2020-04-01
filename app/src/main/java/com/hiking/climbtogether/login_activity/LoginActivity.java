@@ -16,6 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.hiking.climbtogether.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -65,6 +68,8 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVu 
 
     private ProgressBar progressBar;
 
+    private String token;
+
     private UserDataManager userDataManager;
 
     @Override
@@ -78,6 +83,20 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVu 
         initGoogleOptions();
         initPresenter();
         initView();
+
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            token = task.getResult().getToken();
+                            Log.i("Michael", "new Token : " + token);
+
+                        }
+
+                    }
+                });
+
     }
 
     private void initGoogleOptions() {
@@ -198,6 +217,11 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVu 
                                 }
                             }
                         });
+                Map<String,Object> map = new HashMap<>();
+                map.put("token",token);
+                firestore.collection("users")
+                        .document(email)
+                        .set(map, SetOptions.merge());
             }
         }).start();
     }
@@ -241,7 +265,7 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVu 
                     user.put("displayName", displayName);
                     user.put("currentTime", currentTime);
                     user.put("photoUrl","");
-                    user.put("token","");
+                    user.put("token",token);
                     if (firebaseUser != null) {
                         user.put("uid", firebaseUser.getUid());
                     }
@@ -251,6 +275,11 @@ public class LoginActivity extends AppCompatActivity implements LoginActivityVu 
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
+
+                                    userDataManager.saveUserData(email,displayName,"");
+
+                                    userDataManager.saveNotificationToken(token);
+
                                     Log.i("Michael", "Create a data successful");
                                     dialogRegister.dismiss();
                                     tvProcessing.setVisibility(View.GONE);

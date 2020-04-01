@@ -33,4 +33,8 @@ public interface ChatActivityVu {
     void showUserDialog();
 
     void createNewChatDataToFirebase(String jsonStr);
+
+    void intentToVoteActivity();
+
+    void intentToVoteListActivity();
 }

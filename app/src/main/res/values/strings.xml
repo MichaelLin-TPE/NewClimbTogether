@@ -140,4 +140,20 @@
     <string name="add_fav_sucess">已新增到我的最愛</string>
     <string name="already_top">已登頂</string>
     <string name="not_top">尚未登頂</string>
+    <string name="vote">發起投票</string>
+    <string name="create_vote">發起投票</string>
+    <string name="vote_title">投票標題 : </string>
+    <string name="please_enter_title">請輸入標題</string>
+    <string name="vote_day_line">投票截止日 : </string>
+    <string name="vote_number">投票項目數量</string>
+    <string name="one">1</string>
+    <string name="vote_item">投票項目</string>
+    <string name="vote_list">投票所</string>
+    <string name="voting">投票中</string>
+    <string name="i_am_ready">我決定好了</string>
+    <string name="vote_successful">投票成功</string>
+    <string name="vote_already">你已經投過了唷</string>
+    <string name="send_invitation_successful">已傳送好友邀請</string>
+    <string name="vote_already_event">已結束的投票</string>
+    <string name="the_end">已結束</string>
 </resources>

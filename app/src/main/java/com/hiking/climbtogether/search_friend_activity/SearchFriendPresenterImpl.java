@@ -28,7 +28,7 @@ public class SearchFriendPresenterImpl implements SearchFriendPresenter {
 
     @Override
     public void onSendButtonClickListener() {
-
+        mView.sendInvitationToFriend();
     }
 
     @Override

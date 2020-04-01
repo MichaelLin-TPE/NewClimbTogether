@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -32,7 +33,9 @@ import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.makeramen.roundedimageview.RoundedImageView;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class SearchFriendActivity extends AppCompatActivity implements SearchFriendVu {
 
@@ -51,6 +54,12 @@ public class SearchFriendActivity extends AppCompatActivity implements SearchFri
     private ImageView ivIsFriend;
 
     private Button btnSend;
+
+    private String friendEmail;
+
+    private static final String INVITE_FRIEND = "invite_friend";
+
+    private static final String INVITE = "invite";
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -148,9 +157,7 @@ public class SearchFriendActivity extends AppCompatActivity implements SearchFri
 
     @Override
     public void showUserInformation(String photoUrl, String name, String email) {
-
-
-
+        this.friendEmail = email;
         if (email.equals(user.getEmail())){
             ivPhoto.setVisibility(View.VISIBLE);
             tvUserInfo.setVisibility(View.VISIBLE);
@@ -196,6 +203,28 @@ public class SearchFriendActivity extends AppCompatActivity implements SearchFri
         btnSend.setVisibility(View.GONE);
         tvStartInfo.setVisibility(View.VISIBLE);
         tvStartInfo.setText(getString(R.string.search_no_data));
+    }
+
+    @Override
+    public void sendInvitationToFriend() {
+        Map<String,Object> map = new HashMap<>();
+        if (user != null && user.getEmail() != null){
+            firestore.collection(INVITE_FRIEND)
+                    .document(friendEmail)
+                    .collection(INVITE)
+                    .document(user.getEmail())
+                    .set(map)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                String message = getString(R.string.send_invitation_successful);
+                                Toast.makeText(SearchFriendActivity.this,message,Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+        }
+
     }
 
     private void searchFriendShip(String photoUrl, String name, String email) {

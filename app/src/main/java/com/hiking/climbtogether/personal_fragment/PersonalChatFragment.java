@@ -359,11 +359,11 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
     public void onPause() {
         super.onPause();
         Log.i("Michael", "chat onPause");
-//        if (adapter != null) {
-//            adapter = new PersonalFragmentAdapter(context);
-//            adapter.setData(new ArrayList<PersonalChatDTO>());
-//            recyclerView.setAdapter(adapter);
-//        }
+        if (adapter != null) {
+            adapter = new PersonalFragmentAdapter(context);
+            adapter.setData(new ArrayList<PersonalChatDTO>());
+            recyclerView.setAdapter(adapter);
+        }
     }
 
     @Override

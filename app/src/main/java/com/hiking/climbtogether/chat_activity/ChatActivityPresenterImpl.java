@@ -122,4 +122,14 @@ public class ChatActivityPresenterImpl implements ChatActivityPresenter {
     public void onCatchNoChatData() {
 
     }
+
+    @Override
+    public void onCreateVoteButtonClickListener() {
+        mView.intentToVoteActivity();
+    }
+
+    @Override
+    public void onVoteListClickListener() {
+        mView.intentToVoteListActivity();
+    }
 }

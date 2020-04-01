@@ -147,24 +147,24 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
         initView();
         //新方法
         searchChatPath();
-        if (testPath != null){
-            DocumentReference reference = firestore.collection(CHAT_DATA)
-                    .document(testPath);
-            reference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                @Override
-                public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
-                    if (e != null) {
-                        System.err.println("Listen failed: " + e);
-                        return;
-                    }
-                    if (snapshot != null && snapshot.exists()){
-                        Log.i("Michael","該更新了");
-                        String jsonStr = (String) snapshot.get("json");
-                        presenter.onCatchChatJson(jsonStr);
-                    }
-                }
-            });
-        }
+//        if (testPath != null){
+//            DocumentReference reference = firestore.collection(CHAT_DATA)
+//                    .document(testPath);
+//            reference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//                @Override
+//                public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
+//                    if (e != null) {
+//                        System.err.println("Listen failed: " + e);
+//                        return;
+//                    }
+//                    if (snapshot != null && snapshot.exists()){
+//                        Log.i("Michael","該更新了");
+//                        String jsonStr = (String) snapshot.get("json");
+//                        presenter.onCatchChatJson(jsonStr);
+//                    }
+//                }
+//            });
+//        }
 
     }
 
@@ -384,16 +384,26 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
     @Override
     protected void onResume() {
         super.onResume();
-
+        if (testPath != null){
+            DocumentReference reference = firestore.collection(CHAT_DATA)
+                    .document(testPath);
+            reference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
+                    if (e != null) {
+                        System.err.println("Listen failed: " + e);
+                        return;
+                    }
+                    if (snapshot != null && snapshot.exists()){
+                        Log.i("Michael","該更新了");
+                        String jsonStr = (String) snapshot.get("json");
+                        presenter.onCatchChatJson(jsonStr);
+                    }
+                }
+            });
+        }
     }
 
-
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -949,6 +959,8 @@ public class PersonalChatActivity extends AppCompatActivity implements PersonalC
             PictureFileUtils.deleteAllCacheDirFile(this);
         }
     }
+
+
 
 
     private void catchDocument(String message, long time) {

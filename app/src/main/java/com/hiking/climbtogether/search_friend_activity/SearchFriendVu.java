@@ -8,4 +8,6 @@ public interface SearchFriendVu {
     void showIsFriendUserInformation(String photoUrl, String name, String email);
 
     void showSearChNoDataView();
+
+    void sendInvitationToFriend();
 }

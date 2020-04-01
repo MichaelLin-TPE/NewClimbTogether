@@ -96,6 +96,8 @@ public class NewShareAdapter extends RecyclerView.Adapter<NewShareAdapter.ViewHo
                 if (userEmail.equals(like.getMemberEmail())){
                     holder.ivLike.setImageResource(R.drawable.like_pressed);
                     break;
+                }else {
+                    holder.ivLike.setImageResource(R.drawable.like_not_press);
                 }
             }
         }else {

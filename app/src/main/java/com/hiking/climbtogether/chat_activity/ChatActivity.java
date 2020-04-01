@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -43,6 +45,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.hiking.climbtogether.tool.NewImageLoaderManager;
 import com.hiking.climbtogether.tool.UserDataManager;
+import com.hiking.climbtogether.vote_activity.VoteActivity;
+import com.hiking.climbtogether.vote_list_activity.VoteListActivity;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.ArrayList;
@@ -103,6 +107,27 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
     private UserDataManager userDataManager;
 
     private ArrayList<ChatRoomDTO> chatRoomArrayList;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.discuss_menu,menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        if (item.getItemId() == R.id.discuss_vote){
+            presenter.onCreateVoteButtonClickListener();
+        }
+        if (item.getItemId() == R.id.discuss_vote_list){
+            presenter.onVoteListClickListener();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -529,6 +554,19 @@ public class ChatActivity extends AppCompatActivity implements ChatActivityVu {
                     }
                 });
     }
+
+    @Override
+    public void intentToVoteActivity() {
+        Intent it = new Intent(this, VoteActivity.class);
+        startActivity(it);
+    }
+
+    @Override
+    public void intentToVoteListActivity() {
+        Intent it = new Intent(this, VoteListActivity.class);
+        startActivity(it);
+    }
+
     private void updateView() {
         Map<String,Object> map = new HashMap<>();
         map.put("is_discuss_update",true);

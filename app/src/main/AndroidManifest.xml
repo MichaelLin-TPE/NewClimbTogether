@@ -17,7 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustResize">
-        <activity android:name=".favorite_activity.FavoriteActivity"></activity>
+        <activity android:name=".vote_list_activity.VoteListActivity"></activity>
+        <activity android:name=".vote_activity.VoteActivity" />
+        <activity android:name=".favorite_activity.FavoriteActivity" />
         <activity android:name=".personal_chat_photo_activity.PersonalPhotoActivity" />
         <activity android:name=".photo_activity.PhotoActivity" />
         <activity
