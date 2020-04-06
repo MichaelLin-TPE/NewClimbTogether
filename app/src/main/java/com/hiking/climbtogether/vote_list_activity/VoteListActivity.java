@@ -68,7 +68,7 @@ public class VoteListActivity extends AppCompatActivity implements VoteListActiv
     private String voteTitle,voteCreator;
 
     private TextView tvTitle ;
-    private TextView tvCreator;
+    private TextView tvCreator,tvTotalVoteNumber;
     private RecyclerView resultRecyclerView;
 
     private ProgressBar resultProgress;
@@ -279,6 +279,7 @@ public class VoteListActivity extends AppCompatActivity implements VoteListActiv
         tvCreator = view.findViewById(R.id.vote_result_creator);
         resultRecyclerView = view.findViewById(R.id.vote_result_recycler_view);
         resultProgress = view.findViewById(R.id.vote_result_progressbar);
+        tvTotalVoteNumber = view.findViewById(R.id.vote_result_total_number);
 
         resultProgress.setVisibility(View.VISIBLE);
 
@@ -328,10 +329,16 @@ public class VoteListActivity extends AppCompatActivity implements VoteListActiv
                 data.setNumber(voteNumberArray.get(i));
                 dataArrayList.add(data);
             }
+            int totalNumber = 0;
+            for (Integer number : voteNumberArray){
+                totalNumber += number;
+            }
 
             tvTitle.setText(voteTitle);
 
             tvCreator.setText(String.format(Locale.getDefault(),"發起人 : %s",voteCreator));
+
+            tvTotalVoteNumber.setText(String.format(Locale.getDefault(),"總共投票人數 : %d",totalNumber));
 
             VoteResultAdapter resultAdapter = new VoteResultAdapter(this,dataArrayList);
             resultRecyclerView.setAdapter(resultAdapter);

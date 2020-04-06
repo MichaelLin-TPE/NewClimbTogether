@@ -50,10 +50,11 @@ public class ViewPresenterImpl implements ViewPresenter {
         if(position == 0 && isAnimationShow){
             return ANIMATION_PIC;
         }
+        //天氣先暫時不用 再想想要做甚麼
         if (position == 1 && isSpinnerShow){
             return WEATHER_SPINNER;
         }
-        if (position == 2 && isNewsShow){
+        if (position == 1 && isNewsShow){
             return NEWS;
         }
         return 0;
@@ -67,7 +68,7 @@ public class ViewPresenterImpl implements ViewPresenter {
     @Override
     public void onSetSpinnerData(ArrayList<String> nationParkNameArray) {
         this.nationParkNameArray = nationParkNameArray;
-        isSpinnerShow = true;
+        isSpinnerShow = false;
     }
 
     @Override

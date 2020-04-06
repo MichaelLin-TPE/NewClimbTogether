@@ -3,6 +3,7 @@ package com.hiking.climbtogether.home_fragment.weather_view;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
@@ -13,9 +14,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.hiking.climbtogether.R;
+import com.hiking.climbtogether.tool.WeatherHttpConnection;
+import com.hiking.climbtogether.weather_parser.WeatherObject;
 
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class WeatherSpinnerView extends ConstraintLayout implements WeatherSpinnerVu {
@@ -67,6 +72,28 @@ public class WeatherSpinnerView extends ConstraintLayout implements WeatherSpinn
         tvSpinner.setText(nationParkNameArray.get(0));
 
         spinnerPresenter.onShowRecyclerView();
+
+
+//        String url = "https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/F-B0053-039?Authorization=CWB-CF93991C-7A79-4387-8A8B-D5F583B50AEC&downloadType=WEB&format=JSON";
+//
+//        WeatherHttpConnection connection = new WeatherHttpConnection();
+//        connection.execute(url);
+//        connection.setOnConnectionListener(new WeatherHttpConnection.OnConnectionListener() {
+//            @Override
+//            public void onSuccessful(String result) {
+//                Log.i("Michael","Post successful : "+result);
+//                Gson gson = new Gson();
+//                WeatherObject object = gson.fromJson(result,WeatherObject.class);
+//                Log.i("Michael","取得element : "+object.getCwbOpenData().getDataSet().getLocation().getLocation().get(0).getWeatherElement().get(0).getTime().get(0).getElementValue());
+//            }
+//
+//            @Override
+//            public void onFailure(String errorCode) {
+//                Log.i("Michael","Post failure : "+errorCode);
+//            }
+//        });
+
+
 
 
 

@@ -78,9 +78,11 @@ public class VoteListActivityPresenterImpl implements VoteListActivityPresenter 
                     if (myTime != null && voteTime != null) {
                         if (myTime.after(voteTime)) {
                             //新增投票截止
-                            voteDayLineArray.add(votingArrayList.get(index));
-                            //刪除投票中
-                            iterator.remove();
+                            if (index < votingArrayList.size()){
+                                voteDayLineArray.add(votingArrayList.get(index));
+                                //刪除投票中
+                                iterator.remove();
+                            }
                         }
                     }
                 } catch (ParseException e) {
@@ -114,7 +116,7 @@ public class VoteListActivityPresenterImpl implements VoteListActivityPresenter 
             }
 
 
-            if (votingArrayList.size() != 0) {
+            if (votingArrayList.size() != 0 || voteDayLineArray.size() != 0) {
                 mView.setRecyclerView(votingArrayList, isVoteArray, voteDayLineArray);
             } else {
                 Log.i("Michael", "votingArrayList null");
