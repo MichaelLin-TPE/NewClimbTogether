@@ -7,10 +7,7 @@ public class UserDataManager {
 
     private SharedPreferences sharedPreferences;
 
-    private Context context;
-
     public UserDataManager(Context context){
-        this.context = context;
         sharedPreferences = context.getSharedPreferences("userData",Context.MODE_PRIVATE);
     }
 
@@ -55,5 +52,15 @@ public class UserDataManager {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
+    }
+
+    public void saveMountainSortType(String type){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("sortType",type);
+        editor.apply();
+    }
+
+    public String getMountainSortType(){
+        return sharedPreferences.getString("sortType","");
     }
 }

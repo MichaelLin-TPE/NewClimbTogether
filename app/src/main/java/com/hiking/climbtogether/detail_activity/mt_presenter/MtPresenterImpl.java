@@ -18,10 +18,10 @@ public class MtPresenterImpl implements MtPresenter {
         if (position == 0){
             return PHOTO;
         }
+//        if (position == 1){
+//            return WEATHER;
+//        }
         if (position == 1){
-            return WEATHER;
-        }
-        if (position == 2){
             return INTRODUCE;
         }
         return 0;
@@ -29,7 +29,7 @@ public class MtPresenterImpl implements MtPresenter {
 
     @Override
     public int getItemCount() {
-        return 3;
+        return 2;
     }
 
     @Override

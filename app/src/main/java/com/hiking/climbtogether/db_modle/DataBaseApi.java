@@ -12,7 +12,13 @@ public interface DataBaseApi {
 
     ArrayList<PersonalChatDTO> getAllChatData();
 
+    ArrayList<DataDTO> searchAllInformation(String searchContent,boolean isSort);
+
+    ArrayList<DataDTO> searchAllLevelInformation(String levelType,String searchContent,boolean isSort);
+
     ArrayList<DataDTO> getInformationOrderByTimeNotFar();
+
+    ArrayList<DataDTO> getInformationLevelOrderByTimeNotFar(String levelType);
 
     ArrayList<DataDTO> getInformationOrderByTimFar();
 

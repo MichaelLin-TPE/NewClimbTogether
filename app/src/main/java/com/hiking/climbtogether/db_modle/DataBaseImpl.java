@@ -106,6 +106,8 @@ public class DataBaseImpl implements DataBaseApi {
     }
 
 
+
+
     @Override
     public ArrayList<DataDTO> getLevelAInformation(String levelType) {
         ArrayList<DataDTO> data = new ArrayList<>();
@@ -128,7 +130,7 @@ public class DataBaseImpl implements DataBaseApi {
     public ArrayList<DataDTO> getInformationOrderByTimeNotFar() {
         ArrayList<DataDTO> data = new ArrayList<>();
         SQLiteDatabase db = getReadableDatatbase();
-        Cursor cursor = db.rawQuery("SELECT * FROM mountain_table ORDER BY time", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM mountain_table ORDER BY time DESC", null);
         if (cursor.moveToFirst()) {
             do {
                 DataDTO dataDTO = new DataDTO();
@@ -140,6 +142,92 @@ public class DataBaseImpl implements DataBaseApi {
         db.close();
         return data;
     }
+
+    @Override
+    public ArrayList<DataDTO> searchAllInformation(String searchContent,boolean isSort) {
+        ArrayList<DataDTO> data = new ArrayList<>();
+        if (isSort){
+            SQLiteDatabase db = getReadableDatatbase();
+            Cursor cursor = db.rawQuery("SELECT * FROM mountain_table WHERE name LIKE '%"+searchContent+"%'"+" ORDER BY time DESC", null);
+            if (cursor.moveToFirst()) {
+                do {
+                    DataDTO dataDTO = new DataDTO();
+                    dataDTO.fromCursor(cursor);
+                    data.add(dataDTO);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        }else {
+            SQLiteDatabase db = getReadableDatatbase();
+            Cursor cursor = db.rawQuery("SELECT * FROM mountain_table WHERE name LIKE '%"+searchContent+"%'", null);
+            if (cursor.moveToFirst()) {
+                do {
+                    DataDTO dataDTO = new DataDTO();
+                    dataDTO.fromCursor(cursor);
+                    data.add(dataDTO);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        }
+
+
+        return data;
+    }
+
+    @Override
+    public ArrayList<DataDTO> searchAllLevelInformation(String levelType, String searchContent,boolean isSort) {
+        ArrayList<DataDTO> data = new ArrayList<>();
+        if (isSort){
+            SQLiteDatabase db = getReadableDatatbase();
+            Cursor cursor = db.rawQuery("SELECT * FROM mountain_table WHERE name"+" LIKE '%"+searchContent+"%'"+" AND difficulty = '" + levelType + "'"+"ORDER BY time DESC", null);
+            if (cursor.moveToFirst()) {
+                do {
+                    DataDTO dataDTO = new DataDTO();
+                    dataDTO.fromCursor(cursor);
+                    data.add(dataDTO);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+
+        }else {
+
+            SQLiteDatabase db = getReadableDatatbase();
+            Cursor cursor = db.rawQuery("SELECT * FROM mountain_table WHERE name"+" LIKE '%"+searchContent+"%'"+" AND difficulty = '" + levelType + "'", null);
+            if (cursor.moveToFirst()) {
+                do {
+                    DataDTO dataDTO = new DataDTO();
+                    dataDTO.fromCursor(cursor);
+                    data.add(dataDTO);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        }
+
+        return data;
+    }
+
+    @Override
+    public ArrayList<DataDTO> getInformationLevelOrderByTimeNotFar(String levelType) {
+        ArrayList<DataDTO> data = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatatbase();
+        Cursor cursor = db.rawQuery("SELECT * FROM mountain_table WHERE difficulty = '" + levelType + "'"+"ORDER BY time DESC", null);
+        if (cursor.moveToFirst()) {
+            do {
+                DataDTO dataDTO = new DataDTO();
+                dataDTO.fromCursor(cursor);
+                data.add(dataDTO);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return data;
+    }
+
+
 
     @Override
     public ArrayList<DataDTO> getInformationOrderByTimFar() {

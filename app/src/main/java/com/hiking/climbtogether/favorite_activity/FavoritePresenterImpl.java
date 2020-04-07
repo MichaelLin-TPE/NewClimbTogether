@@ -30,4 +30,9 @@ public class FavoritePresenterImpl implements FavoritePresenter {
 
 
     }
+
+    @Override
+    public void onNotLoginEvent() {
+        mView.intentToLoginPage();
+    }
 }

@@ -25,7 +25,7 @@
 
     <string name="client_id" translatable="false">687642928001-s3jkcc6kc3o20ggq2e7ut8tf685mmmq6.apps.googleusercontent.com</string>
     <string name="question">問題</string>
-    <string name="search_no_data">查無資料唷~</string>
+    <string name="search_no_data">暫時無資料唷(之後會再更新..敬請期待)</string>
     <string name="member_notice">免費註冊/登入會員後,即可享所有功能唷</string>
     <string name="login_and_registered">註冊/登入</string>
     <string name="favorite_mt">百岳戰績</string>
@@ -50,7 +50,7 @@
     <string name="processing">處理中....</string>
     <string name="google_login_fail">Google 登入失敗 : </string>
     <string name="no_sort">默認排序</string>
-    <string name="order_by_time">日期由近到遠</string>
+    <string name="order_by_time">日期排序</string>
     <string name="order_by_time_not_far">日期由遠到近</string>
     <string name="login_notice">此功能僅限會員使用\n立即「免費註冊」或登入即可增加戰績</string>
     <string name="login_notice_discuss">此功能僅限會員使用\n立即「免費註冊」或登入即可參加討論</string>
@@ -156,4 +156,5 @@
     <string name="send_invitation_successful">已傳送好友邀請</string>
     <string name="vote_already_event">已結束的投票</string>
     <string name="the_end">已結束</string>
+    <string name="search_mountain"><font size="15">請輸入要搜尋的百岳</font></string>
 </resources>

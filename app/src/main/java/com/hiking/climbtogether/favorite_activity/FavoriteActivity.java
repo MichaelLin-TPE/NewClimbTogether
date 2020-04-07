@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -18,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.detail_activity.MountainFavoriteData;
+import com.hiking.climbtogether.login_activity.LoginActivity;
 
 import java.util.ArrayList;
 
@@ -60,6 +62,8 @@ public class FavoriteActivity extends AppCompatActivity implements FavoriteActiv
                             }
                         }
                     });
+        }else {
+            presenter.onNotLoginEvent();
         }
 
     }
@@ -98,5 +102,12 @@ public class FavoriteActivity extends AppCompatActivity implements FavoriteActiv
     public void setRecyclerView(ArrayList<MountainFavoriteData> dataArrayList) {
         adapter = new FavoriteAdapter(this,dataArrayList);
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void intentToLoginPage() {
+        Intent it = new Intent(this, LoginActivity.class);
+        startActivity(it);
+        finish();
     }
 }

@@ -11,9 +11,9 @@ public interface MountainFragmentPresenter {
 
     void onPrepareData();
 
-    void onTopIconChange(int sid,String isShow,String topTime);
+    void onTopIconChange(int sid, String isShow, String topTime, DataDTO data, int itemPosition);
 
-    void onShowDatePicker(int sid);
+    void onShowDatePicker(int sid, DataDTO data, int itemPosition);
 
     void onCreateDocumentInFirestore(int sid, String topTime);
 
@@ -32,4 +32,6 @@ public interface MountainFragmentPresenter {
     void onMountainItemClick(DataDTO data);
 
     void onShowSpinnerDialog(ArrayList<String> spinnerData);
+
+    void onSearchMtListener(CharSequence searchContent);
 }

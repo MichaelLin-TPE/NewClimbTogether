@@ -4,4 +4,6 @@ public interface FavoritePresenter {
     void onBackButtonClickListener();
 
     void onCatchJson(String json);
+
+    void onNotLoginEvent();
 }

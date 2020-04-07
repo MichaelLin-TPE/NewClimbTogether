@@ -8,4 +8,6 @@ public interface FavoriteActivityVu {
     void closePage();
 
     void setRecyclerView(ArrayList<MountainFavoriteData> dataArrayList);
+
+    void intentToLoginPage();
 }

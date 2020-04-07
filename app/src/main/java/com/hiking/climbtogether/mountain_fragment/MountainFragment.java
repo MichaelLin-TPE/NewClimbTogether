@@ -15,14 +15,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.hiking.climbtogether.tool.UserDataManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -84,9 +86,15 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     private FireStoreManager manager;
 
+    private EditText edSearchMt;
+
     private static final String COLLECTION_MOUNTAIN = "collection_mountain";
 
     private static final String COLLECTION = "collection";
+
+    private UserDataManager userDataManager;
+
+    private ArrayList<String> spinnerData;
 
     public static MountainFragment newInstance() {
         MountainFragment fragment = new MountainFragment();
@@ -109,6 +117,8 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         mAuth = FirebaseAuth.getInstance();
         adapter = new MountainRecyclerViewAdapter(context);
         manager = new FireStoreManager();
+        userDataManager = new UserDataManager(context);
+
         initPresenter();
 
     }
@@ -234,7 +244,11 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     @Override
     public void setSpinner(ArrayList<String> spinnerData) {
-        spinner.setText(spinnerData.get(0));
+        if (!userDataManager.getMountainSortType().isEmpty()){
+            spinner.setText(userDataManager.getMountainSortType());
+        }else {
+            spinner.setText(spinnerData.get(0));
+        }
         spinner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -284,6 +298,30 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         tvWatchMore = view.findViewById(R.id.mountain_fragment_watch_more);
         recyclerView = view.findViewById(R.id.mountain_fragment_recycler_view);
         tvSearchNoData = view.findViewById(R.id.mountain_fragment_search_no_data);
+        edSearchMt = view.findViewById(R.id.mountain_fragment_edit_search);
+        edSearchMt.clearFocus();
+        edSearchMt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                if (actionId == EditorInfo.IME_ACTION_SEARCH){
+                    presenter.onSearchMtListener(edSearchMt.getText().toString());
+                    edSearchMt.setText("");
+                    //輸入完收起鍵盤
+                    if (getActivity() != null){
+                        InputMethodManager im = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        if (im != null){
+                            im.hideSoftInputFromWindow(edSearchMt.getWindowToken(),
+                                    InputMethodManager.HIDE_NOT_ALWAYS);
+                        }
+
+                    }
+
+                }
+
+                return true;
+            }
+        });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
@@ -369,28 +407,34 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     @Override
     public void setRecyclerView(ArrayList<DataDTO> allInformation) {
+        if (getActivity() != null){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.setData(allInformation);
+                    recyclerView.setAdapter(adapter);
+                    adapter.setOnMountainItemClickListener(new MountainRecyclerViewAdapter.OnMountainItemClickListener() {
+                        @Override
+                        public void onClick(DataDTO data) {
+                            presenter.onMountainItemClick(data);
+                        }
 
-        adapter.setData(allInformation);
-        recyclerView.setAdapter(adapter);
-        adapter.setOnMountainItemClickListener(new MountainRecyclerViewAdapter.OnMountainItemClickListener() {
-            @Override
-            public void onClick(DataDTO data) {
-                presenter.onMountainItemClick(data);
-            }
-
-            @Override
-            public void onIconClick(int sid) {
-                user = mAuth.getCurrentUser();
-                if (user != null) {
-                    presenter.onShowDatePicker(sid);
-                } else {
-                    presenter.onLoginEvent();
+                        @Override
+                        public void onIconClick(int sid,DataDTO data,int itemPosition) {
+                            user = mAuth.getCurrentUser();
+                            if (user != null) {
+                                presenter.onShowDatePicker(sid,data,itemPosition);
+                            } else {
+                                presenter.onLoginEvent();
+                            }
+                        }
+                    });
+                    presenter.onPrepareSpinnerData();
                 }
+            });
+        }
 
 
-            }
-        });
-        presenter.onPrepareSpinnerData();
 
     }
 
@@ -416,10 +460,10 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     @Override
     public void showSpinnerDialog(ArrayList<String> spinnerData) {
+        this.spinnerData = spinnerData;
         ArrayList<Integer> imageArray = new ArrayList<>();
         imageArray.add(R.drawable.native_icon);
-        imageArray.add(R.drawable.close);
-        imageArray.add(R.drawable.far);
+        imageArray.add(R.drawable.sort);
         View view = View.inflate(getActivity(),R.layout.weather_spinner_dialog,null);
         RecyclerView recyclerView = view.findViewById(R.id.weather_dialog_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -428,6 +472,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         AlertDialog dialog = new AlertDialog.Builder(getActivity())
                 .setView(view).create();
         dialog.show();
+
         adapter.setOnWeatherDialogItemClickListener(new WeatherDialogAdapter.OnWeatherDialogItemClickListener() {
             @Override
             public void onClick(String name, int position) {
@@ -438,9 +483,14 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         });
     }
 
+    @Override
+    public void saveSortType(int position) {
+        userDataManager.saveMountainSortType(spinnerData.get(position));
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void showDatePick(final int sid) {
+    public void showDatePick(final int sid, DataDTO data, int itemPosition) {
         datePicker = new DatePicker(context);
 
         AlertDialog dialog = new AlertDialog.Builder(context)
@@ -453,7 +503,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
                             topTime = new SimpleDateFormat("yyyy/MM/dd",Locale.TAIWAN).format(new Date(System.currentTimeMillis()));
                         }
                         String isShow = "true";
-                        presenter.onTopIconChange(sid,isShow,topTime);
+                        presenter.onTopIconChange(sid,isShow,topTime,data,itemPosition);
                         presenter.onCreateDocumentInFirestore(sid, topTime);
                     }
                 }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -532,7 +582,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     }
 
     @Override
-    public void deleteFavorite(final int sid, DataDTO dataDTO) {
+    public void deleteFavorite(final int sid, DataDTO dataDTO, int itemPosition) {
         user = mAuth.getCurrentUser();
         if (user != null) {
             String email = user.getEmail();
@@ -543,7 +593,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
                     @Override
                     public void onSuccessful() {
                         String isShow = "false";
-                        presenter.onTopIconChange(sid,isShow,null);
+                        presenter.onTopIconChange(sid,isShow,null, dataDTO, itemPosition);
                     }
 
                     @Override

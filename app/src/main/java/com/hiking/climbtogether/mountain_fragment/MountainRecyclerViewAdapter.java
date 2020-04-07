@@ -77,7 +77,7 @@ public class MountainRecyclerViewAdapter extends RecyclerView.Adapter<MountainRe
             @Override
             public void onClick(View view) {
                 int sid = dataArrayList.get(position).getSid();
-                listener.onIconClick(sid);
+                listener.onIconClick(sid,data,position);
             }
         });
 
@@ -120,6 +120,6 @@ public class MountainRecyclerViewAdapter extends RecyclerView.Adapter<MountainRe
     public interface OnMountainItemClickListener{
         void onClick(DataDTO data);
 
-        void onIconClick(int sid);
+        void onIconClick(int sid,DataDTO data,int itemPosition);
     }
 }

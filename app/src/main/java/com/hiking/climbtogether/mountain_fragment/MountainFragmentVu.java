@@ -19,13 +19,13 @@ public interface MountainFragmentVu {
 
     void setDataChange(ArrayList<DataDTO> dataDTO,String isShow);
 
-    void showDatePick(int sid);
+    void showDatePick(int sid, DataDTO data, int itemPosition);
 
     void setFirestore(int sid, long topTime,DataDTO data);
 
     void intentToLoginActivity();
 
-    void deleteFavorite(int sid, DataDTO dataDTO);
+    void deleteFavorite(int sid, DataDTO dataDTO, int itemPosition);
 
     void searchDataFromDb(String email, ArrayList<DataDTO> allInformation);
 
@@ -40,4 +40,6 @@ public interface MountainFragmentVu {
     void intentToMtDetailActivity(DataDTO data);
 
     void showSpinnerDialog(ArrayList<String> spinnerData);
+
+    void saveSortType(int position);
 }

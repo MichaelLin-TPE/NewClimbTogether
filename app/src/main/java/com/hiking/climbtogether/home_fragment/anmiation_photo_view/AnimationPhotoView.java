@@ -15,6 +15,8 @@ import com.hiking.climbtogether.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.ArrayList;
 
@@ -58,12 +60,37 @@ public class AnimationPhotoView extends ConstraintLayout {
     public void setPhotoData(ArrayList<String> photoUrlArray) {
 
         Log.i("Michael","執行 setPhotoData");
+        ArrayList<Bitmap> imageArray = new ArrayList<>();
+        for (String uri : photoUrlArray){
+            imageLoader.loadImage(uri, new ImageLoadingListener() {
+                @Override
+                public void onLoadingStarted(String imageUri, View view) {
 
-        fadeOutAndHideImage(ivPhoto,photoUrlArray);
+                }
+
+                @Override
+                public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+
+                }
+
+                @Override
+                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                    imageArray.add(loadedImage);
+                }
+
+                @Override
+                public void onLoadingCancelled(String imageUri, View view) {
+
+                }
+            });
+        }
+
+
+        fadeOutAndHideImage(ivPhoto,imageArray);
     }
 
     //圖片淡出
-    private void fadeOutAndHideImage(final ImageView img, final ArrayList<String> photoUrlArray){
+    private void fadeOutAndHideImage(final ImageView img, final ArrayList<Bitmap> photoUrlArray){
         final Animation fadeOut = new AlphaAnimation(1, 0);
         fadeOut.setInterpolator(new AccelerateInterpolator());
         fadeOut.setDuration(3000);
@@ -74,11 +101,11 @@ public class AnimationPhotoView extends ConstraintLayout {
             {
                 if (picIndex == photoUrlArray.size()){
                     picIndex = 0;
-                    imageLoader.displayImage(photoUrlArray.get(picIndex),img,options);
+                    img.setImageBitmap(photoUrlArray.get(picIndex));
                     picIndex ++;
                     fadeInAndShowImage(img,photoUrlArray);
                 }else {
-                    imageLoader.displayImage(photoUrlArray.get(picIndex),img,options);
+                    img.setImageBitmap(photoUrlArray.get(picIndex));
                     picIndex++;
                     fadeInAndShowImage(img,photoUrlArray);
                 }
@@ -91,7 +118,7 @@ public class AnimationPhotoView extends ConstraintLayout {
         img.startAnimation(fadeOut);
     }
     //圖片淡入
-    private void fadeInAndShowImage(final ImageView img, final ArrayList<String> photoUrlArray){
+    private void fadeInAndShowImage(final ImageView img, final ArrayList<Bitmap> photoUrlArray){
         Animation fadeIn = new AlphaAnimation(0, 1);
         fadeIn.setInterpolator(new AccelerateInterpolator());
         fadeIn.setDuration(2000);
