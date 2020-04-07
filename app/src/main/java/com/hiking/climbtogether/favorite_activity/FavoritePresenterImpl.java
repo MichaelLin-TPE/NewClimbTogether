@@ -22,10 +22,11 @@ public class FavoritePresenterImpl implements FavoritePresenter {
     @Override
     public void onCatchJson(String json) {
         if (json != null){
+            mView.showNoDataView(false);
             MountainObject object = gson.fromJson(json,MountainObject.class);
             mView.setRecyclerView(object.getDataArrayList());
         }else {
-
+            mView.showNoDataView(true);
         }
 
 

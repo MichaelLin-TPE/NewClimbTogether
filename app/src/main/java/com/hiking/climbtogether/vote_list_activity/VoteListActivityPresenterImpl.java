@@ -36,6 +36,7 @@ public class VoteListActivityPresenterImpl implements VoteListActivityPresenter 
     @Override
     public void onCatchJsonStr(ArrayList<String> jsonArray, ArrayList<Boolean> isDayLineArray) {
         if (jsonArray.size() != 0) {
+            mView.showNoDataView(false);
             ArrayList<VoteData> catchDataArray = new ArrayList<>();
 
             voteDayLineArray = new ArrayList<>();
@@ -123,6 +124,7 @@ public class VoteListActivityPresenterImpl implements VoteListActivityPresenter 
             }
         } else {
             Log.i("Michael", "沒資料");
+            mView.showNoDataView(true);
         }
     }
 

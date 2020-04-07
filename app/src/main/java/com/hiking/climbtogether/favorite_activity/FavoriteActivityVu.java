@@ -10,4 +10,6 @@ public interface FavoriteActivityVu {
     void setRecyclerView(ArrayList<MountainFavoriteData> dataArrayList);
 
     void intentToLoginPage();
+
+    void showNoDataView(boolean isShow);
 }

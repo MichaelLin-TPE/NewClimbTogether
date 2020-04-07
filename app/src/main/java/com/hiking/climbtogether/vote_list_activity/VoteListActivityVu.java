@@ -22,4 +22,6 @@ public interface VoteListActivityVu {
     void updateVoteDayLineData(ArrayList<VoteData> voteDayLineArray);
 
     void showResultDialog(VoteData data);
+
+    void showNoDataView(boolean isShow);
 }

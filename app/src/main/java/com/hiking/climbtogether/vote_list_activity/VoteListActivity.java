@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,6 +74,10 @@ public class VoteListActivity extends AppCompatActivity implements VoteListActiv
 
     private ProgressBar resultProgress;
 
+    private ImageView ivLogo;
+
+    private TextView tvNotice;
+
 
 
     @Override
@@ -113,6 +118,9 @@ public class VoteListActivity extends AppCompatActivity implements VoteListActiv
                 presenter.onBackButtonClickListener();
             }
         });
+
+        ivLogo = findViewById(R.id.vote_list_logo);
+        tvNotice = findViewById(R.id.vote_list_notice);
 
         recyclerView = findViewById(R.id.vote_list_recycler_view);
 
@@ -296,6 +304,12 @@ public class VoteListActivity extends AppCompatActivity implements VoteListActiv
         searchVoteNumber();
 
 
+    }
+
+    @Override
+    public void showNoDataView(boolean isShow) {
+        tvNotice.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        ivLogo.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
 
     private void searchVoteNumber() {

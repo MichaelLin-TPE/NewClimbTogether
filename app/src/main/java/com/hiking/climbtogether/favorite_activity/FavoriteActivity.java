@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -36,6 +38,10 @@ public class FavoriteActivity extends AppCompatActivity implements FavoriteActiv
     private RecyclerView recyclerView;
 
     private FavoriteAdapter adapter;
+
+    private ImageView ivLogo;
+
+    private TextView tvNotice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +75,8 @@ public class FavoriteActivity extends AppCompatActivity implements FavoriteActiv
     }
 
     private void initView() {
+        ivLogo = findViewById(R.id.favorite_logo);
+        tvNotice = findViewById(R.id.favorite_notice);
         Toolbar toolbar = findViewById(R.id.favorite_toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -109,5 +117,11 @@ public class FavoriteActivity extends AppCompatActivity implements FavoriteActiv
         Intent it = new Intent(this, LoginActivity.class);
         startActivity(it);
         finish();
+    }
+
+    @Override
+    public void showNoDataView(boolean isShow) {
+        tvNotice.setVisibility(isShow ? View.VISIBLE : View.GONE);
+        ivLogo.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
 }

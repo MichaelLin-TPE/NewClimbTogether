@@ -147,7 +147,9 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
     public void showLoginInformation(boolean isShow) {
         ivLogo.setVisibility(isShow ? View.VISIBLE : View.GONE);
         tvNotice.setVisibility(isShow ? View.VISIBLE : View.GONE);
-        tvNotice.setText(getActivity().getString(R.string.login_notice_chat));
+        if (getActivity() != null){
+            tvNotice.setText(getActivity().getString(R.string.login_notice_chat));
+        }
         btnLogin.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
 
