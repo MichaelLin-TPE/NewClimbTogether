@@ -142,42 +142,12 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
 
     }
 
-    private void searchData() {
-        user = mAuth.getCurrentUser();
-        if (user != null && user.getEmail() != null) {
-
-            presenter.onShowProgress(true);
-            jsonArray = new ArrayList<>();
-            documentIdArray = new ArrayList<>();
-
-            firestore.collection("chat_data")
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                for (QueryDocumentSnapshot snapshot : task.getResult()) {
-                                    String jsonStr = (String) snapshot.get("json");
-                                    String path = snapshot.getId();
-                                    if (jsonStr != null) {
-                                        jsonArray.add(jsonStr);
-                                        documentIdArray.add(path);
-                                    }
-                                }
-                                presenter.onCatchallData(jsonArray,documentIdArray);
-                            }
-                        }
-                    });
-        } else {
-            presenter.onNoUserEvent();
-        }
-    }
 
     @Override
     public void showLoginInformation(boolean isShow) {
         ivLogo.setVisibility(isShow ? View.VISIBLE : View.GONE);
         tvNotice.setVisibility(isShow ? View.VISIBLE : View.GONE);
-        tvNotice.setText(getString(R.string.login_notice_chat));
+        tvNotice.setText(getActivity().getString(R.string.login_notice_chat));
         btnLogin.setVisibility(isShow ? View.VISIBLE : View.GONE);
     }
 
@@ -291,7 +261,6 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
                             Log.i("Michael","刪除成功");
-                            documentIdArray.remove(itemPosition);
                         }
                     }
                 });
@@ -321,7 +290,7 @@ public class PersonalChatFragment extends Fragment implements PersonalFragmentVu
                         @Override
                         public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException e) {
                             if (e != null){
-                                Log.i("Michael","Listen failed : "+e);
+                                Log.i("Michael","Listen failed : "+e.toString());
                                 return;
                             }
                             if (value != null){
