@@ -1,6 +1,7 @@
 package com.hiking.climbtogether.home_activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -17,15 +18,26 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsParams;
+import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.member_activity.MemberActivity;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomePageActivity extends AppCompatActivity implements HomePageVu {
 
@@ -38,6 +50,10 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
     private HomePagePresenter homePresenter;
 
     private FragmentManager fragmentManager;
+
+    private BillingClient billingClient;
+
+    private String drinkPrice = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,9 +187,10 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
                     public void onClick(DialogInterface dialog, int which) {
                         homePresenter.onContactMeButtonClickListener();
                     }
-                }).setNegativeButton(getString(R.string.i_know), new DialogInterface.OnClickListener() {
+                }).setNegativeButton(getString(R.string.donate), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        homePresenter.onDonateClickListener();
 
                     }
                 }).create();
@@ -195,6 +212,70 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void checkGooglePlayAccount() {
+        billingClient = BillingClient.newBuilder(this)
+                .enablePendingPurchases()
+                .setListener(new PurchasesUpdatedListener() {
+                    @Override
+                    public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> list) {
+
+                    }
+                }).build();
+
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(BillingResult billingResult) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                    homePresenter.onBillingSetupFinishedListener();
+                }
+            }
+
+            @Override
+            public void onBillingServiceDisconnected() {
+
+            }
+        });
+
+    }
+
+    @Override
+    public void showDonateDialog() {
+
+        ArrayList<String> skuList = new ArrayList<>();
+        skuList.add("treat_a_drink");
+        SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
+        params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP);
+        billingClient.querySkuDetailsAsync(params.build(), new SkuDetailsResponseListener() {
+            @Override
+            public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> list) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null){
+                    for (SkuDetails skuDetails : list){
+                        String sku = skuDetails.getSku();
+                        String price = skuDetails.getPrice();
+                        if ("treat_a_drink".equals(sku)){
+                            drinkPrice = price;
+                        }
+                    }
+                    BillingFlowParams flowParams = BillingFlowParams.newBuilder()
+                            .setSkuDetails(list.get(0))
+                            .build();
+                    BillingResult responseCode = billingClient.launchBillingFlow(HomePageActivity.this,flowParams);
+                }
+            }
+        });
+
+
+//        View view = View.inflate(this,R.layout.donate_dialog_view,null);
+//        Button btnThirty = view.findViewById(R.id.donate_pay_thirty);
+//        Button btnSexty = view.findViewById(R.id.donate_pay_sixty);
+//        AlertDialog dialog = new AlertDialog.Builder(this)
+//                .setView(view).create();
+//        dialog.show();
+
+    }
+
 
     private View prepareView(String title, Drawable icon) {
         View view = View.inflate(this, R.layout.home_bottom_tablayout_custom_view, null);

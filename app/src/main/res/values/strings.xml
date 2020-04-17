@@ -159,4 +159,7 @@
     <string name="search_mountain"><font size="15">請輸入要搜尋的百岳</font></string>
     <string name="no_vote_right_now">目前沒有任何人發起投票</string>
     <string name="no_favorite">還沒有任何山加入你的最愛唷,快去加吧..</string>
+    <string name="donate">贊助</string>
+    <string name="buy_me_drink">請我一杯飲料</string>
+    <string name="i_pay">我請客</string>
 </resources>

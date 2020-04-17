@@ -10,4 +10,8 @@ public interface HomePagePresenter {
     void onQuestionButtonClickListener();
 
     void onContactMeButtonClickListener();
+
+    void onDonateClickListener();
+
+    void onBillingSetupFinishedListener();
 }

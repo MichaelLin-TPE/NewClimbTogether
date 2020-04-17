@@ -17,4 +17,9 @@ public interface HomePageVu {
     void showQuestionDialog();
 
     void contactMe();
+
+    void checkGooglePlayAccount();
+
+
+    void showDonateDialog();
 }

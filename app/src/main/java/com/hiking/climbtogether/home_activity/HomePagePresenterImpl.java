@@ -64,4 +64,14 @@ public class HomePagePresenterImpl implements HomePagePresenter {
     public void onContactMeButtonClickListener() {
         mView.contactMe();
     }
+
+    @Override
+    public void onDonateClickListener() {
+        mView.checkGooglePlayAccount();
+    }
+
+    @Override
+    public void onBillingSetupFinishedListener() {
+        mView.showDonateDialog();
+    }
 }
