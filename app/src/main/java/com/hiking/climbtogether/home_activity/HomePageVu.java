@@ -21,5 +21,7 @@ public interface HomePageVu {
     void checkGooglePlayAccount();
 
 
-    void showDonateDialog();
+    void showSingleDonateDialog();
+
+    void showLoopDonateDialog();
 }

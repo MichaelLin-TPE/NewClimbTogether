@@ -73,6 +73,10 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
 
     private Handler handler = new Handler();
 
+    private AlertDialog paymentDialog;
+
+    private String skuType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -234,6 +238,113 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
     @Override
     public void checkGooglePlayAccount() {
         Log.i("Michael", "贊助");
+        ArrayList<String> paymentList = new ArrayList<>();
+        paymentList.add(getString(R.string.single_buy));
+        paymentList.add(getString(R.string.loop_buy));
+        String[] list = paymentList.toArray(new String[0]);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setItems(list, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0){
+                            skuType = BillingClient.SkuType.INAPP;
+                        }else {
+                            skuType = BillingClient.SkuType.SUBS;
+                        }
+                        homePresenter.onSelectItemClickListener(which);
+                        dialog.dismiss();
+                    }
+                }).create();
+        dialog.show();
+
+    }
+
+    //消耗商品
+    private void consumePurchase(Purchase data, int state) {
+        Log.i("Michael", "消耗商品");
+        ConsumeParams.Builder consumeParams = ConsumeParams.newBuilder();
+        consumeParams.setPurchaseToken(data.getPurchaseToken());
+        consumeParams.setDeveloperPayload(data.getDeveloperPayload());
+        billingClient.consumeAsync(consumeParams.build(), new ConsumeResponseListener() {
+            @Override
+            public void onConsumeResponse(BillingResult billingResult, String s) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                    if (state == consumeImmediately) {
+                        Log.i("Michael", "消耗商品 : " + consumeImmediately);
+                    }
+                } else {
+                    //如果消耗不成功 那就在消耗一次
+                    Log.i("Michael", "再次消耗一次");
+                    if (state == CONSUME_DELAY && billingResult.getDebugMessage().contains("Server error,please try again")) {
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                queryAndConsumePurchaseSingle();
+                            }
+                        }, 5 * 1000);
+                    }
+                }
+            }
+        });
+
+
+    }
+
+    private void queryAndConsumePurchaseSingle() {
+        //queryPurchases() 方法会使用 Google Play 商店应用的缓存，而不会发起网络请求
+        billingClient.queryPurchaseHistoryAsync(skuType,
+                new PurchaseHistoryResponseListener() {
+
+                    @Override
+                    public void onPurchaseHistoryResponse(BillingResult billingResult, List<PurchaseHistoryRecord> list) {
+                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null) {
+                            for (PurchaseHistoryRecord record : list) {
+                                //Process the result
+                                //確認購買交易 不然三天後會退款給用戶
+                                try {
+                                    Purchase purchase = new Purchase(record.getOriginalJson(), record.getSignature());
+                                    if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+                                        //消耗品開始消耗
+                                        consumePurchase(purchase, consumeImmediately);
+                                        //確認購買交易
+                                        if (!purchase.isAcknowledged()) {
+                                            acknowledgePurchase(purchase);
+                                        }
+                                        //TODO: 這裡可以添加訂單找回功能,防止變態用戶付完錢就殺死App的那種
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+
+    //確認訂單
+    private void acknowledgePurchase(Purchase data) {
+        AcknowledgePurchaseParams acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
+                .setPurchaseToken(data.getPurchaseToken())
+                .build();
+        AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = new AcknowledgePurchaseResponseListener() {
+            @Override
+            public void onAcknowledgePurchaseResponse(BillingResult billingResult) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                    paymentDialog.dismiss();
+                    Toast.makeText(HomePageActivity.this, "山岳感謝您~", Toast.LENGTH_SHORT).show();
+                    Log.i("Michael", "Acknowledge purchase success");
+                } else {
+                    Log.i("Michael", "Acknowledge purchase fail");
+                }
+            }
+        };
+        billingClient.acknowledgePurchase(acknowledgePurchaseParams, acknowledgePurchaseResponseListener);
+    }
+
+    //單次購買
+    @Override
+    public void showSingleDonateDialog() {
+
         billingClient = BillingClient.newBuilder(this)
                 .enablePendingPurchases()
                 .setListener(new PurchasesUpdatedListener() {
@@ -261,8 +372,10 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
                             }
                         } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
                             Log.i("Michael", "使用者取消");
+                        } else if (list == null) {
+                            Log.i("Michael", "支付錯誤 : " + billingResult.getResponseCode() + " , list == null");
                         } else {
-                            Log.i("Michael", "支付錯誤");
+                            Log.i("Michael", "支付錯誤 : " + billingResult.getResponseCode());
                         }
                     }
                 }).build();
@@ -272,11 +385,46 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
             public void onBillingSetupFinished(BillingResult billingResult) {
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                     Log.i("Michael", "startConnection : " + BillingClient.BillingResponseCode.OK);
-                    homePresenter.onBillingSetupFinishedListener();
+                    ArrayList<String> skuList = new ArrayList<>();
+                    skuList.add("treat_a_box");
+                    skuList.add("buy_me_a_drink");
+
+                    SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
+                    params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP);
+                    billingClient.querySkuDetailsAsync(params.build(), new SkuDetailsResponseListener() {
+                        @Override
+                        public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> list) {
+                            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null) {
+
+                                //列出清單
+                                View view = View.inflate(HomePageActivity.this, R.layout.payment_view, null);
+                                RecyclerView rvPay = view.findViewById(R.id.payment_recycler_view);
+                                rvPay.setLayoutManager(new LinearLayoutManager(HomePageActivity.this));
+
+                                PaymentAdapter paymentAdapter = new PaymentAdapter(list, HomePageActivity.this);
+                                rvPay.setAdapter(paymentAdapter);
+
+                                paymentDialog = new AlertDialog.Builder(HomePageActivity.this)
+                                        .setView(view).create();
+                                paymentDialog.show();
+
+
+                                paymentAdapter.setOnPaymentItemClickListener(new PaymentAdapter.OnPaymentItemClickListener() {
+                                    @Override
+                                    public void onPay(SkuDetails data) {
+
+                                        BillingFlowParams flowParams = BillingFlowParams.newBuilder()
+                                                .setSkuDetails(data)
+                                                .build();
+                                        billingClient.launchBillingFlow(HomePageActivity.this, flowParams);
+                                    }
+                                });
+
+                            }
+                        }
+                    });
                 } else {
-                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-                        homePresenter.onBillingSetupFinishedListener();
-                    }
+                    Toast.makeText(HomePageActivity.this, "購買頁錯誤 : " + billingResult.getResponseCode(), Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -287,139 +435,107 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
             }
         });
 
-    }
-
-    //消耗商品
-    private void consumePurchase(Purchase data, int state) {
-        Log.i("Michael","消耗商品");
-        ConsumeParams.Builder consumeParams = ConsumeParams.newBuilder();
-        consumeParams.setPurchaseToken(data.getPurchaseToken());
-        consumeParams.setDeveloperPayload(data.getDeveloperPayload());
-        billingClient.consumeAsync(consumeParams.build(), new ConsumeResponseListener() {
-            @Override
-            public void onConsumeResponse(BillingResult billingResult, String s) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    if (state == consumeImmediately) {
-                        Log.i("Michael", "消耗商品 : " + consumeImmediately);
-                    }
-                } else {
-                    //如果消耗不成功 那就在消耗一次
-                    Log.i("Michael", "再次消耗一次");
-                    if (state == CONSUME_DELAY && billingResult.getDebugMessage().contains("Server error,please try again")) {
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                queryAndConsumePurchase();
-                            }
-                        }, 5 * 1000);
-                    }
-                }
-            }
-        });
-
 
     }
 
-    //查询最近的购买交易，并消耗商品
-    private void queryAndConsumePurchase() {
-        //queryPurchases() 方法会使用 Google Play 商店应用的缓存，而不会发起网络请求
-        billingClient.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP,
-                new PurchaseHistoryResponseListener() {
-
+    //訂閱
+    @Override
+    public void showLoopDonateDialog() {
+        billingClient = BillingClient.newBuilder(this)
+                .enablePendingPurchases()
+                .setListener(new PurchasesUpdatedListener() {
                     @Override
-                    public void onPurchaseHistoryResponse(BillingResult billingResult, List<PurchaseHistoryRecord> list) {
+                    public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> list) {
+
                         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null) {
-                            for (PurchaseHistoryRecord record : list){
-                                //Process the result
-                                //確認購買交易 不然三天後會退款給用戶
-                                try{
-                                    Purchase purchase = new Purchase(record.getOriginalJson(),record.getSignature());
-                                    if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED){
-                                        //消耗品開始消耗
-                                        consumePurchase(purchase,consumeImmediately);
-                                        //確認購買交易
-                                        if (!purchase.isAcknowledged()){
-                                            acknowledgePurchase(purchase);
-                                        }
-                                        //TODO: 這裡可以添加訂單找回功能,防止變態用戶付完錢就殺死App的那種
+                            for (Purchase data : list) {
+                                if (data.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+                                    Log.i("Michael", "Purchase success");
+                                    if (!data.isAcknowledged()) {
+                                        acknowledgePurchase(data);
                                     }
-                                }catch (Exception e){
-                                    e.printStackTrace();
+
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (skuType.equals(BillingClient.SkuType.INAPP)){
+                                                consumePurchase(data, CONSUME_DELAY);
+                                            }
+
+                                        }
+                                    }, 2000);
+                                    //TODO:發放商品
+                                } else if (data.getPurchaseState() == Purchase.PurchaseState.PENDING) {
+
                                 }
                             }
+                        } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
+                            Log.i("Michael", "使用者取消");
+                            Toast.makeText(HomePageActivity.this,"沒關係唷~下次下次",Toast.LENGTH_LONG).show();
+                        } else if (list == null) {
+                            Log.i("Michael", "支付錯誤 : " + billingResult.getResponseCode() + " , list == null");
+                        } else {
+                            Log.i("Michael", "支付錯誤 : " + billingResult.getResponseCode());
                         }
                     }
-                });
-    }
+                }).build();
 
-    //確認訂單
-    private void acknowledgePurchase(Purchase data) {
-        AcknowledgePurchaseParams acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
-                .setPurchaseToken(data.getPurchaseToken())
-                .build();
-        AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = new AcknowledgePurchaseResponseListener() {
+        billingClient.startConnection(new BillingClientStateListener() {
             @Override
-            public void onAcknowledgePurchaseResponse(BillingResult billingResult) {
+            public void onBillingSetupFinished(BillingResult billingResult) {
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    Log.i("Michael", "Acknowledge purchase success");
+                    Log.i("Michael", "startConnection : " + BillingClient.BillingResponseCode.OK);
+                    ArrayList<String> skuList = new ArrayList<>();
+                    //商品ID
+                    skuList.add("give_me_money_every_month");
+                    skuList.add("treat_me_one_year");
+                    SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
+                    //訂閱
+                    params.setSkusList(skuList).setType(BillingClient.SkuType.SUBS);
+
+                    billingClient.querySkuDetailsAsync(params.build(), new SkuDetailsResponseListener() {
+                        @Override
+                        public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> list) {
+                            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null) {
+
+                                //列出清單
+                                View view = View.inflate(HomePageActivity.this, R.layout.payment_view, null);
+                                RecyclerView rvPay = view.findViewById(R.id.payment_recycler_view);
+                                rvPay.setLayoutManager(new LinearLayoutManager(HomePageActivity.this));
+
+                                PaymentAdapter paymentAdapter = new PaymentAdapter(list, HomePageActivity.this);
+                                rvPay.setAdapter(paymentAdapter);
+
+                                paymentDialog = new AlertDialog.Builder(HomePageActivity.this)
+                                        .setView(view).create();
+                                paymentDialog.show();
+
+
+                                paymentAdapter.setOnPaymentItemClickListener(new PaymentAdapter.OnPaymentItemClickListener() {
+                                    @Override
+                                    public void onPay(SkuDetails data) {
+
+                                        BillingFlowParams flowParams = BillingFlowParams.newBuilder()
+                                                .setSkuDetails(data)
+                                                .build();
+                                        billingClient.launchBillingFlow(HomePageActivity.this, flowParams);
+                                    }
+                                });
+
+                            }
+                        }
+                    });
                 } else {
-                    Log.i("Michael", "Acknowledge purchase fail");
+                    Toast.makeText(HomePageActivity.this, "購買頁錯誤 : " + billingResult.getResponseCode(), Toast.LENGTH_LONG).show();
                 }
             }
-        };
-        billingClient.acknowledgePurchase(acknowledgePurchaseParams, acknowledgePurchaseResponseListener);
-    }
 
-
-    @Override
-    public void showDonateDialog() {
-        Log.i("Michael", "queryList");
-        ArrayList<String> skuList = new ArrayList<>();
-        skuList.add("treat_a_box");
-        SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
-        params.setSkusList(skuList).setType(BillingClient.SkuType.INAPP);
-        billingClient.querySkuDetailsAsync(params.build(), new SkuDetailsResponseListener() {
             @Override
-            public void onSkuDetailsResponse(BillingResult billingResult, List<SkuDetails> list) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null) {
-                    for (SkuDetails skuDetails : list) {
-                        String sku = skuDetails.getSku();
-                        String price = skuDetails.getPrice();
-                        if ("treat_a_drink".equals(sku)) {
-                            drinkPrice = price;
-                        }
-                    }
-                    BillingFlowParams flowParams = BillingFlowParams.newBuilder()
-                            .setSkuDetails(list.get(0))
-                            .build();
-                    BillingResult responseCode = billingClient.launchBillingFlow(HomePageActivity.this, flowParams);
-                } else {
-                    Log.i("Michael", "QueryResponseCode :" + billingResult.getResponseCode());
-                    for (SkuDetails skuDetails : list) {
-                        String sku = skuDetails.getSku();
-                        String price = skuDetails.getPrice();
-                        if ("treat_a_drink".equals(sku)) {
-                            drinkPrice = price;
-                        }
-                    }
-                    BillingFlowParams flowParams = BillingFlowParams.newBuilder()
-                            .setSkuDetails(list.get(0))
-                            .build();
-                    BillingResult responseCode = billingClient.launchBillingFlow(HomePageActivity.this, flowParams);
+            public void onBillingServiceDisconnected() {
+                Log.i("Michael", "BillingServiceDisconnected");
 
-
-                }
             }
         });
-
-
-//        View view = View.inflate(this,R.layout.donate_dialog_view,null);
-//        Button btnThirty = view.findViewById(R.id.donate_pay_thirty);
-//        Button btnSexty = view.findViewById(R.id.donate_pay_sixty);
-//        AlertDialog dialog = new AlertDialog.Builder(this)
-//                .setView(view).create();
-//        dialog.show();
-
     }
 
 

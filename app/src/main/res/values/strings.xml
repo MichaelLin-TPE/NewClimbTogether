@@ -162,4 +162,7 @@
     <string name="donate">贊助</string>
     <string name="buy_me_drink">請我一杯飲料</string>
     <string name="i_pay">我請客</string>
+    <string name="buy">購買</string>
+    <string name="single_buy">單一次贊助</string>
+    <string name="loop_buy">週期性贊助</string>
 </resources>

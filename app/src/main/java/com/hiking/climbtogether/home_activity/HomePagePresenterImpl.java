@@ -10,7 +10,11 @@ public class HomePagePresenterImpl implements HomePagePresenter {
 
     private HomePageVu mView;
 
-    public HomePagePresenterImpl(HomePageVu mView){
+    private static final int SINGLE_BUY = 0;
+
+    private static final int LOOP_BUY = 1;
+
+    public HomePagePresenterImpl(HomePageVu mView) {
         this.mView = mView;
     }
 
@@ -42,7 +46,7 @@ public class HomePagePresenterImpl implements HomePagePresenter {
         pressedIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.chat_pressed));
         pressedIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.personal_chat_pressed));
 
-        mView.showBottomTabLayout(tabTitleArray,notPressIconArray,pressedIconArray);
+        mView.showBottomTabLayout(tabTitleArray, notPressIconArray, pressedIconArray);
     }
 
     @Override
@@ -70,8 +74,18 @@ public class HomePagePresenterImpl implements HomePagePresenter {
         mView.checkGooglePlayAccount();
     }
 
+
     @Override
-    public void onBillingSetupFinishedListener() {
-        mView.showDonateDialog();
+    public void onSelectItemClickListener(int which) {
+        switch (which) {
+            case SINGLE_BUY:
+                mView.showSingleDonateDialog();
+                break;
+            case LOOP_BUY:
+                mView.showLoopDonateDialog();
+                break;
+            default:
+                break;
+        }
     }
 }

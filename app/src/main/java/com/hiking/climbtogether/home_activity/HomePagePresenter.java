@@ -13,5 +13,5 @@ public interface HomePagePresenter {
 
     void onDonateClickListener();
 
-    void onBillingSetupFinishedListener();
+    void onSelectItemClickListener(int which);
 }
