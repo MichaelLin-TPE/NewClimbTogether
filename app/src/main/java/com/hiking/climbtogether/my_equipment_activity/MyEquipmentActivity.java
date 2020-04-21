@@ -103,7 +103,7 @@ public class MyEquipmentActivity extends AppCompatActivity implements MyEquipmen
                 presenter.onShareButtonClick();
                 break;
             case R.id.delete_icon:
-                presenter.onDeleteButtonClick();
+                presenter.onDeleteButtonClick(notPrepareArrayList,preparedArrayList);
                 break;
         }
 

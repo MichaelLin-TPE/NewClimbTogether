@@ -23,7 +23,7 @@ public interface MyEquipmentPresenter {
 
     void onShareSuccessful();
 
-    void onDeleteButtonClick();
+    void onDeleteButtonClick(ArrayList<EquipmentListDTO> notPrepareArrayList, ArrayList<EquipmentListDTO> preparedArrayList);
 
     void onDeleteAllListConfirmClick();
 

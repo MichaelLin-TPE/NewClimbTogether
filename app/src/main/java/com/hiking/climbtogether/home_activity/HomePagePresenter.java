@@ -14,4 +14,10 @@ public interface HomePagePresenter {
     void onDonateClickListener();
 
     void onSelectItemClickListener(int which);
+
+    void onCheckGoogleUpdateVersion();
+
+    void onShowUpdateDialog();
+
+    void onUpdateConfirmClickListener();
 }

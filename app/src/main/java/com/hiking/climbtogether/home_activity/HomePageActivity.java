@@ -13,6 +13,8 @@ import androidx.viewpager.widget.ViewPager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -45,6 +47,7 @@ import com.google.api.Billing;
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.member_activity.MemberActivity;
 import com.google.android.material.tabs.TabLayout;
+import com.hiking.climbtogether.tool.GoogleUpdater;
 
 import org.json.JSONException;
 
@@ -88,6 +91,8 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
         homePresenter.onPrepareData();
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+
+        homePresenter.onCheckGoogleUpdateVersion();
     }
 
 
@@ -536,6 +541,67 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
 
             }
         });
+    }
+
+    public String getVersionCode(){
+        PackageManager pm = getPackageManager();
+        PackageInfo info = null;
+        try{
+            info = pm.getPackageInfo(getPackageName(),0);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return info != null ? info.versionName+"" : "";
+    }
+
+    @Override
+    public void checkGoogleUpdate() {
+        GoogleUpdater updater = new GoogleUpdater();
+        updater.execute();
+        updater.setOnCheckUpdateListener(new GoogleUpdater.OnCheckUpdateListener() {
+            @Override
+            public void onSuccess(String result) {
+
+                double lastV = Double.parseDouble(result);
+                double currentV = Double.parseDouble(getVersionCode());
+                Log.i("Michael","lastVersion : "+lastV+" ,currentVersion : "+currentV);
+                if (currentV < lastV){
+                    homePresenter.onShowUpdateDialog();
+                }
+            }
+
+            @Override
+            public void onFail(String errorCode) {
+                Log.i("Michael","取得GOOLE PLAY 資訊錯誤 : "+errorCode);
+            }
+        });
+    }
+
+    @Override
+    public void showUpdateDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.need_to_update))
+                .setMessage(getString(R.string.search_a_new_version))
+                .setPositiveButton(getString(R.string.go_to_update), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        homePresenter.onUpdateConfirmClickListener();
+                    }
+                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    @Override
+    public void intentToGooglePlay() {
+        Intent it = new Intent(Intent.ACTION_VIEW);
+        it.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.hiking.climbtogether"));
+        startActivity(it);
     }
 
 

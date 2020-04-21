@@ -86,10 +86,15 @@ public class EquipmentFragment extends Fragment implements EquipmentVu {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        user = mAuth.getCurrentUser();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         searchPreparedData();
-        user = mAuth.getCurrentUser();
     }
 
     @Override

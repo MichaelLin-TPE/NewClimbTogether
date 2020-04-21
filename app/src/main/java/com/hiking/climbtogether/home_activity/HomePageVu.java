@@ -24,4 +24,10 @@ public interface HomePageVu {
     void showSingleDonateDialog();
 
     void showLoopDonateDialog();
+
+    void checkGoogleUpdate();
+
+    void showUpdateDialog();
+
+    void intentToGooglePlay();
 }

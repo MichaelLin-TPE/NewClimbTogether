@@ -165,4 +165,7 @@
     <string name="buy">購買</string>
     <string name="single_buy">單一次贊助</string>
     <string name="loop_buy">週期性贊助</string>
+    <string name="need_to_update">有新的版本可以更新</string>
+    <string name="search_a_new_version">偵測到有新版本,可以立即前往更新唷~*</string>
+    <string name="go_to_update">前往更新</string>
 </resources>

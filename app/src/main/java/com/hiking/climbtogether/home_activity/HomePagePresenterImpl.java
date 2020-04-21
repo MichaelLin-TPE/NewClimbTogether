@@ -88,4 +88,19 @@ public class HomePagePresenterImpl implements HomePagePresenter {
                 break;
         }
     }
+
+    @Override
+    public void onCheckGoogleUpdateVersion() {
+        mView.checkGoogleUpdate();
+    }
+
+    @Override
+    public void onShowUpdateDialog() {
+        mView.showUpdateDialog();
+    }
+
+    @Override
+    public void onUpdateConfirmClickListener() {
+        mView.intentToGooglePlay();
+    }
 }

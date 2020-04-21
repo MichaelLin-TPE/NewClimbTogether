@@ -74,8 +74,13 @@ public class MyEquipmentPresenterImpl implements MyEquipmentPresenter {
     }
 
     @Override
-    public void onDeleteButtonClick() {
-        mView.showDeleteDialog();
+    public void onDeleteButtonClick(ArrayList<EquipmentListDTO> notPrepareArrayList, ArrayList<EquipmentListDTO> preparedArrayList) {
+        if (notPrepareArrayList == null && preparedArrayList == null){
+            mView.showToast("沒有任何資訊可以刪除唷");
+        }else {
+            mView.showDeleteDialog();
+        }
+
     }
 
     @Override
