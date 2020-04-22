@@ -1,15 +1,14 @@
-package com.hiking.climbtogether.weather_parser;
+package com.hiking.climbtogether.home_fragment.json_object;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class WeatherLocationNew implements Serializable {
+public class WeatherLocation implements Serializable {
+
     @SerializedName("locationName")
     private String locationName;
-    @SerializedName("geocode")
-    private String geoCode;
     @SerializedName("lat")
     private String lat;
     @SerializedName("lon")
@@ -23,14 +22,6 @@ public class WeatherLocationNew implements Serializable {
 
     public void setLocationName(String locationName) {
         this.locationName = locationName;
-    }
-
-    public String getGeoCode() {
-        return geoCode;
-    }
-
-    public void setGeoCode(String geoCode) {
-        this.geoCode = geoCode;
     }
 
     public String getLat() {

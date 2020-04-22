@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hiking.climbtogether.R;
+import com.hiking.climbtogether.home_fragment.json_object.WeatherElement;
+import com.hiking.climbtogether.home_fragment.json_object.WeatherLocation;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -21,17 +23,13 @@ import java.util.Locale;
 
 public class WeatherRecyclerViewAdapter extends RecyclerView.Adapter<WeatherRecyclerViewAdapter.ViewHolder> {
 
-    private ArrayList<String> timeArray;
-
-    private ArrayList<String> rainArray;
-
-    private ArrayList<String> tempArray;
-
-    private ArrayList<String> imgUrlArray;
+    private ArrayList<WeatherElement> dataArray;
 
     private Context context;
 
     private DisplayImageOptions options;
+
+    private ArrayList<String> rainArray,timeArray,tempArray,descriptionArray;
 
     private ImageLoader imageLoader = ImageLoader.getInstance();
 
@@ -40,11 +38,33 @@ public class WeatherRecyclerViewAdapter extends RecyclerView.Adapter<WeatherRecy
         this.context = context;
         initImageLoader();
     }
-    public void setData( ArrayList<String> timeArray , ArrayList<String> rainArray,ArrayList<String> tempArray,ArrayList<String> imgUrlArray){
-        this.timeArray = timeArray;
-        this.rainArray = rainArray;
-        this.tempArray = tempArray;
-        this.imgUrlArray = imgUrlArray;
+    public void setData( ArrayList<WeatherElement> dataArray){
+        this.dataArray = dataArray;
+        rainArray = new ArrayList<>();
+        timeArray = new ArrayList<>();
+        tempArray = new ArrayList<>();
+        descriptionArray = new ArrayList<>();
+        for (int i = 0 ; i < dataArray.size() ; i ++){
+            for (int j = 0 ; j < dataArray.get(0).getTime().size() ; j ++){
+                if (dataArray.get(i).getDescription().equals("12小時降雨機率")){
+                    if (j % 2 == 0){
+                        rainArray.add(dataArray.get(i).getTime().get(j).getElementValue().get(0).getValue()+"%");
+                        timeArray.add(dataArray.get(i).getTime().get(j).getStartTime().substring(0,10));
+                    }
+                }
+                if (dataArray.get(i).getDescription().equals("最高溫度")){
+                    if (j % 2 == 0){
+                        tempArray.add(dataArray.get(i).getTime().get(j).getElementValue().get(0).getValue()+"%");
+                    }
+                }
+                if (dataArray.get(i).getDescription().equals("天氣預報綜合描述")){
+                    if (j % 2 == 0){
+                        descriptionArray.add(dataArray.get(i).getTime().get(j).getElementValue().get(0).getValue());
+                    }
+                }
+            }
+        }
+
     }
 
     private void initImageLoader() {
@@ -70,15 +90,27 @@ public class WeatherRecyclerViewAdapter extends RecyclerView.Adapter<WeatherRecy
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
+
+
         holder.tvTime.setText(timeArray.get(position));
         holder.tvRain.setText(rainArray.get(position));
         holder.tvTemp.setText(String.format(Locale.getDefault(),"%s℃",tempArray.get(position)));
-        imageLoader.displayImage(imgUrlArray.get(position),holder.ivIcon,options);
+//        imageLoader.displayImage(imgUrlArray.get(position),holder.ivIcon,options);
+        if (descriptionArray.get(position).contains("雲")){
+            holder.ivIcon.setImageResource(R.drawable.cloudy);
+        }else if (descriptionArray.get(position).contains("晴")){
+            holder.ivIcon.setImageResource(R.drawable.sun);
+        }else if (descriptionArray.get(position).contains("雨")){
+            holder.ivIcon.setImageResource(R.drawable.rain);
+        }else {
+            holder.ivIcon.setImageResource(R.drawable.cloudy);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return timeArray.size();
+        return dataArray == null ? 0 : dataArray.get(0).getTime().size()/2;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{

@@ -3,15 +3,16 @@ package com.hiking.climbtogether.home_fragment.json_object;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
-public class NationalParkTime implements Serializable {
+public class WeatherTime implements Serializable {
     @SerializedName("startTime")
     private String startTime;
     @SerializedName("endTime")
     private String endTime;
-
     @SerializedName("elementValue")
-    private NationalParkElementValue elementValue;
+    private ArrayList<WeatherElementValue> elementValue;
 
     public String getStartTime() {
         return startTime;
@@ -29,11 +30,11 @@ public class NationalParkTime implements Serializable {
         this.endTime = endTime;
     }
 
-    public NationalParkElementValue getElementValue() {
+    public ArrayList<WeatherElementValue> getElementValue() {
         return elementValue;
     }
 
-    public void setElementValue(NationalParkElementValue elementValue) {
+    public void setElementValue(ArrayList<WeatherElementValue> elementValue) {
         this.elementValue = elementValue;
     }
 }

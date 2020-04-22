@@ -48,9 +48,9 @@ public class WeatherViewHolder extends RecyclerView.ViewHolder {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        WeatherRecyclerViewAdapter adapter = new WeatherRecyclerViewAdapter(context);
-                        adapter.setData(timeArray,rainArray,tempArray,imgUrlArray);
-                        recyclerView.setAdapter(adapter);
+//                        WeatherRecyclerViewAdapter adapter = new WeatherRecyclerViewAdapter(context);
+//                        adapter.setData(timeArray,rainArray,tempArray,imgUrlArray);
+//                        recyclerView.setAdapter(adapter);
                     }
                 });
             }

@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class NationalParkElementValue implements Serializable {
+public class WeatherElementValue implements Serializable {
     @SerializedName("value")
     private String value;
     @SerializedName("measures")

@@ -17,6 +17,6 @@ public class WeatherSpinnerViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void setNationalNameData(ArrayList<String> nationParkNameArray) {
-        weatherSpinnerView.setData(nationParkNameArray);
+        weatherSpinnerView.showWeatherView();
     }
 }

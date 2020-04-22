@@ -1,12 +1,10 @@
 package com.hiking.climbtogether.home_fragment.weather_view;
 
-import java.util.ArrayList;
-
 public interface WeatherSpinnerPresenter {
 
-    void onShowRecyclerView();
+    void onGetWeatherData();
 
-    void onSpinnerItemSelectListener(String name, int position);
+    void onTvSpinnerClickListener();
 
-    void onShowCustomDialog(ArrayList<String> nationParkNameArray);
+    void onLocationItemClickListener(String name,int itemPosition);
 }
