@@ -9,8 +9,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class HttpConnection {
-
-
     public void startConnection(final String apiUrl, final String jsonStr, final OnPostNotificationListener listener) {
         new Thread(new Runnable() {
             @Override
@@ -56,8 +54,6 @@ public class HttpConnection {
                 }
             }
         }).start();
-
-
     }
 
 

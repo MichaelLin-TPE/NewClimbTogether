@@ -10,9 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -44,15 +46,57 @@ import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsParams;
 import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.api.Billing;
+import com.hiking.climbtogether.MainActivity;
 import com.hiking.climbtogether.R;
+import com.hiking.climbtogether.hms_tools.CipherUtil;
+import com.hiking.climbtogether.hms_tools.Key;
 import com.hiking.climbtogether.member_activity.MemberActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.hiking.climbtogether.tool.GoogleUpdater;
+import com.huawei.hianalytics.hms.HiAnalyticsTools;
+import com.huawei.hmf.tasks.OnFailureListener;
+import com.huawei.hmf.tasks.OnSuccessListener;
+import com.huawei.hmf.tasks.Task;
+import com.huawei.hms.analytics.HiAnalytics;
+import com.huawei.hms.analytics.HiAnalyticsInstance;
+import com.huawei.hms.iap.Iap;
+import com.huawei.hms.iap.IapApiException;
+import com.huawei.hms.iap.IapClient;
+import com.huawei.hms.iap.entity.ConsumeOwnedPurchaseReq;
+import com.huawei.hms.iap.entity.ConsumeOwnedPurchaseResult;
+import com.huawei.hms.iap.entity.InAppPurchaseData;
+import com.huawei.hms.iap.entity.IsEnvReadyResult;
+import com.huawei.hms.iap.entity.IsSandboxActivatedReq;
+import com.huawei.hms.iap.entity.IsSandboxActivatedResult;
+import com.huawei.hms.iap.entity.OrderStatusCode;
+import com.huawei.hms.iap.entity.ProductInfo;
+import com.huawei.hms.iap.entity.ProductInfoReq;
+import com.huawei.hms.iap.entity.ProductInfoResult;
+import com.huawei.hms.iap.entity.PurchaseIntentReq;
+import com.huawei.hms.iap.entity.PurchaseIntentResult;
+import com.huawei.hms.iap.entity.PurchaseResultInfo;
+import com.huawei.hms.iap.util.IapClientHelper;
+import com.huawei.hms.support.api.client.AidlApiClient;
+import com.huawei.hms.support.api.client.InnerApiClient;
+import com.huawei.hms.support.api.client.Status;
 
 import org.json.JSONException;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import static com.huawei.hms.analytics.type.HAEventType.ADDPRODUCT2WISHLIST;
+import static com.huawei.hms.analytics.type.HAParamType.CATEGORY;
+import static com.huawei.hms.analytics.type.HAParamType.CURRNAME;
+import static com.huawei.hms.analytics.type.HAParamType.PLACEID;
+import static com.huawei.hms.analytics.type.HAParamType.PRICE;
+import static com.huawei.hms.analytics.type.HAParamType.PRODUCTID;
+import static com.huawei.hms.analytics.type.HAParamType.PRODUCTNAME;
+import static com.huawei.hms.analytics.type.HAParamType.QUANTITY;
+import static com.huawei.hms.analytics.type.HAParamType.REVENUE;
 
 public class HomePageActivity extends AppCompatActivity implements HomePageVu {
 
@@ -80,6 +124,17 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
 
     private String skuType;
 
+    private IapClient iapClient;
+
+    private HiAnalyticsInstance instance;
+
+    private static final int REQ_CODE_BUY = 0;
+
+    private static final int SUBSCRIPTION = 2;
+
+    private static final int REQUEST_CODE = 666;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,8 +148,361 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
         homePresenter.onCheckGoogleUpdateVersion();
+
+
+        //HMS 分析系統
+        HiAnalyticsTools.enableLog();
+        instance = HiAnalytics.getInstance(this);
+        //傳送事件 給HMS分析系統
+        Bundle bundle = new Bundle();
+        bundle.putString("exam_difficulty","high");
+        bundle.putString("exam_level","1-1");
+        bundle.putString("exam_time","20190520-08");
+        bundle.putString(PRODUCTID,"123");
+        bundle.putString(PRODUCTNAME,"Michael");
+        bundle.putString(CATEGORY,"human");
+        bundle.putLong(QUANTITY,1000);
+        bundle.putLong(PRICE,20000);
+        bundle.putDouble(REVENUE,10);
+        bundle.putString(CURRNAME,"TWD");
+        bundle.putString(PLACEID,"locationID");
+        instance.onEvent("begin_examination",bundle);
+
+        //預置事件打點
+
     }
 
+    private void hmsInAppPurchase() {
+        IapClient client = Iap.getIapClient(this);
+        Task<IsSandboxActivatedResult> sandTask = client.isSandboxActivated(new IsSandboxActivatedReq());
+        sandTask.addOnSuccessListener(new OnSuccessListener<IsSandboxActivatedResult>() {
+            @Override
+            public void onSuccess(IsSandboxActivatedResult isSandboxActivatedResult) {
+
+                if (isSandboxActivatedResult.getIsSandboxApk()){
+
+                    Task<IsEnvReadyResult> task = Iap.getIapClient(HomePageActivity.this).isEnvReady();
+                    task.addOnSuccessListener(new OnSuccessListener<IsEnvReadyResult>() {
+                        @Override
+                        public void onSuccess(IsEnvReadyResult isEnvReadyResult) {
+                            if (isEnvReadyResult.getReturnCode() == 0){
+                                Log.i("Michael","沙盒測試環境成功"+" , 是否滿足沙盒條件 : "+isSandboxActivatedResult.getIsSandboxApk()+ " , 是否為沙盒帳號 : "+isSandboxActivatedResult.getIsSandboxUser()+" , 沙盒通關碼 : "+isSandboxActivatedResult.getReturnCode()+" , 市場版本 : "+isSandboxActivatedResult.getVersionFrMarket()+" , Status : "+isSandboxActivatedResult.getStatus());
+                                ArrayList<String> productIdArray = new ArrayList<>();
+                                productIdArray.add("drink");
+                                ProductInfoReq req = new ProductInfoReq();
+                                /**
+                                 * priceType: 0: consumable; 1: non-consumable; 2: auto-renewable subscription
+                                 */
+                                req.setPriceType(SUBSCRIPTION);
+                                req.setProductIds(productIdArray);
+
+                                Task<ProductInfoResult> task = Iap.getIapClient(HomePageActivity.this).obtainProductInfo(req);
+                                task.addOnSuccessListener(new OnSuccessListener<ProductInfoResult>() {
+                                    @Override
+                                    public void onSuccess(ProductInfoResult result) {
+                                        if (result != null) {
+                                            List<ProductInfo> productList = result.getProductInfoList();
+
+                                            String[] name = new String[productList.size()];
+                                            for (int i = 0; i < productList.size(); i++) {
+                                                name[i] = productList.get(i).getProductName();
+                                            }
+
+                                            AlertDialog dialog = new AlertDialog.Builder(HomePageActivity.this)
+                                                    .setItems(name, new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            if (which == 0) {
+                                                                PurchaseIntentReq purchase = new PurchaseIntentReq();
+                                                                purchase.setProductId(productList.get(which).getProductId());
+                                                                purchase.setPriceType(IapClient.PriceType.IN_APP_SUBSCRIPTION);
+                                                                purchase.setDeveloperPayload("test");
+                                                                Activity activity = HomePageActivity.this;
+                                                                Task<PurchaseIntentResult> task = Iap.getIapClient(activity).createPurchaseIntent(purchase);
+                                                                task.addOnSuccessListener(new OnSuccessListener<PurchaseIntentResult>() {
+                                                                    @Override
+                                                                    public void onSuccess(PurchaseIntentResult result) {
+
+                                                                        if (result != null) {
+                                                                            Status status = result.getStatus();
+                                                                            if (status.hasResolution()) {
+                                                                                try {
+                                                                                    status.startResolutionForResult(HomePageActivity.this, REQUEST_CODE);
+                                                                                } catch (IntentSender.SendIntentException e) {
+                                                                                    e.printStackTrace();
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }).addOnFailureListener(new OnFailureListener() {
+                                                                    @Override
+                                                                    public void onFailure(Exception e) {
+                                                                        if (e instanceof IapApiException) {
+                                                                            IapApiException apiException = (IapApiException) e;
+                                                                            Status status = apiException.getStatus();
+                                                                            int returnCode = apiException.getStatusCode();
+                                                                            Log.i("Michael", "Iap 錯誤 status : " + status + " , returnCode : " + returnCode);
+                                                                        } else {
+                                                                            Log.i("Michael", "Iap 其他錯誤 : " + e.toString());
+                                                                            // Other external errors
+                                                                        }
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                    }).create();
+                                            dialog.show();
+                                        }
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        if (e instanceof IapApiException) {
+                                            IapApiException apiException = (IapApiException) e;
+                                            int returnCode = apiException.getStatusCode();
+                                            Log.i("Michael", "IAP 錯誤 : " + returnCode);
+                                        } else {
+                                            Log.i("Michael", "其他錯誤 : " + e.toString());
+                                        }
+                                    }
+                                });
+
+
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(Exception e) {
+                            Log.i("Michael","購買啟動失敗 : "+e.toString());
+                        }
+                    });
+
+
+
+
+
+
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("Michael", "isSandboxActivated fail");
+                if (e instanceof IapApiException) {
+                    IapApiException apiException = (IapApiException)e;
+                    int returnCode = apiException.getStatusCode();
+                    Log.i("Michael","沙盒測試錯誤 : "+returnCode);
+                } else {
+                    // Other external errors
+                    Log.i("Michael","沙盒測試其他錯誤 : "+e.toString());
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        if (requestCode == REQUEST_CODE) {
+            if (data == null) {
+                Log.i("Michael", "ActivityResult data == null");
+                return;
+            }
+            PurchaseResultInfo purchaseResultInfo = Iap.getIapClient(HomePageActivity.this).parsePurchaseResultInfoFromIntent(data);
+            switch (purchaseResultInfo.getReturnCode()) {
+                case OrderStatusCode.ORDER_STATE_CANCEL:
+                    Log.i("Michael", "使用者自行取消");
+                    break;
+                case OrderStatusCode.ORDER_STATE_FAILED:
+                case OrderStatusCode.ORDER_PRODUCT_OWNED:
+                    Log.i("Michael", "商品已擁有");
+                    break;
+                case OrderStatusCode.ORDER_STATE_SUCCESS:
+                    String inAppPurchaseData = purchaseResultInfo.getInAppPurchaseData();
+                    Log.i("Michael","購買成功後的 Json : "+inAppPurchaseData);
+                    String purchaseToken = "";
+                    Log.i("Michae;","確認交易");
+
+//                    try{
+//                        InAppPurchaseData inAppPurchaseDataBean = new InAppPurchaseData(inAppPurchaseData);
+//                        purchaseToken = inAppPurchaseDataBean.getPurchaseToken();
+//                    }catch (Exception e){
+//                        Log.i("Michael","錯誤 : "+e.toString());
+//                    }
+//                    ConsumeOwnedPurchaseReq req = new ConsumeOwnedPurchaseReq();
+//                    req.setPurchaseToken(purchaseToken);
+//
+//
+//                    Task<ConsumeOwnedPurchaseResult> task = Iap.getIapClient(HomePageActivity.this).consumeOwnedPurchase(req);
+//                    task.addOnSuccessListener(new OnSuccessListener<ConsumeOwnedPurchaseResult>() {
+//                        @Override
+//                        public void onSuccess(ConsumeOwnedPurchaseResult consumeOwnedPurchaseResult) {
+//                            Log.i("Michael", "consumeOwnedPurchase success");
+//                            Toast.makeText(HomePageActivity.this, "Pay success, and the product has been delivered", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }).addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(Exception e) {
+//                            if (e instanceof IapApiException) {
+//                                IapApiException apiException = (IapApiException) e;
+//                                Status status = apiException.getStatus();
+//                                int returnCode = apiException.getStatusCode();
+//                                Log.i("Michael", "Iap 錯誤 status : " + status + " , returnCode : " + returnCode);
+//                            } else {
+//                                Log.i("Michael", "Iap 其他錯誤 : " + e.toString());
+//                                // Other external errors
+//                            }
+//                        }
+//                    });
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+
+    }
+
+    private void showProductList(List<ProductInfo> productInfoList) {
+
+        String[] productId = new String[productInfoList.size()];
+
+        for (int i = 0; i < productInfoList.size(); i++) {
+            productId[i] = productInfoList.get(i).getProductName();
+            Log.i("Michael", "productName : " + productInfoList.get(i).getProductName());
+        }
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setItems(productId, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            String productId = productInfoList.get(0).getProductId();
+                            gotoPay(HomePageActivity.this, productId, IapClient.PriceType.IN_APP_CONSUMABLE);
+                        }
+                    }
+                }).create();
+        dialog.show();
+
+
+        //這邊是顯示RecyclerView的地方
+        //假的 要刪掉
+        viewPager.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+    }
+
+    private void gotoPay(Activity activity, String productId, int type) {
+        IapClient mClient = Iap.getIapClient(activity);
+        Task<PurchaseIntentResult> task = mClient.createPurchaseIntent(createProductInfoReq(type, productId));
+        task.addOnSuccessListener(new OnSuccessListener<PurchaseIntentResult>() {
+            @Override
+            public void onSuccess(PurchaseIntentResult result) {
+                if (result == null) {
+                    Log.i("Michael", "result == null");
+                    return;
+                }
+                Status status = result.getStatus();
+                if (status == null) {
+                    Log.i("Michael", "status == null");
+                    return;
+                }
+
+                if (status.hasResolution()) {
+                    try {
+                        status.startResolutionForResult(activity, REQ_CODE_BUY);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.i("Michael", e.getMessage());
+                Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                if (e instanceof IapApiException) {
+                    IapApiException apiException = (IapApiException) e;
+                    int returnCode = apiException.getStatusCode();
+                    Log.i("Michael", "createPurchaseIntent, returnCode: " + returnCode);
+                    // handle error scenarios
+                } else {
+                    // Other external errors
+                }
+            }
+        });
+    }
+
+    private PurchaseIntentReq createProductInfoReq(int type, String productId) {
+        PurchaseIntentReq req = new PurchaseIntentReq();
+        req.setProductId(productId);
+        req.setPriceType(type);
+        req.setDeveloperPayload("test");
+        return req;
+    }
+
+    private ProductInfoReq createProductInfoReq() {
+
+        ProductInfoReq req = new ProductInfoReq();
+        // In-app product type contains:
+        // 0: consumable
+        // 1: non-consumable
+        // 2: auto-renewable subscription
+        req.setPriceType(IapClient.PriceType.IN_APP_CONSUMABLE);
+        ArrayList<String> productIds = new ArrayList<>();
+        productIds.add("drink");
+        req.setProductIds(productIds);
+        return req;
+    }
+
+    //接資料
+
+
+
+
+    private void consumeOwnedPurchase(HomePageActivity homePageActivity, String inAppPurchaseData) {
+
+        IapClient client = Iap.getIapClient(homePageActivity);
+        Task<ConsumeOwnedPurchaseResult> task = client.consumeOwnedPurchase(createConsumeOwnedPurchaseReq(inAppPurchaseData));
+        task.addOnSuccessListener(new OnSuccessListener<ConsumeOwnedPurchaseResult>() {
+            @Override
+            public void onSuccess(ConsumeOwnedPurchaseResult consumeOwnedPurchaseResult) {
+                Log.i("Michael", "consumeOwnedPurchase success");
+                Toast.makeText(homePageActivity, "Pay success, and the product has been delivered", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.i("Michael", e.getMessage());
+                Toast.makeText(homePageActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                if (e instanceof IapApiException) {
+                    IapApiException apiException = (IapApiException) e;
+                    Status status = apiException.getStatus();
+                    int returnCode = apiException.getStatusCode();
+                    Log.e("Michael", "consumeOwnedPurchase fail,returnCode: " + returnCode);
+                } else {
+                    // Other external errors
+                }
+            }
+        });
+    }
+
+    private ConsumeOwnedPurchaseReq createConsumeOwnedPurchaseReq(String inAppPurchaseData) {
+        ConsumeOwnedPurchaseReq req = new ConsumeOwnedPurchaseReq();
+        try {
+            InAppPurchaseData data = new InAppPurchaseData(inAppPurchaseData);
+            req.setPurchaseToken(data.getPurchaseToken());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return req;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -243,24 +651,28 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
     @Override
     public void checkGooglePlayAccount() {
         Log.i("Michael", "贊助");
-        ArrayList<String> paymentList = new ArrayList<>();
-        paymentList.add(getString(R.string.single_buy));
-        paymentList.add(getString(R.string.loop_buy));
-        String[] list = paymentList.toArray(new String[0]);
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setItems(list, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0){
-                            skuType = BillingClient.SkuType.INAPP;
-                        }else {
-                            skuType = BillingClient.SkuType.SUBS;
-                        }
-                        homePresenter.onSelectItemClickListener(which);
-                        dialog.dismiss();
-                    }
-                }).create();
-        dialog.show();
+
+        hmsInAppPurchase();
+
+
+//        ArrayList<String> paymentList = new ArrayList<>();
+//        paymentList.add(getString(R.string.single_buy));
+//        paymentList.add(getString(R.string.loop_buy));
+//        String[] list = paymentList.toArray(new String[0]);
+//        AlertDialog dialog = new AlertDialog.Builder(this)
+//                .setItems(list, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        if (which == 0) {
+//                            skuType = BillingClient.SkuType.INAPP;
+//                        } else {
+//                            skuType = BillingClient.SkuType.SUBS;
+//                        }
+//                        homePresenter.onSelectItemClickListener(which);
+//                        dialog.dismiss();
+//                    }
+//                }).create();
+//        dialog.show();
 
     }
 
@@ -274,9 +686,8 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
             @Override
             public void onConsumeResponse(BillingResult billingResult, String s) {
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    if (state == consumeImmediately) {
-                        Log.i("Michael", "消耗商品 : " + consumeImmediately);
-                    }
+                    Log.i("Michael", "消耗商品 : " + consumeImmediately);
+
                 } else {
                     //如果消耗不成功 那就在消耗一次
                     Log.i("Michael", "再次消耗一次");
@@ -463,7 +874,7 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
                                     handler.postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-                                            if (skuType.equals(BillingClient.SkuType.INAPP)){
+                                            if (skuType.equals(BillingClient.SkuType.INAPP)) {
                                                 consumePurchase(data, CONSUME_DELAY);
                                             }
 
@@ -476,7 +887,7 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
                             }
                         } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
                             Log.i("Michael", "使用者取消");
-                            Toast.makeText(HomePageActivity.this,"沒關係唷~下次下次",Toast.LENGTH_LONG).show();
+                            Toast.makeText(HomePageActivity.this, "沒關係唷~下次下次", Toast.LENGTH_LONG).show();
                         } else if (list == null) {
                             Log.i("Michael", "支付錯誤 : " + billingResult.getResponseCode() + " , list == null");
                         } else {
@@ -543,16 +954,16 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
         });
     }
 
-    public String getVersionCode(){
+    public String getVersionCode() {
         PackageManager pm = getPackageManager();
         PackageInfo info = null;
-        try{
-            info = pm.getPackageInfo(getPackageName(),0);
+        try {
+            info = pm.getPackageInfo(getPackageName(), 0);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return info != null ? info.versionName+"" : "";
+        return info != null ? info.versionName + "" : "";
     }
 
     @Override
@@ -565,15 +976,15 @@ public class HomePageActivity extends AppCompatActivity implements HomePageVu {
 
                 double lastV = Double.parseDouble(result);
                 double currentV = Double.parseDouble(getVersionCode());
-                Log.i("Michael","lastVersion : "+lastV+" ,currentVersion : "+currentV);
-                if (currentV < lastV){
+                Log.i("Michael", "lastVersion : " + lastV + " ,currentVersion : " + currentV);
+                if (currentV < lastV) {
                     homePresenter.onShowUpdateDialog();
                 }
             }
 
             @Override
             public void onFail(String errorCode) {
-                Log.i("Michael","取得GOOLE PLAY 資訊錯誤 : "+errorCode);
+                Log.i("Michael", "取得GOOLE PLAY 資訊錯誤 : " + errorCode);
             }
         });
     }

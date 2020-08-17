@@ -118,7 +118,6 @@ public class NewShareAdapter extends RecyclerView.Adapter<NewShareAdapter.ViewHo
                             break;
                         }
                     }
-
                     if (isChecked){
                         holder.ivLike.setImageResource(R.drawable.like_not_press);
                     }else {

@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.huawei.agconnect'
 ////for firebase Performance
 //apply plugin: 'com.google.firebase.firebase-perf'
 
@@ -10,16 +11,29 @@ android {
         applicationId "com.hiking.climbtogether"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 15
-        versionName "1.4"
+        versionCode 21
+        versionName "1.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\michael.lin\\Desktop\\key\\climbTogether.jks')
+            keyAlias 'michael.lin'
+            keyPassword 'Tommy88yy'
+            storePassword 'Tommy88yy'
+        }
     }
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug{
+            signingConfig signingConfigs.release
+        }
     }
+
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
@@ -64,5 +78,11 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'com.github.LuckSiege.PictureSelector:picture_library:v2.4.6'
 
+    //HMS
+    implementation 'com.huawei.hms:iap:4.0.2.300'
+    implementation 'com.huawei.hms:hwid:4.0.1.301'
+
+    //HMS 分析
+    implementation 'com.huawei.hms:hianalytics:4.0.3.300'
 
 }

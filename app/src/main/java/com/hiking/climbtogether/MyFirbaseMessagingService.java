@@ -89,6 +89,7 @@ public class MyFirbaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendRegistrationToServer(String token) {
+
     }
 
     public void sendNotification(String messageBody) {

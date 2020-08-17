@@ -232,6 +232,7 @@ public class MemberActivity extends AppCompatActivity implements MemberActivityV
             firestore.collection("users")
                     .document(currentUser.getEmail())
                     .set(map, SetOptions.merge());
+
         }
 
     }

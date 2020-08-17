@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
 
         switch (requestCode) {
             case REQUEST_EXTERNAL_STORAGE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                     //開啟通知權限
                     NotificationManagerCompat manager = NotificationManagerCompat.from(MainActivity.this);
                     boolean isEnable = manager.areNotificationsEnabled();

@@ -54,7 +54,7 @@ public class WeatherRecyclerViewAdapter extends RecyclerView.Adapter<WeatherRecy
                 }
                 if (dataArray.get(i).getDescription().equals("最高溫度")){
                     if (j % 2 == 0){
-                        tempArray.add(dataArray.get(i).getTime().get(j).getElementValue().get(0).getValue()+"%");
+                        tempArray.add(dataArray.get(i).getTime().get(j).getElementValue().get(0).getValue());
                     }
                 }
                 if (dataArray.get(i).getDescription().equals("天氣預報綜合描述")){

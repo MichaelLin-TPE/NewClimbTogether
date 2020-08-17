@@ -6,6 +6,7 @@ public class LoginActivityPresenterImpl implements LoginActivityPresenter {
 
     private LoginActivityVu mView;
 
+
     public LoginActivityPresenterImpl(LoginActivityVu mView){
         this.mView = mView;
     }
@@ -27,6 +28,7 @@ public class LoginActivityPresenterImpl implements LoginActivityPresenter {
             mView.showLoginFail(message);
             return;
         }
+
         mView.signIn(email,password);
     }
 
