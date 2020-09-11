@@ -1,6 +1,5 @@
 package com.hiking.climbtogether.tool;
 
-import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -8,6 +7,7 @@ import org.jsoup.select.Elements;
 
 import java.net.URL;
 import java.util.ArrayList;
+
 
 public class NationalParkWeatherAndNewsManager {
 
@@ -113,7 +113,6 @@ public class NationalParkWeatherAndNewsManager {
                 } catch (Exception e) {
                     e.printStackTrace();
                     String message = "news取得失敗 : "+e.toString();
-                    Log.i("Michael",message);
                     listener.onFail(message);
                 }
 

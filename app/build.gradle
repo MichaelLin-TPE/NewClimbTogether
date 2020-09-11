@@ -15,23 +15,23 @@ android {
         versionName "1.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    signingConfigs {
-        release {
-            storeFile file('C:\\Users\\michael.lin\\Desktop\\key\\climbTogether.jks')
-            keyAlias 'michael.lin'
-            keyPassword 'Tommy88yy'
-            storePassword 'Tommy88yy'
-        }
-    }
+//    signingConfigs {
+//        release {
+//            storeFile file('C:\\Users\\michael.lin\\Desktop\\key\\climbTogether.jks')
+//            keyAlias 'michael.lin'
+//            keyPassword 'Tommy88yy'
+//            storePassword 'Tommy88yy'
+//        }
+//    }
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        debug{
-            signingConfig signingConfigs.release
-        }
+//        debug{
+//            signingConfig signingConfigs.release
+//        }
     }
 
     compileOptions {

@@ -1,6 +1,7 @@
 <component name="libraryTable">
   <library name="Gradle: com.github.LuckSiege.PictureSelector:picture_library:v2.4.6@aar">
     <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/bedff7142c1763abfeee374a8b825868/picture_library-v2.4.6/AndroidManifest.xml" />
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/bedff7142c1763abfeee374a8b825868/picture_library-v2.4.6/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/bedff7142c1763abfeee374a8b825868/picture_library-v2.4.6/res" />
     </CLASSES>

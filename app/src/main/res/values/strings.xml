@@ -168,4 +168,5 @@
     <string name="need_to_update">有新的版本可以更新</string>
     <string name="search_a_new_version">偵測到有新版本,可以立即前往更新唷~*</string>
     <string name="go_to_update">前往更新</string>
+    <string name="error_title">錯誤訊息</string>
 </resources>

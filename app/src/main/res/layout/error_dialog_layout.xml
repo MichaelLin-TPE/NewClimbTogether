@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/error_dialog_size"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="10dp"
+    android:background="@color/white"
+    android:layout_height="@dimen/error_dialog_size">
+
+    <TextView
+        android:id="@+id/error_dialog_title"
+        android:text="@string/error_title"
+        android:textSize="@dimen/error_title_size"
+        android:gravity="center"
+        android:textColor="@color/red"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <View
+        android:id="@+id/error_dialog_line"
+        android:background="@color/grey"
+        app:layout_constraintTop_toBottomOf="@id/error_dialog_title"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <TextView
+        android:id="@+id/error_dialog_content"
+        android:layout_marginTop="5dp"
+        android:padding="10dp"
+        tools:text="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        app:layout_constraintTop_toBottomOf="@id/error_dialog_line"
+        app:layout_constraintBottom_toTopOf="@id/error_dialog_btn_confirm"
+        android:layout_marginBottom="5dp"
+        android:textColor="@color/black"
+        android:textSize="@dimen/normal_text_size"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"/>
+
+
+    <Button
+        android:id="@+id/error_dialog_btn_confirm"
+        android:text="@string/confirm"
+        android:background="@drawable/btn_selector"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/error_dialog_btn_height"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,7 +2,6 @@ package com.hiking.climbtogether;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -17,37 +16,22 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 
 import com.hiking.climbtogether.home_activity.HomePageActivity;
+import com.hiking.climbtogether.tool.ErrorDialogFragment;
+import com.hiking.climbtogether.tool.FirestoreUserData;
 import com.hiking.climbtogether.tool.UserDataManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.luck.picture.lib.listener.OnResultCallbackListener;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements MainActivityVu {
 
     private MainActivityPresenter mainPresenter;
 
     private UserDataManager userDataManager;
-
-    private FirebaseAuth mAuth;
-
-    private FirebaseUser user;
-
-    private FirebaseFirestore firestore;
 
     private int permission;
 
@@ -61,9 +45,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAuth = FirebaseAuth.getInstance();
-        user = mAuth.getCurrentUser();
-        firestore = FirebaseFirestore.getInstance();
+        ;
+
         initPresenter();
         userDataManager = new UserDataManager(this);
 
@@ -114,39 +97,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
                     boolean isEnable = manager.areNotificationsEnabled();
                     if (!isEnable) {
 
-                        AlertDialog dialog = new AlertDialog.Builder(this)
-                                .setTitle(getString(R.string.permission))
-                                .setMessage(getString(R.string.is_open_notification))
-                                .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                            //这种方案适用于 API 26, 即8.0（含8.0）以上可以用
-                                            Intent intent = new Intent();
-                                            intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-                                            intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
-                                            intent.putExtra(Settings.EXTRA_CHANNEL_ID, getApplicationInfo().uid);
-                                            startActivity(intent);
-                                        } else {
-                                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
-                                                toSystemConfig();
-                                            } else {
-                                                try {
-                                                    toApplicationInfo();
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                    toSystemConfig();
-                                                }
-                                            }
-                                        }
-                                    }
-                                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                        showPermissionDialog();
 
-                                    }
-                                }).create();
-                        dialog.show();
                     }else {
                         try {
                             Thread.sleep(2000);
@@ -158,12 +110,50 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
                         finish();
                     }
                 } else {
-                    ActivityCompat.requestPermissions(MainActivity.this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+                    Intent it = new Intent(MainActivity.this,HomePageActivity.class);
+                    startActivity(it);
+                    finish();
                 }
                 break;
             default:
                 break;
         }
+    }
+
+    private void showPermissionDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.permission))
+                .setMessage(getString(R.string.is_open_notification))
+                .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            //这种方案适用于 API 26, 即8.0（含8.0）以上可以用
+                            Intent intent = new Intent();
+                            intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                            intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                            intent.putExtra(Settings.EXTRA_CHANNEL_ID, getApplicationInfo().uid);
+                            startActivity(intent);
+                        } else {
+                            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                                toSystemConfig();
+                            } else {
+                                try {
+                                    toApplicationInfo();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    toSystemConfig();
+                                }
+                            }
+                        }
+                    }
+                }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).create();
+        dialog.show();
     }
 
     private void toApplicationInfo() {
@@ -184,22 +174,24 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
     }
 
     @Override
-    public void saveCurrentUserData() {
-        if (user != null && user.getEmail() != null) {
-            firestore.collection("users")
-                    .document(user.getEmail())
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                DocumentSnapshot snapshot = task.getResult();
-                                userDataManager.saveUserData((String) snapshot.get("email"), (String) snapshot.get("displayName"), (String) snapshot.get("photoUrl"));
-                            }
-                        }
-                    });
+    public void saveCurrentUserData(FirestoreUserData data) {
 
-        }
+        Log.i("Michael","準備儲存 : "+data.getEmail() + " , displayName : "+ data.getDisplayName());
+        userDataManager.saveUserData(data.getEmail(), data.getDisplayName(), data.getPhotoUrl());
+
+    }
+
+    @Override
+    public void showErrorDialog(String errorCode) {
+
+        ErrorDialogFragment.newInstance(errorCode).setOnErrorClickListener(new ErrorDialogFragment.OnErrorDialogClickListener() {
+            @Override
+            public void onClick() {
+
+            }
+        }).show(getSupportFragmentManager(),"dialog");
+
+
     }
 
 
@@ -219,7 +211,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
 
                             Log.i("Michael", "new Token : " + token);
                             userDataManager.saveNotificationToken(token);
-                            updateUserToken(token);
+
+                            mainPresenter.onUpdateUserToken(token);
                             mainPresenter.onSaveCurrentUserData();
                         }
 
@@ -234,13 +227,5 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
         }
     }
 
-    private void updateUserToken(String token) {
-        if (user != null && user.getEmail() != null) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("token", token);
-            firestore.collection("users").document(user.getEmail())
-                    .set(map, SetOptions.merge());
-        }
-    }
 
 }
