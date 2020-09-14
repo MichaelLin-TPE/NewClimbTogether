@@ -32,12 +32,15 @@ import com.hiking.climbtogether.detail_activity.DetailActivity;
 import com.hiking.climbtogether.home_fragment.weather_view.WeatherDialogAdapter;
 import com.hiking.climbtogether.login_activity.LoginActivity;
 import com.hiking.climbtogether.db_modle.DataDTO;
+import com.hiking.climbtogether.tool.ErrorDialogFragment;
 import com.hiking.climbtogether.tool.FireStoreManager;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.hiking.climbtogether.tool.FirebaseHandler;
+import com.hiking.climbtogether.tool.FirebaseHandlerImpl;
 import com.hiking.climbtogether.tool.UserDataManager;
 
 import java.text.SimpleDateFormat;
@@ -96,6 +99,14 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     private ArrayList<String> spinnerData;
 
+    private FirebaseHandler firebaseHandler;
+
+    private ArrayList<DataDTO> allInformationArray;
+
+    private int sid, itemPosition;
+
+    private DataDTO dataDTO;
+
     public static MountainFragment newInstance() {
         MountainFragment fragment = new MountainFragment();
 
@@ -104,7 +115,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     @Override
     public void onAttach(Context context) {
-        Log.i("Michael","Mt onAttach");
+        Log.i("Michael", "Mt onAttach");
         super.onAttach(context);
         this.context = context;
     }
@@ -113,11 +124,12 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("Michael","Mt onCreate");
+        Log.i("Michael", "Mt onCreate");
         mAuth = FirebaseAuth.getInstance();
         adapter = new MountainRecyclerViewAdapter(context);
         manager = new FireStoreManager();
         userDataManager = new UserDataManager(context);
+        firebaseHandler = new FirebaseHandlerImpl();
 
         initPresenter();
 
@@ -126,7 +138,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     @Override
     public void onStart() {
         super.onStart();
-        Log.i("Michael","Mt onStart");
+        Log.i("Michael", "Mt onStart");
         user = mAuth.getCurrentUser();
 
     }
@@ -134,7 +146,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     @Override
     public void onPause() {
         super.onPause();
-        Log.i("Michael","Mt onPause");
+        Log.i("Michael", "Mt onPause");
         adapter.setData(new ArrayList<DataDTO>());
         adapter.notifyDataSetChanged();
     }
@@ -142,97 +154,85 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     @Override
     public void onStop() {
         super.onStop();
-        Log.i("Michael","Mt onStop");
+        Log.i("Michael", "Mt onStop");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.i("Michael","Mt onResume");
-        user = mAuth.getCurrentUser();
-        if (user != null){
-            Log.i("Michael","onResume 有用戶");
-            String email = user.getEmail();
-            presenter.onSearchDbData(email);
-        }else {
-            Log.i("Michael","onResume 沒用戶");
-            presenter.initDbData();
-        }
+        Log.i("Michael", "Mt onResume");
+        presenter.onActivityCreated();
+
     }
 
-    private void initDbData() {
-        user = mAuth.getCurrentUser();
-        if (user != null){
-            String email = user.getEmail();
-            Log.i("Michael","有使用者 : "+email);
-            presenter.onSearchDbData(email);
-        }else {
-            Log.i("Michael","無使用者");
-            presenter.initDbData();
-        }
-    }
+
     @Override
-    public void searchDataFromDb(String email, final ArrayList<DataDTO> allInformation) {
+    public void searchDataFromDb(String email, final ArrayList<DataDTO> allInformationArray) {
 
-        if (getActivity() != null){
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.i("Michael","searchDataFromDb");
-                    firestoreData = new ArrayList<>();
-                    timeArray = new ArrayList<>();
-
-                    manager.setFirstCollection(COLLECTION_MOUNTAIN);
-                    manager.setFirstDocument(email);
-                    manager.setSecondCollection(COLLECTION);
-                    manager.catchTwoCollectionData(new FireStoreManager.OnConnectingFirebaseListener() {
-                        @Override
-                        public void onSuccess(Task<QuerySnapshot> task) {
-                            if (getActivity() != null){
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (task.isSuccessful() && task.getResult() != null ){
-                                            for (QueryDocumentSnapshot document : task.getResult()){
-                                                Log.i("Michael",document.getId() + " =>" + document.getData());
-                                                Map<String,Object> map = document.getData();
-                                                Log.i("Michael","time : "+map.get("topTime"));
-                                                timeArray.add((Long) map.get("topTime"));
-                                                firestoreData.add(document.getId());
-                                            }
-                                            if (firestoreData.size() != 0 && timeArray.size() != 0){
-                                                Log.i("Michael","有資料的Email做到這 : "+firestoreData.size());
-                                                presenter.onModifyDataFromFirestore(firestoreData,timeArray,allInformation);
-                                            }else {
-                                                presenter.initDbData();
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
-            });
+        if (getActivity() == null) {
+            Log.i("Michael", "MountainFragment getActivity() == null");
+            return;
         }
+        this.allInformationArray = allInformationArray;
+
+        Log.i("Michael", "searchDataFromDb");
+        firestoreData = new ArrayList<>();
+        timeArray = new ArrayList<>();
+
+        firebaseHandler.OnCatchTwoCollectionData(COLLECTION_MOUNTAIN, COLLECTION, email, catchTwoCollectionListener);
+
     }
+
+    private FirebaseHandler.OnConnectFireStoreListener<Task<QuerySnapshot>> catchTwoCollectionListener = new FirebaseHandler.OnConnectFireStoreListener<Task<QuerySnapshot>>() {
+        @Override
+        public void onSuccess(Task<QuerySnapshot> data) {
+
+            if (data == null || data.getResult() == null) {
+                presenter.onShowErrorCode("FireStore 資料取得錯誤");
+                return;
+            }
+
+            for (QueryDocumentSnapshot document : data.getResult()) {
+                Log.i("Michael", document.getId() + " =>" + document.getData());
+                Map<String, Object> map = document.getData();
+                Log.i("Michael", "time : " + map.get("topTime"));
+                timeArray.add((Long) map.get("topTime"));
+                firestoreData.add(document.getId());
+            }
+
+            if (firestoreData.size() == 0 || timeArray.size() == 0) {
+                presenter.initDbData();
+                return;
+            }
+            presenter.onModifyDataFromFirestore(firestoreData, timeArray, allInformationArray);
+        }
+
+        @Override
+        public void onFail(String errorCode) {
+            presenter.onShowErrorCode(errorCode);
+        }
+    };
 
     @Override
     public void readyToProvideData() {
-        if (getActivity() != null){
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    presenter.onPrepareData();
-                }
-            });
+
+
+        if (getActivity() == null) {
+            return;
         }
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                presenter.onPrepareData();
+            }
+        });
+
 
     }
 
     @Override
     public void showProgressbar(boolean isShow) {
-        if (getActivity() != null){
+        if (getActivity() != null) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -244,9 +244,9 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     @Override
     public void setSpinner(ArrayList<String> spinnerData) {
-        if (!userDataManager.getMountainSortType().isEmpty()){
+        if (!userDataManager.getMountainSortType().isEmpty()) {
             spinner.setText(userDataManager.getMountainSortType());
-        }else {
+        } else {
             spinner.setText(spinnerData.get(0));
         }
         spinner.setOnClickListener(new View.OnClickListener() {
@@ -271,7 +271,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Log.i("Michael","Mt onCreateView");
+        Log.i("Michael", "Mt onCreateView");
         View view = inflater.inflate(R.layout.fragment_mountain, container, false);
         initView(view);
         return view;
@@ -280,10 +280,13 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.i("Michael","Mt onActivityCreated");
-        initDbData();
+        Log.i("Michael", "Mt onActivityCreated");
+
+        presenter.onActivityCreated();
+//        initDbData();
 
     }
+
 
     private void initView(View view) {
         spinner = view.findViewById(R.id.mountain_fragment_spinner);
@@ -304,19 +307,17 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
-                if (actionId == EditorInfo.IME_ACTION_SEARCH){
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     presenter.onSearchMtListener(edSearchMt.getText().toString());
                     edSearchMt.setText("");
                     //輸入完收起鍵盤
-                    if (getActivity() != null){
-                        InputMethodManager im = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                        if (im != null){
-                            im.hideSoftInputFromWindow(edSearchMt.getWindowToken(),
-                                    InputMethodManager.HIDE_NOT_ALWAYS);
-                        }
 
+                    InputMethodManager im = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (im == null) {
+                        return true;
                     }
-
+                    im.hideSoftInputFromWindow(edSearchMt.getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
                 }
 
                 return true;
@@ -407,34 +408,23 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     @Override
     public void setRecyclerView(ArrayList<DataDTO> allInformation) {
-        if (getActivity() != null){
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    adapter.setData(allInformation);
-                    recyclerView.setAdapter(adapter);
-                    adapter.setOnMountainItemClickListener(new MountainRecyclerViewAdapter.OnMountainItemClickListener() {
-                        @Override
-                        public void onClick(DataDTO data) {
-                            presenter.onMountainItemClick(data);
-                        }
-
-                        @Override
-                        public void onIconClick(int sid,DataDTO data,int itemPosition) {
-                            user = mAuth.getCurrentUser();
-                            if (user != null) {
-                                presenter.onShowDatePicker(sid,data,itemPosition);
-                            } else {
-                                presenter.onLoginEvent();
-                            }
-                        }
-                    });
-                    presenter.onPrepareSpinnerData();
-                }
-            });
-        }
 
 
+        adapter.setData(allInformation);
+        recyclerView.setAdapter(adapter);
+        adapter.setOnMountainItemClickListener(new MountainRecyclerViewAdapter.OnMountainItemClickListener() {
+            @Override
+            public void onClick(DataDTO data) {
+                presenter.onMountainItemClick(data);
+            }
+
+            @Override
+            public void onIconClick(int sid, DataDTO data, int itemPosition) {
+
+                presenter.onMtListItemIconClickListener(data, itemPosition);
+            }
+        });
+        presenter.onPrepareSpinnerData();
 
     }
 
@@ -444,7 +434,7 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     }
 
     @Override
-    public void setDataChange(ArrayList<DataDTO> dataDTO,String isSHow) {
+    public void setDataChange(ArrayList<DataDTO> dataDTO, String isSHow) {
         adapter.setData(dataDTO);
         adapter.notifyDataSetChanged();
         Toast.makeText(context, isSHow.equals("true") ? "此筆資料已加入我的戰績" : "已從我的戰績移除", Toast.LENGTH_LONG).show();
@@ -452,8 +442,8 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     @Override
     public void intentToMtDetailActivity(DataDTO data) {
-        Intent it = new Intent(context ,DetailActivity.class);
-        it.putExtra("data",data);
+        Intent it = new Intent(context, DetailActivity.class);
+        it.putExtra("data", data);
         context.startActivity(it);
 
     }
@@ -464,10 +454,10 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         ArrayList<Integer> imageArray = new ArrayList<>();
         imageArray.add(R.drawable.native_icon);
         imageArray.add(R.drawable.sort);
-        View view = View.inflate(getActivity(),R.layout.weather_spinner_dialog,null);
+        View view = View.inflate(getActivity(), R.layout.weather_spinner_dialog, null);
         RecyclerView recyclerView = view.findViewById(R.id.weather_dialog_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        WeatherDialogAdapter adapter = new WeatherDialogAdapter(getActivity(),spinnerData,imageArray);
+        WeatherDialogAdapter adapter = new WeatherDialogAdapter(getActivity(), spinnerData, imageArray);
         recyclerView.setAdapter(adapter);
         AlertDialog dialog = new AlertDialog.Builder(getActivity())
                 .setView(view).create();
@@ -488,9 +478,32 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         userDataManager.saveMountainSortType(spinnerData.get(position));
     }
 
+    @Override
+    public void showErrorCode(String errorCode) {
+
+        if (getActivity() == null) {
+            Log.i("Michael", "MountainFragment getActivity() == null");
+            return;
+        }
+
+        ErrorDialogFragment.newInstance(errorCode).show(getActivity().getSupportFragmentManager(), "dialog");
+    }
+
+    @Override
+    public void updateRecyclerView(ArrayList<DataDTO> dataArrayList) {
+        adapter.setData(dataArrayList);
+        adapter.notifyDataSetChanged();
+        Toast.makeText(context, "資料已修正", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public String getSortType() {
+        return userDataManager.getMountainSortType();
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void showDatePick(final int sid, DataDTO data, int itemPosition) {
+    public void showDatePick(DataDTO data, int itemPosition) {
         datePicker = new DatePicker(context);
 
         AlertDialog dialog = new AlertDialog.Builder(context)
@@ -499,12 +512,11 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Log.i("Michael", "時間為 : " + topTime);
-                        if (topTime == null || topTime.isEmpty()){
-                            topTime = new SimpleDateFormat("yyyy/MM/dd",Locale.TAIWAN).format(new Date(System.currentTimeMillis()));
+                        if (topTime == null || topTime.isEmpty()) {
+                            topTime = new SimpleDateFormat("yyyy/MM/dd", Locale.TAIWAN).format(new Date(System.currentTimeMillis()));
                         }
                         String isShow = "true";
-                        presenter.onTopIconChange(sid,isShow,topTime,data,itemPosition);
-                        presenter.onCreateDocumentInFirestore(sid, topTime);
+                        presenter.onTopIconChange(isShow, topTime, data, itemPosition);
                     }
                 }).setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     @Override
@@ -538,41 +550,13 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     @Override
     public void setFirestore(final int sid, long topTime, DataDTO data) {
-        user = mAuth.getCurrentUser();
-        if (user != null) {
-            String email = user.getEmail();
-            String mountainName = data.getName();
-            if (email != null) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("name", data.getName());
-                map.put("topTime", topTime);
-                map.put("sid", data.getSid());
-                map.put("photoUrl","");
-                manager.setFirstCollection(COLLECTION_MOUNTAIN);
-                manager.setFirstDocument(user.getEmail());
-                manager.setSecondCollection(COLLECTION);
-                manager.setSecondDocument(mountainName);
-                manager.setMap(map);
-                manager.setTwoDocumentData(new FireStoreManager.OnFirebaseSetDocumentListener() {
-                    @Override
-                    public void onSuccessful() {
-                        if (getActivity() != null){
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Log.i("Michael","資料增加成功");
-                                }
-                            });
-                        }
-                    }
-
-                    @Override
-                    public void onFailure() {
-
-                    }
-                });
-            }
-        }
+        String mountainName = data.getName();
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", data.getName());
+        map.put("topTime", topTime);
+        map.put("sid", data.getSid());
+        map.put("photoUrl", "");
+        firebaseHandler.onSetSwoDocumentData(COLLECTION_MOUNTAIN, COLLECTION, map, mountainName);
     }
 
     @Override
@@ -581,31 +565,30 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         context.startActivity(it);
     }
 
+
     @Override
     public void deleteFavorite(final int sid, DataDTO dataDTO, int itemPosition) {
-        user = mAuth.getCurrentUser();
-        if (user != null) {
-            String email = user.getEmail();
-            if (email != null) {
-                manager.setFirstCollection(email);
-                manager.setFirstDocument(dataDTO.getName());
-                manager.deleteDocument(new FireStoreManager.OnFirebaseDeleteListener() {
-                    @Override
-                    public void onSuccessful() {
-                        String isShow = "false";
-                        presenter.onTopIconChange(sid,isShow,null, dataDTO, itemPosition);
-                    }
 
-                    @Override
-                    public void onFailure() {
-                        Log.i("Michael","刪除失敗");
-                    }
-                });
-            }
-        }
+        this.sid = sid;
+        this.dataDTO = dataDTO;
+        this.itemPosition = itemPosition;
+        firebaseHandler.onDeleteDocument(COLLECTION_MOUNTAIN, COLLECTION, dataDTO.getName(), onDeleteDocumentListener);
+
+
     }
 
+    private FirebaseHandler.OnConnectFireStoreSuccessfulListener onDeleteDocumentListener = new FirebaseHandler.OnConnectFireStoreSuccessfulListener() {
+        @Override
+        public void onSuccess() {
+            String isShow = "false";
+            presenter.onTopIconChange(isShow, null, dataDTO, itemPosition);
+        }
 
+        @Override
+        public void onFail(String errorCode) {
+            presenter.onShowErrorCode(errorCode);
+        }
+    };
 
 
 }

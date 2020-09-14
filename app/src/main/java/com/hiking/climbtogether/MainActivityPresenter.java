@@ -7,4 +7,6 @@ public interface MainActivityPresenter {
     void onSaveCurrentUserData();
 
     void onUpdateUserToken(String token);
+
+    void onIntentToHomeActivity();
 }

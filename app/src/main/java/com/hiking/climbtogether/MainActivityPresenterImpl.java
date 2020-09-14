@@ -51,4 +51,9 @@ public class MainActivityPresenterImpl implements MainActivityPresenter {
         }
 
     }
+
+    @Override
+    public void onIntentToHomeActivity() {
+        mView.intentToHomeActivity();
+    }
 }

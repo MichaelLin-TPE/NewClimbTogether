@@ -19,7 +19,7 @@ public interface MountainFragmentVu {
 
     void setDataChange(ArrayList<DataDTO> dataDTO,String isShow);
 
-    void showDatePick(int sid, DataDTO data, int itemPosition);
+    void showDatePick(DataDTO data, int itemPosition);
 
     void setFirestore(int sid, long topTime,DataDTO data);
 
@@ -42,4 +42,10 @@ public interface MountainFragmentVu {
     void showSpinnerDialog(ArrayList<String> spinnerData);
 
     void saveSortType(int position);
+
+    void showErrorCode(String errorCode);
+
+    void updateRecyclerView(ArrayList<DataDTO> dataArrayList);
+
+    String getSortType();
 }

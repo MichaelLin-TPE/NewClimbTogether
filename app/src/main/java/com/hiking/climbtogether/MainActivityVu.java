@@ -9,4 +9,6 @@ public interface MainActivityVu {
     void saveCurrentUserData(FirestoreUserData data);
 
     void showErrorDialog(String errorCode);
+
+    void intentToHomeActivity();
 }

@@ -1,5 +1,9 @@
 package com.hiking.climbtogether.home_activity;
 
+import com.android.billingclient.api.SkuDetails;
+
+import java.util.List;
+
 public interface HomePagePresenter {
     void onPrepareData();
 
@@ -20,4 +24,8 @@ public interface HomePagePresenter {
     void onShowUpdateDialog();
 
     void onUpdateConfirmClickListener();
+
+    void OnPrintOrderList(List<SkuDetails> list);
+
+    void onDonateError(String errorMessage);
 }

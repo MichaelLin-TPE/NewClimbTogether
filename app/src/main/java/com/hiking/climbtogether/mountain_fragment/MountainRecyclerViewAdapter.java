@@ -1,7 +1,6 @@
 package com.hiking.climbtogether.mountain_fragment;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.hiking.climbtogether.R;
 import com.hiking.climbtogether.db_modle.DataDTO;
+import com.hiking.climbtogether.tool.ImageLoaderProvider;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.text.SimpleDateFormat;
@@ -58,11 +58,13 @@ public class MountainRecyclerViewAdapter extends RecyclerView.Adapter<MountainRe
 
         holder.tvDifficulty.setText(String.format(Locale.getDefault(),"難易度 : %s",data.getDifficulty()));
 
-        byte[] ab = data.getPhoto();
+        ImageLoaderProvider.getInstance().setImage(data.getphoto(),holder.ivIcon);
 
-        if (ab != null){
-            holder.ivIcon.setImageBitmap(BitmapFactory.decodeByteArray(ab,0,ab.length));
-        }
+//        byte[] ab = data.getPhoto();
+//
+//        if (ab != null){
+//            holder.ivIcon.setImageBitmap(BitmapFactory.decodeByteArray(ab,0,ab.length));
+//        }
 
         holder.ivTopIcon.setImageResource(data.getCheck().equals("false") ? R.drawable.flag_no_top : R.drawable.flag_top);
 
@@ -97,7 +99,8 @@ public class MountainRecyclerViewAdapter extends RecyclerView.Adapter<MountainRe
         return dataArrayList == null ? 0 : dataArrayList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder{
+
 
         private TextView tvTitle,tvHeight,tvDifficulty,tvLocation,tvTime;
         private ImageView ivTopIcon;

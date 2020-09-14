@@ -18,6 +18,7 @@
         android:roundIcon="@mipmap/climb_together_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:name=".tool.ClimbTogetherApplication"
         android:windowSoftInputMode="adjustResize">
         <activity android:name=".vote_list_activity.VoteListActivity"></activity>
         <activity android:name=".vote_activity.VoteActivity" />

@@ -100,19 +100,11 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
                         showPermissionDialog();
 
                     }else {
-                        try {
-                            Thread.sleep(2000);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        Intent it = new Intent(MainActivity.this,HomePageActivity.class);
-                        startActivity(it);
-                        finish();
+                        mainPresenter.onIntentToHomeActivity();
+
                     }
                 } else {
-                    Intent it = new Intent(MainActivity.this,HomePageActivity.class);
-                    startActivity(it);
-                    finish();
+                    mainPresenter.onIntentToHomeActivity();
                 }
                 break;
             default:
@@ -192,6 +184,18 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
         }).show(getSupportFragmentManager(),"dialog");
 
 
+    }
+
+    @Override
+    public void intentToHomeActivity() {
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Intent it = new Intent(MainActivity.this,HomePageActivity.class);
+        startActivity(it);
+        finish();
     }
 
 

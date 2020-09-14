@@ -11,7 +11,7 @@ public interface MountainFragmentPresenter {
 
     void onPrepareData();
 
-    void onTopIconChange(int sid, String isShow, String topTime, DataDTO data, int itemPosition);
+    void onTopIconChange(String isShow, String topTime, DataDTO data, int itemPosition);
 
     void onShowDatePicker(int sid, DataDTO data, int itemPosition);
 
@@ -34,4 +34,10 @@ public interface MountainFragmentPresenter {
     void onShowSpinnerDialog(ArrayList<String> spinnerData);
 
     void onSearchMtListener(CharSequence searchContent);
+
+    void onShowErrorCode(String errorCode);
+
+    void onActivityCreated();
+
+    void onMtListItemIconClickListener(DataDTO data, int itemPosition);
 }

@@ -75,7 +75,7 @@ public class MountainCollectionPresenterImpl implements MountainCollectionPresen
                     DataDTO dataDTO = db.getDataBySid(data.getSid());
                     dataDTO.setTime(timeArray.get(i));
                     dataDTO.setCheck("true");
-                    dataDTO.setUserPhoto(downloadUrlArray.get(i));
+                    dataDTO.setphoto(downloadUrlArray.get(i));
                     db.update(dataDTO);
                     break;
                 }
@@ -137,7 +137,7 @@ public class MountainCollectionPresenterImpl implements MountainCollectionPresen
             case REMOVE_DATA:
                 DataDTO data = db.getDataBySid(dataDTO.getSid());
                 data.setCheck("false");
-                data.setUserPhoto("");
+                data.setphoto("");
                 data.setTime(0);
                 db.update(data);
                 mView.changeRecyclerView(position);

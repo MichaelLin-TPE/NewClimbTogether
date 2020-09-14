@@ -2,9 +2,11 @@ package com.hiking.climbtogether.home_activity;
 
 import android.graphics.drawable.Drawable;
 
-import com.hiking.climbtogether.R;
+import com.android.billingclient.api.SkuDetails;
+import com.hiking.climbtogether.tool.DataProvider;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomePagePresenterImpl implements HomePagePresenter {
 
@@ -20,31 +22,16 @@ public class HomePagePresenterImpl implements HomePagePresenter {
 
     @Override
     public void onPrepareData() {
-        ArrayList<String> tabTitleArray = new ArrayList<>();
-        tabTitleArray.add(mView.getVuContext().getResources().getString(R.string.home));
-        tabTitleArray.add(mView.getVuContext().getResources().getString(R.string.mountain));
-        tabTitleArray.add(mView.getVuContext().getResources().getString(R.string.equipment));
-        tabTitleArray.add(mView.getVuContext().getResources().getString(R.string.discuss));
-        tabTitleArray.add(mView.getVuContext().getString(R.string.personal_chat));
+        ArrayList<String> tabTitleArray = DataProvider.getInstance().getTabTitleArray();
         /**
          * 未點擊
          */
-        ArrayList<Drawable> notPressIconArray = new ArrayList<>();
-        notPressIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.home_not_press));
-        notPressIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.mt_not_press));
-        notPressIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.equipment_not_press));
-        notPressIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.chat_not_press));
-        notPressIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.personal_chat_not_pressed));
+        ArrayList<Drawable> notPressIconArray = DataProvider.getInstance().getNotPressIconArray();
 
         /**
          * 點擊後
          */
-        ArrayList<Drawable> pressedIconArray = new ArrayList<>();
-        pressedIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.home_pressed));
-        pressedIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.mt_pressed));
-        pressedIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.equipment_pressed));
-        pressedIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.chat_pressed));
-        pressedIconArray.add(mView.getVuContext().getResources().getDrawable(R.drawable.personal_chat_pressed));
+        ArrayList<Drawable> pressedIconArray = DataProvider.getInstance().getPressedIconArray();
 
         mView.showBottomTabLayout(tabTitleArray, notPressIconArray, pressedIconArray);
     }
@@ -102,5 +89,15 @@ public class HomePagePresenterImpl implements HomePagePresenter {
     @Override
     public void onUpdateConfirmClickListener() {
         mView.intentToGooglePlay();
+    }
+
+    @Override
+    public void OnPrintOrderList(List<SkuDetails> list) {
+        mView.printOrderList(list);
+    }
+
+    @Override
+    public void onDonateError(String errorMessage) {
+        mView.showToast(errorMessage);
     }
 }

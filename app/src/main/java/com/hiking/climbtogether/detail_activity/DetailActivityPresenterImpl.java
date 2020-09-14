@@ -38,7 +38,7 @@ public class DetailActivityPresenterImpl implements DetailActivityPresenter {
         if (isCheck){
             //資料新增
 
-            mView.uploadMtPhoto(data.getPhoto());
+//            mView.uploadMtPhoto(data.getPhoto());
 
             mView.showFavoriteStatus(true);
 

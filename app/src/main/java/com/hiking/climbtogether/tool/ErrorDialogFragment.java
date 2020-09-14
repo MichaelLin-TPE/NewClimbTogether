@@ -2,6 +2,7 @@ package com.hiking.climbtogether.tool;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,10 +44,7 @@ public class ErrorDialogFragment extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() == null){
-            return;
-        }
-        errorCode = getArguments().getString("error","");
+
     }
 
     @NonNull
@@ -67,6 +65,12 @@ public class ErrorDialogFragment extends DialogFragment {
     }
 
     private void initView(View view) {
+
+        if (getArguments() == null){
+            Log.i("Michael","getArgument == null");
+            return;
+        }
+        errorCode = getArguments().getString("error","");
         tvContent = view.findViewById(R.id.error_dialog_content);
         btnConfirm = view.findViewById(R.id.error_dialog_btn_confirm);
 
@@ -74,6 +78,10 @@ public class ErrorDialogFragment extends DialogFragment {
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (listener == null){
+                    dismiss();
+                    return;
+                }
                 listener.onClick();
                 dismiss();
             }

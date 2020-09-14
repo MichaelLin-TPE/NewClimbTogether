@@ -39,7 +39,7 @@ public class MtPresenterImpl implements MtPresenter {
 
     @Override
     public void onBindPhotoViewHolder(PhotoViewHolder holder, int position) {
-        holder.setData(data.getPhoto());
+//        holder.setData(data.getPhoto());
     }
 
     @Override

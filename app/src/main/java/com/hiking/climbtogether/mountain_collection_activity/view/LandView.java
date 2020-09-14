@@ -54,9 +54,9 @@ public class LandView extends ConstraintLayout {
         tvTime.setText(String.format(Locale.getDefault(),"日期 : %s",new SimpleDateFormat("yyyy/MM/dd",Locale.TAIWAN).format(new Date(dataDTO.getTime()))));
         clickArea.setBackground(isColorChange ? ContextCompat.getDrawable(context, R.drawable.mountain_collection_green)
                 : ContextCompat.getDrawable(context,R.drawable.mountain_collection_blue));
-        if (!dataDTO.getUserPhoto().isEmpty()){
+        if (!dataDTO.getphoto().isEmpty()){
             ivIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            NewImageLoaderManager.getInstance(context).setPhotoUrl(dataDTO.getUserPhoto(),ivIcon);
+            NewImageLoaderManager.getInstance(context).setPhotoUrl(dataDTO.getphoto(),ivIcon);
         }else {
             ivIcon.setScaleType(ImageView.ScaleType.FIT_CENTER);
             Log.i("Michael","照片沒資料");

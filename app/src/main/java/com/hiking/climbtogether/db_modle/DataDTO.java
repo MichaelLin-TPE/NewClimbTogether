@@ -16,19 +16,17 @@ public class DataDTO implements Serializable {
     private String height;
     @SerializedName("day")
     private String day;
-    @SerializedName("day")
+    @SerializedName("content")
     private String content;
-    @SerializedName("day")
-    private byte[] photo;
-    @SerializedName("day")
+    @SerializedName("location")
     private String location;
-    @SerializedName("day")
+    @SerializedName("difficulty")
     private String difficulty;
-    @SerializedName("day")
+    @SerializedName("check")
     private String check;
-    @SerializedName("day")
-    private String userPhoto;
-    @SerializedName("day")
+    @SerializedName("photo")
+    private String photo;
+    @SerializedName("time")
     private long time;
 
     private String allTitle;
@@ -51,12 +49,12 @@ public class DataDTO implements Serializable {
         this.allTitle = allTitle;
     }
 
-    public String getUserPhoto() {
-        return userPhoto;
+    public String getphoto() {
+        return photo;
     }
 
-    public void setUserPhoto(String userPhoto) {
-        this.userPhoto = userPhoto;
+    public void setphoto(String photo) {
+        this.photo = photo;
     }
 
     public int getSid() {
@@ -99,13 +97,6 @@ public class DataDTO implements Serializable {
         this.content = content;
     }
 
-    public byte[] getPhoto() {
-        return photo;
-    }
-
-    public void setPhoto(byte[] photo) {
-        this.photo = photo;
-    }
 
     public String getLocation() {
         return location;
@@ -145,12 +136,11 @@ public class DataDTO implements Serializable {
         height = cursor.getString(cursor.getColumnIndex("height"));
         day = cursor.getString(cursor.getColumnIndex("day"));
         content = cursor.getString(cursor.getColumnIndex("content"));
-        photo = cursor.getBlob(cursor.getColumnIndex("photo"));
         location = cursor.getString(cursor.getColumnIndex("location"));
         difficulty = cursor.getString(cursor.getColumnIndex("difficulty"));
         check = cursor.getString(cursor.getColumnIndex("check_top"));
         time = cursor.getLong(cursor.getColumnIndex("time"));
-        userPhoto = cursor.getString(cursor.getColumnIndex("user_photo"));
+        photo = cursor.getString(cursor.getColumnIndex("user_photo"));
         allTitle = cursor.getString(cursor.getColumnIndex("all_title"));
         weatherUrl = cursor.getString(cursor.getColumnIndex("weather_url"));
     }
@@ -159,7 +149,7 @@ public class DataDTO implements Serializable {
         ContentValues data = new ContentValues();
         data.put("check_top",this.check);
         data.put("time",time);
-        data.put("user_photo",userPhoto);
+        data.put("user_photo",photo);
         return data;
     }
 }

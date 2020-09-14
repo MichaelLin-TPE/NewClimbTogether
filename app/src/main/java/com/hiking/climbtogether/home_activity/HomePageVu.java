@@ -3,7 +3,10 @@ package com.hiking.climbtogether.home_activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 
+import com.android.billingclient.api.SkuDetails;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public interface HomePageVu {
     Context getVuContext();
@@ -30,4 +33,8 @@ public interface HomePageVu {
     void showUpdateDialog();
 
     void intentToGooglePlay();
+
+    void printOrderList(List<SkuDetails> list);
+
+    void showToast(String errorMessage);
 }

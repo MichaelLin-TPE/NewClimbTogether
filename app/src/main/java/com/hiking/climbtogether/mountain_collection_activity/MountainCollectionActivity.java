@@ -501,7 +501,7 @@ public class MountainCollectionActivity extends AppCompatActivity implements Mou
             map.put("name", data.getName());
             map.put("topTime", data.getTime());
             map.put("sid", data.getSid());
-            map.put("photoUrl",data.getUserPhoto());
+            map.put("photoUrl",data.getphoto());
             if (email != null){
                 firestore.collection(COLLECTION_MOUNTAIN).document(email)
                         .collection(COLLECTION)

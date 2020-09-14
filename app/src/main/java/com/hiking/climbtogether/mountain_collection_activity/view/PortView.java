@@ -84,9 +84,9 @@ public class PortView extends ConstraintLayout {
                 listener.onClick(data,position);
             }
         });
-        if (data.getUserPhoto() != null){
+        if (data.getphoto() != null){
             ivPhoto.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            imageLoader.displayImage(data.getUserPhoto(),ivPhoto,options);
+            imageLoader.displayImage(data.getphoto(),ivPhoto,options);
         }else {
             ivPhoto.setScaleType(null);
             Log.i("Michael","照片沒資料");
