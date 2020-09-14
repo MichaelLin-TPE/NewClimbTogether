@@ -13,13 +13,6 @@ public interface MountainFragmentPresenter {
 
     void onTopIconChange(String isShow, String topTime, DataDTO data, int itemPosition);
 
-    void onShowDatePicker(int sid, DataDTO data, int itemPosition);
-
-    void onCreateDocumentInFirestore(int sid, String topTime);
-
-    void onLoginEvent();
-
-    void onSearchDbData(String email);
 
     void onModifyDataFromFirestore(ArrayList<String> firestoreData,ArrayList<Long> timeArray, ArrayList<DataDTO> allInformation);
 

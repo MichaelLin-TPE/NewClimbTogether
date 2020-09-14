@@ -125,58 +125,6 @@ public class MountainFragmentPresentImpl implements MountainFragmentPresenter {
     }
 
     @Override
-    public void onShowDatePicker(int sid, DataDTO data, int itemPosition) {
-        if (data.getCheck().equals("false")) {
-            mView.showDatePick(data, itemPosition);
-        } else {
-            mView.deleteFavorite(sid, data, itemPosition);
-        }
-
-
-    }
-
-    @Override
-    public void onCreateDocumentInFirestore(int sid, String topTime) {
-        DataDTO dataDTO = db.getDataBySid(sid);
-        try {
-            long time = new SimpleDateFormat("yyyy/MM/dd", Locale.TAIWAN).parse(topTime).getTime();
-            mView.setFirestore(sid, time, dataDTO);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @Override
-    public void onLoginEvent() {
-        mView.intentToLoginActivity();
-    }
-
-    @Override
-    public void onSearchDbData(String email) {
-        mView.showProgressbar(true);
-        if (db.getAllInformation().size() != 0) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for (DataDTO dataDTO : db.getAllInformation()) {
-                        if (dataDTO.getTime() != 0) {
-                            DataDTO data = db.getDataBySid(dataDTO.getSid());
-                            data.setTime(0);
-                            data.setCheck("false");
-                            db.update(data);
-                        }
-                    }
-                    mView.searchDataFromDb(email, db.getAllInformation());
-                }
-            }).start();
-
-        } else {
-            Log.i("Michael", "db資料為 0");
-        }
-    }
-
-    @Override
     public void onModifyDataFromFirestore(ArrayList<String> firestoreData, ArrayList<Long> timeArray, ArrayList<DataDTO> allInformation) {
 
 

@@ -34,11 +34,10 @@ import com.hiking.climbtogether.login_activity.LoginActivity;
 import com.hiking.climbtogether.db_modle.DataDTO;
 import com.hiking.climbtogether.tool.ErrorDialogFragment;
 import com.hiking.climbtogether.tool.FireStoreManager;
-import com.google.android.gms.tasks.Task;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+
 import com.hiking.climbtogether.tool.FirebaseHandler;
 import com.hiking.climbtogether.tool.FirebaseHandlerImpl;
 import com.hiking.climbtogether.tool.UserDataManager;
@@ -46,9 +45,9 @@ import com.hiking.climbtogether.tool.UserDataManager;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+
 import java.util.Locale;
-import java.util.Map;
+
 
 import static com.hiking.climbtogether.tool.Constant.ALL;
 import static com.hiking.climbtogether.tool.Constant.LEVEL_A;
@@ -167,53 +166,6 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
 
     @Override
-    public void searchDataFromDb(String email, final ArrayList<DataDTO> allInformationArray) {
-
-        if (getActivity() == null) {
-            Log.i("Michael", "MountainFragment getActivity() == null");
-            return;
-        }
-        this.allInformationArray = allInformationArray;
-
-        Log.i("Michael", "searchDataFromDb");
-        firestoreData = new ArrayList<>();
-        timeArray = new ArrayList<>();
-
-        firebaseHandler.OnCatchTwoCollectionData(COLLECTION_MOUNTAIN, COLLECTION, email, catchTwoCollectionListener);
-
-    }
-
-    private FirebaseHandler.OnConnectFireStoreListener<Task<QuerySnapshot>> catchTwoCollectionListener = new FirebaseHandler.OnConnectFireStoreListener<Task<QuerySnapshot>>() {
-        @Override
-        public void onSuccess(Task<QuerySnapshot> data) {
-
-            if (data == null || data.getResult() == null) {
-                presenter.onShowErrorCode("FireStore 資料取得錯誤");
-                return;
-            }
-
-            for (QueryDocumentSnapshot document : data.getResult()) {
-                Log.i("Michael", document.getId() + " =>" + document.getData());
-                Map<String, Object> map = document.getData();
-                Log.i("Michael", "time : " + map.get("topTime"));
-                timeArray.add((Long) map.get("topTime"));
-                firestoreData.add(document.getId());
-            }
-
-            if (firestoreData.size() == 0 || timeArray.size() == 0) {
-                presenter.initDbData();
-                return;
-            }
-            presenter.onModifyDataFromFirestore(firestoreData, timeArray, allInformationArray);
-        }
-
-        @Override
-        public void onFail(String errorCode) {
-            presenter.onShowErrorCode(errorCode);
-        }
-    };
-
-    @Override
     public void readyToProvideData() {
 
 
@@ -232,14 +184,9 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
 
     @Override
     public void showProgressbar(boolean isShow) {
-        if (getActivity() != null) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    progressBar.setVisibility(isShow ? View.VISIBLE : View.GONE);
-                }
-            });
-        }
+
+        progressBar.setVisibility(isShow ? View.VISIBLE : View.GONE);
+
     }
 
     @Override
@@ -257,11 +204,6 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
         });
     }
 
-    @Override
-    public void changeRecyclerViewSor(ArrayList<DataDTO> allInformation) {
-        adapter.setData(allInformation);
-        adapter.notifyDataSetChanged();
-    }
 
     private void initPresenter() {
         presenter = new MountainFragmentPresentImpl(this);
@@ -434,13 +376,6 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     }
 
     @Override
-    public void setDataChange(ArrayList<DataDTO> dataDTO, String isSHow) {
-        adapter.setData(dataDTO);
-        adapter.notifyDataSetChanged();
-        Toast.makeText(context, isSHow.equals("true") ? "此筆資料已加入我的戰績" : "已從我的戰績移除", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
     public void intentToMtDetailActivity(DataDTO data) {
         Intent it = new Intent(context, DetailActivity.class);
         it.putExtra("data", data);
@@ -549,46 +484,11 @@ public class MountainFragment extends Fragment implements MountainFragmentVu {
     }
 
     @Override
-    public void setFirestore(final int sid, long topTime, DataDTO data) {
-        String mountainName = data.getName();
-        Map<String, Object> map = new HashMap<>();
-        map.put("name", data.getName());
-        map.put("topTime", topTime);
-        map.put("sid", data.getSid());
-        map.put("photoUrl", "");
-        firebaseHandler.onSetSwoDocumentData(COLLECTION_MOUNTAIN, COLLECTION, map, mountainName);
-    }
-
-    @Override
     public void intentToLoginActivity() {
         Intent it = new Intent(context, LoginActivity.class);
         context.startActivity(it);
     }
 
-
-    @Override
-    public void deleteFavorite(final int sid, DataDTO dataDTO, int itemPosition) {
-
-        this.sid = sid;
-        this.dataDTO = dataDTO;
-        this.itemPosition = itemPosition;
-        firebaseHandler.onDeleteDocument(COLLECTION_MOUNTAIN, COLLECTION, dataDTO.getName(), onDeleteDocumentListener);
-
-
-    }
-
-    private FirebaseHandler.OnConnectFireStoreSuccessfulListener onDeleteDocumentListener = new FirebaseHandler.OnConnectFireStoreSuccessfulListener() {
-        @Override
-        public void onSuccess() {
-            String isShow = "false";
-            presenter.onTopIconChange(isShow, null, dataDTO, itemPosition);
-        }
-
-        @Override
-        public void onFail(String errorCode) {
-            presenter.onShowErrorCode(errorCode);
-        }
-    };
 
 
 }
