@@ -15,6 +15,8 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hiking.climbtogether.db_modle.DataDTO;
+import com.hiking.climbtogether.detail_activity.MountainFavoriteData;
+import com.hiking.climbtogether.detail_activity.MountainObject;
 import com.hiking.climbtogether.mountain_fragment.MtTopData;
 
 import java.util.ArrayList;
@@ -37,9 +39,15 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
 
     private static final String COLLECTION = "collection";
 
+    private static final String FAVORITE = "favorite";
+
+    private MountainObject mountainObject;
+
+    private OnConnectFireStoreSuccessfulListener favoriteDataListener;
+
     private Gson gson;
 
-    public FirebaseHandlerImpl(){
+    public FirebaseHandlerImpl() {
         mAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         user = mAuth.getCurrentUser();
@@ -65,7 +73,7 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (!task.isSuccessful() || task.getResult() == null){
+                        if (!task.isSuccessful() || task.getResult() == null) {
                             listener.onFail("FirebaseStore connect failed");
                             return;
                         }
@@ -73,7 +81,7 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
 
                         FirestoreUserData data = snapshot.toObject(FirestoreUserData.class);
 
-                        if (data == null){
+                        if (data == null) {
                             listener.onFail("Get Firebase Data Failed");
                         }
 
@@ -81,7 +89,6 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
                     }
                 });
     }
-
 
 
     @Override
@@ -102,11 +109,11 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                        if (task.getResult() == null){
+                        if (task.getResult() == null) {
                             listener.onFail("取得資料失敗");
                             return;
                         }
-                        if (!task.isSuccessful()){
+                        if (!task.isSuccessful()) {
                             listener.onFail("取得資料失敗");
                             return;
                         }
@@ -126,8 +133,8 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            Log.i("Michael","Collection : "+firstCollection + " , document : "+getUserEmail()+" 資料新增成功");
+                        if (task.isSuccessful()) {
+                            Log.i("Michael", "Collection : " + firstCollection + " , document : " + getUserEmail() + " 資料新增成功");
                         }
                     }
                 });
@@ -144,7 +151,7 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Log.i("Michael","刪除成功");
+                            Log.i("Michael", "刪除成功");
                             listener.onSuccess();
                         } else {
                             listener.onFail("刪除資料失敗");
@@ -157,7 +164,7 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
     @Override
     public void onGetMountainApi(OnConnectFireStoreListener<ArrayList<DataDTO>> onCatchMountainApiListener) {
 
-        if (isLogin()){
+        if (isLogin()) {
 
             firebaseFirestore.collection(MT_API)
                     .document(MT_API)
@@ -165,25 +172,26 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
                     .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (!task.isSuccessful() || task.getResult() == null){
+                            if (!task.isSuccessful() || task.getResult() == null) {
                                 onCatchMountainApiListener.onFail("取得API資料失敗");
                                 return;
                             }
 
                             DocumentSnapshot snapshot = task.getResult();
 
-                            if (snapshot == null || snapshot.getData() == null){
+                            if (snapshot == null || snapshot.getData() == null) {
                                 onCatchMountainApiListener.onFail("取得API資料失敗");
                                 return;
                             }
-                            String apiJson = (String)snapshot.getData().get("json");
-                            ArrayList<DataDTO> mtDataArray = gson.fromJson(apiJson,new TypeToken<ArrayList<DataDTO>>(){}.getType());
+                            String apiJson = (String) snapshot.getData().get("json");
+                            ArrayList<DataDTO> mtDataArray = gson.fromJson(apiJson, new TypeToken<ArrayList<DataDTO>>() {
+                            }.getType());
 
-                            if (mtDataArray == null ){
+                            if (mtDataArray == null) {
                                 onCatchMountainApiListener.onFail("取得API資料失敗");
                                 return;
                             }
-                            checkUserData(mtDataArray,onCatchMountainApiListener);
+                            checkUserData(mtDataArray, onCatchMountainApiListener);
                         }
                     });
             return;
@@ -194,20 +202,21 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.getResult() == null){
+                        if (task.getResult() == null) {
                             onCatchMountainApiListener.onFail("取得API資料失敗 task.getResult == null");
                             return;
                         }
                         DocumentSnapshot snapshot = task.getResult();
 
-                        if (snapshot == null || snapshot.getData() == null){
+                        if (snapshot == null || snapshot.getData() == null) {
                             onCatchMountainApiListener.onFail("取得API資料失敗 snapshot == null");
                             return;
                         }
-                        String apiJson = (String)snapshot.getData().get("json");
-                        ArrayList<DataDTO> mtDataArray = gson.fromJson(apiJson,new TypeToken<ArrayList<DataDTO>>(){}.getType());
+                        String apiJson = (String) snapshot.getData().get("json");
+                        ArrayList<DataDTO> mtDataArray = gson.fromJson(apiJson, new TypeToken<ArrayList<DataDTO>>() {
+                        }.getType());
 
-                        if (mtDataArray == null ){
+                        if (mtDataArray == null) {
                             onCatchMountainApiListener.onFail("取得API資料失敗 mtDataArray == null");
                             return;
                         }
@@ -228,11 +237,11 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
     @Override
     public void onSetTopMountainData(long time, DataDTO dataDTO) {
 
-        Map<String,Object> map = new HashMap<>();
-        map.put("name",dataDTO.getName());
-        map.put("photoUrl",dataDTO.getphoto());
-        map.put("sid",dataDTO.getSid());
-        map.put("topTime",dataDTO.getTime());
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", dataDTO.getName());
+        map.put("photoUrl", dataDTO.getphoto());
+        map.put("sid", dataDTO.getSid());
+        map.put("topTime", dataDTO.getTime());
 
         firebaseFirestore.collection(COLLECTION_MOUNTAIN)
                 .document(getUserEmail())
@@ -240,6 +249,105 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
                 .document(dataDTO.getName())
                 .set(map);
     }
+
+    @Override
+    public void onDeleteFavoriteData(String jsonStr) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("json", jsonStr);
+        firebaseFirestore.collection(FAVORITE)
+                .document(getUserEmail())
+                .set(map)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.i("Michael", "更新成功");
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void onGetFavoriteData(OnConnectFireStoreListener<MountainObject> onGetFavoriteDataListener) {
+        firebaseFirestore.collection(FAVORITE)
+                .document(getUserEmail())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                        if (!task.isSuccessful() || task.getResult() == null) {
+
+                            return;
+                        }
+                        DocumentSnapshot snapshot = task.getResult();
+                        String jsonStr = (String) snapshot.get("json");
+                        mountainObject = gson.fromJson(jsonStr,MountainObject.class);
+
+                        if (mountainObject == null){
+                            Log.i("Michael","mountainObject is null");
+                            return;
+                        }
+                        onGetFavoriteDataListener.onSuccess(mountainObject);
+
+                    }
+                });
+    }
+
+    @Override
+    public void onSetFavorite(DataDTO data, OnConnectFireStoreSuccessfulListener onSetFavoriteDataListener) {
+        this.favoriteDataListener = onSetFavoriteDataListener;
+
+        MountainFavoriteData favoriteData = new MountainFavoriteData();
+        favoriteData.setAllTitle(data.getAllTitle());
+        favoriteData.setContent(data.getContent());
+        favoriteData.setDay(data.getDay());
+        favoriteData.setDifficulty(data.getDifficulty());
+        favoriteData.setHeight(data.getHeight());
+        favoriteData.setTime(data.getTime());
+        favoriteData.setLocation(data.getLocation());
+        favoriteData.setName(data.getName());
+        favoriteData.setUserPhoto(data.getphoto());
+
+
+        if (mountainObject == null){
+
+            mountainObject = new MountainObject();
+            ArrayList<MountainFavoriteData> favoriteArray = new ArrayList<>();
+            favoriteArray.add(favoriteData);
+            mountainObject.setDataArrayList(favoriteArray);
+            String json = gson.toJson(mountainObject);
+            Map<String,Object> map = new HashMap<>();
+            map.put("json",json);
+            firebaseFirestore.collection(FAVORITE)
+                    .document(getUserEmail())
+                    .set(map)
+                    .addOnCompleteListener(onFirebaseFavoriteDataListener);
+            return;
+        }
+
+        mountainObject.getDataArrayList().add(favoriteData);
+
+        String json = gson.toJson(mountainObject);
+        Map<String, Object> map = new HashMap<>();
+        map.put("json",json);
+        firebaseFirestore.collection(FAVORITE)
+                .document(getUserEmail())
+                .set(map)
+                .addOnCompleteListener(onFirebaseFavoriteDataListener);
+
+    }
+
+    private OnCompleteListener<Void> onFirebaseFavoriteDataListener = new OnCompleteListener<Void>() {
+        @Override
+        public void onComplete(@NonNull Task<Void> task) {
+            if (task.isSuccessful()){
+                favoriteDataListener.onSuccess();
+                return;
+            }
+            favoriteDataListener.onFail("新增我的最愛失敗");
+        }
+    };
 
     private void checkUserData(ArrayList<DataDTO> mtDataArray, OnConnectFireStoreListener<ArrayList<DataDTO>> onCatchMountainApiListener) {
         firebaseFirestore.collection(COLLECTION_MOUNTAIN)
@@ -249,17 +357,17 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (!task.isSuccessful() || task.getResult() == null){
+                        if (!task.isSuccessful() || task.getResult() == null) {
                             onCatchMountainApiListener.onSuccess(mtDataArray);
                             return;
                         }
-                        for (DataDTO dataDTO : mtDataArray){
-                            for (DocumentSnapshot snapshots : task.getResult()){
+                        for (DataDTO dataDTO : mtDataArray) {
+                            for (DocumentSnapshot snapshots : task.getResult()) {
                                 MtTopData mtTopData = snapshots.toObject(MtTopData.class);
-                                if (mtTopData == null){
+                                if (mtTopData == null) {
                                     continue;
                                 }
-                                if (mtTopData.getName().equals(dataDTO.getName())){
+                                if (mtTopData.getName().equals(dataDTO.getName())) {
                                     dataDTO.setCheck("true");
                                     dataDTO.setTime(mtTopData.getTopTime());
                                 }

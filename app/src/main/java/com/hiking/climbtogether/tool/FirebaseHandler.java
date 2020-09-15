@@ -3,6 +3,7 @@ package com.hiking.climbtogether.tool;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.hiking.climbtogether.db_modle.DataDTO;
+import com.hiking.climbtogether.detail_activity.MountainObject;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -28,6 +29,12 @@ public interface FirebaseHandler {
     void onDeleteTopDocument(String mtName);
 
     void onSetTopMountainData(long time, DataDTO dataDTO);
+
+    void onDeleteFavoriteData(String jsonStr);
+
+    void onGetFavoriteData(OnConnectFireStoreListener<MountainObject> onGetFavoriteDataListener);
+
+    void onSetFavorite(DataDTO data, OnConnectFireStoreSuccessfulListener onSetFavoriteDataListener);
 
 
     interface OnConnectFireStoreListener<T>{

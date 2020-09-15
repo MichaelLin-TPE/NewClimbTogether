@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hiking.climbtogether.R;
+import com.hiking.climbtogether.tool.ImageLoaderProvider;
 import com.makeramen.roundedimageview.RoundedImageView;
 
 public class PhotoViewHolder extends RecyclerView.ViewHolder {
@@ -18,7 +19,7 @@ public class PhotoViewHolder extends RecyclerView.ViewHolder {
         ivPhoto = itemView.findViewById(R.id.detail_photo);
     }
 
-    public void setData(byte[] photo) {
-        ivPhoto.setImageBitmap(BitmapFactory.decodeByteArray(photo,0,photo.length));
+    public void setData(String photo) {
+        ImageLoaderProvider.getInstance().setImage(photo,ivPhoto);
     }
 }

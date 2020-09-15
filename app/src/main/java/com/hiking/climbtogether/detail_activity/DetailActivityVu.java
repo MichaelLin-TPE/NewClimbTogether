@@ -11,11 +11,9 @@ public interface DetailActivityVu {
 
     void showFavoriteStatus(boolean isCheck);
 
-    void uploadMtPhoto(byte[] photo);
+    void showErrorCode(String errorCode);
 
-    void showIsFavorite(boolean isFavorite);
+    void showToast(String message);
 
-    void saveFavoriteMt(String jsonStr);
-
-    void IntentToLoginActivity();
+    void intentToLoginActivity();
 }
