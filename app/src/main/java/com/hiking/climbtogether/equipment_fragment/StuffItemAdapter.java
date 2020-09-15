@@ -56,13 +56,13 @@ public class StuffItemAdapter extends RecyclerView.Adapter<StuffItemAdapter.View
         holder.checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onClick(data.getName(),data.getSid(),data.getSort());
+                listener.onClick(data);
             }
         });
         holder.clickArea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onClick(data.getName(),data.getSid(),data.getSort());
+                listener.onClick(data);
             }
         });
     }
@@ -90,6 +90,6 @@ public class StuffItemAdapter extends RecyclerView.Adapter<StuffItemAdapter.View
     }
 
     public interface OnItemCheckBoxClickListener{
-        void onClick(String name,int sid,String sort);
+        void onClick(EquipmentDTO data);
     }
 }

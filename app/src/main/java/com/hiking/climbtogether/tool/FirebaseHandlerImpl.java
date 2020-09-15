@@ -15,6 +15,7 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hiking.climbtogether.db_modle.DataDTO;
+import com.hiking.climbtogether.db_modle.EquipmentDTO;
 import com.hiking.climbtogether.detail_activity.MountainFavoriteData;
 import com.hiking.climbtogether.detail_activity.MountainObject;
 import com.hiking.climbtogether.mountain_fragment.MtTopData;
@@ -31,6 +32,8 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
 
     private static final String MT_API = "mt_api";
 
+    private static final String EQ_API = "eq_api";
+
     private FirebaseUser user;
 
     private static final String USER = "users";
@@ -41,7 +44,15 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
 
     private static final String FAVORITE = "favorite";
 
+    private static final String MY_EQUIPMENT = "my_equipment";
+
+    private static final String PREPARE = "prepare";
+
+    private static final String EQUIPMENT = "equipment";
+
     private MountainObject mountainObject;
+
+    private EquipmentDTO equipmentDTO;
 
     private OnConnectFireStoreSuccessfulListener favoriteDataListener;
 
@@ -336,6 +347,103 @@ public class FirebaseHandlerImpl implements FirebaseHandler {
                 .set(map)
                 .addOnCompleteListener(onFirebaseFavoriteDataListener);
 
+    }
+
+    @Override
+    public void getEquipmentApi(OnConnectFireStoreListener<ArrayList<EquipmentDTO>> onGetEquipmentApiListener) {
+        firebaseFirestore.collection(MT_API)
+                .document(EQ_API)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (!task.isSuccessful() || task.getResult() == null){
+                            onGetEquipmentApiListener.onFail("取得裝備資料失敗,請稍後再試");
+                            return;
+                        }
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        String json = (String) documentSnapshot.get("json");
+                        ArrayList<EquipmentDTO> equipmentDTOArrayList = gson.fromJson(json,new TypeToken<ArrayList<EquipmentDTO>>(){}.getType());
+                        if (equipmentDTOArrayList == null || equipmentDTOArrayList.isEmpty()){
+                            onGetEquipmentApiListener.onFail("取得裝備資料失敗,請稍後再試");
+                            return;
+                        }
+                        onGetEquipmentApiListener.onSuccess(equipmentDTOArrayList);
+                    }
+                });
+    }
+
+    @Override
+    public void onUpdateAndDeleteEquipmentData(EquipmentDTO equipmentDTO) {
+        if (equipmentDTO.getCheck().equals("false")){
+            deleteEquipmentData(equipmentDTO);
+        }else {
+            addNewEquipmentData(equipmentDTO);
+        }
+    }
+
+    private void addNewEquipmentData(EquipmentDTO equipmentDTO) {
+        this.equipmentDTO = equipmentDTO;
+        firebaseFirestore.collection(MY_EQUIPMENT)
+                .document(getUserEmail())
+                .collection(PREPARE)
+                .get()
+                .addOnCompleteListener(onPrepareEquipmentListener);
+    }
+
+    private OnCompleteListener<QuerySnapshot> onPrepareEquipmentListener = new OnCompleteListener<QuerySnapshot>() {
+        @Override
+        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+            if (!task.isSuccessful() || task.getResult() == null){
+                Log.i("Michael","取得資料失敗");
+                return;
+            }
+            if (task.getResult().isEmpty()){
+                addEquipmentData();
+                return;
+            }
+            ArrayList<String> equipmentNameArray = new ArrayList<>();
+            for (DocumentSnapshot snapshot : task.getResult()){
+                equipmentNameArray.add(snapshot.getId());
+            }
+            if (equipmentNameArray.isEmpty()){
+                addEquipmentData();
+                return;
+            }
+            boolean isDataRepeat = false;
+            for (String equipmentName : equipmentNameArray){
+                if (equipmentName.equals(equipmentDTO.getName())){
+                    isDataRepeat = true;
+                    break;
+                }
+            }
+            if (!isDataRepeat){
+                addEquipmentData();
+            }
+        }
+    };
+
+    private void addEquipmentData() {
+        Map<String,Object> map = new HashMap<>();
+        map.put("description",equipmentDTO.getDescription());
+        firebaseFirestore.collection(MY_EQUIPMENT)
+                .document(getUserEmail())
+                .collection(EQUIPMENT)
+                .document(equipmentDTO.getName())
+                .set(map);
+    }
+
+    private void deleteEquipmentData(EquipmentDTO equipmentDTO) {
+        firebaseFirestore.collection(MY_EQUIPMENT)
+                .document(getUserEmail())
+                .collection(EQUIPMENT)
+                .document(equipmentDTO.getName())
+                .delete();
+        firebaseFirestore.collection(MY_EQUIPMENT)
+                .document(getUserEmail())
+                .collection(PREPARE)
+                .document(equipmentDTO.getName())
+                .delete();
     }
 
     private OnCompleteListener<Void> onFirebaseFavoriteDataListener = new OnCompleteListener<Void>() {

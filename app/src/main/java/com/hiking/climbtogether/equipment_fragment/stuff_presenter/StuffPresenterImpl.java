@@ -3,14 +3,13 @@ package com.hiking.climbtogether.equipment_fragment.stuff_presenter;
 import com.hiking.climbtogether.db_modle.EquipmentDTO;
 import com.hiking.climbtogether.equipment_fragment.EquipmentViewHolder;
 import com.hiking.climbtogether.equipment_fragment.StuffItemAdapter;
+import com.hiking.climbtogether.tool.DataProvider;
 
 import java.util.ArrayList;
 
 public class StuffPresenterImpl implements StuffPresenter {
 
     private ArrayList<EquipmentDTO> bodyArrayList,moveArrayList,campArrayList,foodArrayList,electronicArrayList,drogArrayList,otherArrayList;
-
-    private boolean isBody,isMove,isCamp,isFood,isElectronic,isDrog,isOther;
 
     public static final int BODY = 0;
 
@@ -28,25 +27,25 @@ public class StuffPresenterImpl implements StuffPresenter {
 
     @Override
     public int getItemViewType(int position) {
-        if (isBody && position == 0){
+        if (position == 0){
             return BODY;
         }
-        if (isMove && position ==1){
+        if ( position ==1){
             return MOVE;
         }
-        if (isCamp && position == 2){
+        if (position == 2){
             return CAMP;
         }
-        if (isFood && position == 3){
+        if (position == 3){
             return FOOD;
         }
-        if (isElectronic && position == 4){
+        if (position == 4){
             return ELECTRONIC;
         }
-        if (isDrog && position == 5){
+        if (position == 5){
             return DROG;
         }
-        if (isOther && position == 6){
+        if (position == 6){
             return OTHER;
         }
 
@@ -57,48 +56,6 @@ public class StuffPresenterImpl implements StuffPresenter {
     public int getItemCount() {
 
         return 7;
-    }
-
-    @Override
-    public void setBodyData(ArrayList<EquipmentDTO> bodyArrayList) {
-        this.bodyArrayList = bodyArrayList;
-        isBody = true;
-    }
-
-    @Override
-    public void setMoveData(ArrayList<EquipmentDTO> moveArrayList) {
-        this.moveArrayList = moveArrayList;
-        isMove = true;
-    }
-
-    @Override
-    public void setCampData(ArrayList<EquipmentDTO> campArrayList) {
-        this.campArrayList = campArrayList;
-        isCamp = true;
-    }
-
-    @Override
-    public void setFoodData(ArrayList<EquipmentDTO> foodArrayList) {
-        this.foodArrayList = foodArrayList;
-        isFood = true;
-    }
-
-    @Override
-    public void setElectronicData(ArrayList<EquipmentDTO> electronicArrayList) {
-        this.electronicArrayList = electronicArrayList;
-        isElectronic = true;
-    }
-
-    @Override
-    public void setDrogData(ArrayList<EquipmentDTO> drogArrayList) {
-        this.drogArrayList = drogArrayList;
-        isDrog = true;
-    }
-
-    @Override
-    public void setOtherData(ArrayList<EquipmentDTO> otherArrayList) {
-        this.otherArrayList = otherArrayList;
-        isOther = true;
     }
 
     @Override
@@ -137,6 +94,25 @@ public class StuffPresenterImpl implements StuffPresenter {
     @Override
     public void setOnItemCheckBoxListener(EquipmentViewHolder holder, StuffItemAdapter.OnItemCheckBoxClickListener listener) {
         holder.setOnItemCheckBoxClickListener(listener);
+    }
+
+    @Override
+    public void setListData(ArrayList<EquipmentDTO> equipmentArrayList) {
+        DataProvider.getInstance().setEquipmentData(equipmentArrayList, new DataProvider.OnEquipmentDataListener() {
+            @Override
+            public void onSuccess(ArrayList<EquipmentDTO> bodyArrayList, ArrayList<EquipmentDTO> moveArrayList, ArrayList<EquipmentDTO> campArrayList
+                    , ArrayList<EquipmentDTO> foodArrayList, ArrayList<EquipmentDTO> electronicArrayList, ArrayList<EquipmentDTO> drogArrayList
+                    , ArrayList<EquipmentDTO> otherArrayList) {
+                StuffPresenterImpl.this.bodyArrayList = bodyArrayList;
+                StuffPresenterImpl.this.moveArrayList = moveArrayList;
+                StuffPresenterImpl.this.campArrayList = campArrayList;
+                StuffPresenterImpl.this.foodArrayList = foodArrayList;
+                StuffPresenterImpl.this.electronicArrayList = electronicArrayList;
+                StuffPresenterImpl.this.drogArrayList = drogArrayList;
+                StuffPresenterImpl.this.otherArrayList = otherArrayList;
+
+            }
+        });
     }
 
 

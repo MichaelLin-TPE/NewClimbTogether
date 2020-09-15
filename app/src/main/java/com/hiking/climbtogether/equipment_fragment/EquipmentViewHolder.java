@@ -42,8 +42,8 @@ public class EquipmentViewHolder extends RecyclerView.ViewHolder {
         recyclerView.setAdapter(adapter);
         adapter.setOnItemCheckBoxClickListener(new StuffItemAdapter.OnItemCheckBoxClickListener() {
             @Override
-            public void onClick(String name,int sid,String sort) {
-                listener.onClick(name,sid,sort);
+            public void onClick(EquipmentDTO data) {
+                listener.onClick(data);
             }
         });
     }
