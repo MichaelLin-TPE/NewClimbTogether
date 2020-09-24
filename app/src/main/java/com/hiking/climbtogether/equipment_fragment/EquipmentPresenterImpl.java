@@ -53,12 +53,19 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
     @Override
     public void onItemCheckListener(EquipmentDTO data) {
 
+
+
+
+
         for (EquipmentDTO equipmentDTO : equipmentArrayList){
             if (equipmentDTO.getName().equals(data.getName())){
                 if (data.getCheck().equals("false")){
                     equipmentDTO.setCheck("true");
                 }else {
                     equipmentDTO.setCheck("false");
+                }
+                if (!firebaseHandler.isLogin()){
+                    return;
                 }
                 updateMyFavoriteData(equipmentDTO);
                 break;
