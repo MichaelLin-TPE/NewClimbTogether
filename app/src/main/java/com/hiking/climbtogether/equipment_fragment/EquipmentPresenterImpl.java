@@ -65,7 +65,7 @@ public class EquipmentPresenterImpl implements EquipmentPresenter {
                     equipmentDTO.setCheck("false");
                 }
                 if (!firebaseHandler.isLogin()){
-                    return;
+                    break;
                 }
                 updateMyFavoriteData(equipmentDTO);
                 break;
