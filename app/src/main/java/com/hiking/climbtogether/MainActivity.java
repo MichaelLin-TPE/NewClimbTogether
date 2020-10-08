@@ -17,6 +17,10 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.github.javiersantos.appupdater.AppUpdater;
+import com.github.javiersantos.appupdater.AppUpdaterUtils;
+import com.github.javiersantos.appupdater.enums.AppUpdaterError;
+import com.github.javiersantos.appupdater.objects.Update;
 import com.hiking.climbtogether.home_activity.HomePageActivity;
 import com.hiking.climbtogether.tool.ErrorDialogFragment;
 import com.hiking.climbtogether.tool.FirestoreUserData;
@@ -59,6 +63,24 @@ public class MainActivity extends AppCompatActivity implements MainActivityVu {
                 verifyStoragePermissions(MainActivity.this);
             }
         }).start();
+
+
+        //狀態偵測
+        AppUpdaterUtils appUpdaterUtils = new AppUpdaterUtils(this)
+                .withListener(new AppUpdaterUtils.UpdateListener() {
+                    @Override
+                    public void onSuccess(Update update, Boolean isUpdateAvailable) {
+                        Log.i("Michael","Last version : "+update.getLatestVersion());
+                        Log.i("Michael","releaseNote : "+update.getReleaseNotes());
+                        Log.i("Michael","urlToDownload : "+update.getUrlToDownload());
+                    }
+
+                    @Override
+                    public void onFailed(AppUpdaterError error) {
+
+                    }
+                });
+        appUpdaterUtils.start();
 
 
     }

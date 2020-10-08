@@ -35,6 +35,13 @@ android {
 //        }
     }
 
+    //防止這個錯誤  More than one file was found with OS independent path 'META-INF/CHANGES'
+    packagingOptions {
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+        exclude 'META-INF/CHANGES'
+        exclude 'META-INF/README.md'
+    }
+
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
@@ -88,5 +95,7 @@ dependencies {
 
 
     implementation 'androidx.multidex:multidex:2.0.1'
+    //版本偵測
+    implementation 'com.github.javiersantos:AppUpdater:2.7'
 
 }
